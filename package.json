@@ -1,0 +1,24 @@
+{
+  "name": "nelly",
+  "version": "1.0.0-BETA",
+  "description": "An RSS feeder written in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cemozden/nelly.git"
+  },
+  "keywords": [
+    "nelly",
+    "rssfeeder",
+    "rss"
+  ],
+  "author": "Cem Özden",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cemozden/nelly/issues"
+  },
+  "homepage": "https://github.com/cemozden/nelly#readme"
+}
