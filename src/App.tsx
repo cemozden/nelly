@@ -1,12 +1,30 @@
 import React from 'react';
 import './css/main.css';
+import SideBar from "./components/Sidebar";
 
-const App: React.FC = () => {
-  return (
-    <div className="wrapper">
-      <h1>Hello World!</h1>
-    </div>
-  );
+interface ApplicationState {
+  language : string/*ApplicationLanguage*/
 }
 
+
+const className = 'wrapper';
+
+class App extends React.Component<any, ApplicationState> {
+
+  constructor(props : any) {
+    super(props);
+    this.state = {
+      language : 'en'      
+    };
+  }
+
+  render() {
+    return (
+      <div className={className}>
+        <SideBar />
+      </div>
+    );
+  }
+
+}
 export default App;
