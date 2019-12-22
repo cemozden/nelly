@@ -41,7 +41,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar {
-    width: 20%;
+    width: 12%;
     float: left;
     display: block;
     background-color: #3b18af;
@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
     float: right;
     display: block;
     color:#FFFFFF;
-    width: calc(80% - 1px);
+    width: calc(50% - 1px);
     background-color: #202020;
     border-left: 1px solid #000000;
     height: 100%;
@@ -175,4 +175,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .categoryList li {
     padding:0 0 0 0px;
+}
+
+.feeds {
+    width: 38%;
+    height: 100%;
+    float:left;
+    overflow: auto;
+    background-color: #171717;
+    color:#FFFFFF;
 }

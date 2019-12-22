@@ -7,7 +7,7 @@ const BrowserWindow = electron.BrowserWindow;
 const NODE_ENV = process.env.NODE_ENV;
 
 let mainWindow;
-console.log(__dirname + '/../build/index.html');
+
 function createWindow() {
     mainWindow = new BrowserWindow({width: 800, height: 600});
     mainWindow.loadURL(NODE_ENV === 'development' ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
