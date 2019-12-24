@@ -1,7 +1,10 @@
 language : node_js
 node_js:
   - "node"
-os : linux
+os : 
+  - linux
+  - osx
+  - windows
 dist : xenial
 install : 
   - npm install
@@ -11,9 +14,4 @@ cache:
 script:
   - npm run build
   - npm test
-branches:
-  only:
-    - development
-  except:
-    - master
 cache : npm
