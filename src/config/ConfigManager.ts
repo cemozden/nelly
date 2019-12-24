@@ -10,3 +10,11 @@ export class ConfigPathNotAvailableError extends Error {
     }
 
 }
+
+export class InvalidConfigPathError extends Error {
+
+    constructor(message : string) {
+        super(message);
+    }
+
+}
