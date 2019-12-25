@@ -4,7 +4,7 @@ import { existsSync, writeFile, readFileSync, writeFileSync } from "fs";
 export default class JSONSettingsManager implements SettingsManager {
     
     private systemSettings : SystemSettings;
-    private readonly settingsFilePath : string;
+    private readonly SETTINGS_FILE_PATH : string;
 
     constructor(settingsFilePath : string) {
 
@@ -21,7 +21,7 @@ export default class JSONSettingsManager implements SettingsManager {
         else 
             this.systemSettings = JSON.parse(readFileSync(settingsFilePath).toString());
         
-        this.settingsFilePath = settingsFilePath;
+        this.SETTINGS_FILE_PATH = settingsFilePath;
     }
     
     getSettings() : SystemSettings {
@@ -29,7 +29,7 @@ export default class JSONSettingsManager implements SettingsManager {
     }
 
     writeSettings(newSettings : SystemSettings) {
-        writeFile(this.settingsFilePath, newSettings, (err) => {
+        writeFile(this.SETTINGS_FILE_PATH, newSettings, (err) => {
             //TODO: Write error log to logs.
         });
     }

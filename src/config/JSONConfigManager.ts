@@ -1,12 +1,14 @@
-import { ConfigManager, ConfigPathNotAvailableError, InvalidConfigPathError } from "./ConfigManager";
+import { ConfigManager, ConfigPathNotAvailableError } from "./ConfigManager";
 import { existsSync, mkdirSync } from "fs";
 import { sep } from "path";
 
 export default class JSONConfigManager implements ConfigManager {
 
     private readonly SETTINGS_FILE_NAME = 'settings.json';
+    private readonly LANGUAGE_FOLDER_NAME = 'lang';
+
     private readonly SETTINGS_FILE_PATH : string;
-    
+
     constructor(configPath : string | undefined) {
         // If the config path is not a string then throw the error.
         if (typeof configPath === 'undefined') 

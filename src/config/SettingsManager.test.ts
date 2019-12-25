@@ -27,6 +27,6 @@ describe('SettingsManager', () => {
 
     afterAll(() => {
         sync(tmpSettingsFilePath);
-    })
+    });
 
 });
