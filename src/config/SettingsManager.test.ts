@@ -9,7 +9,8 @@ describe('SettingsManager', () => {
 
     describe('JSONSettingsManager', () => {
         it('should create the settings file with default properties if the file does not exist.', () => {
-                    
+          
+          expect(existsSync(tmpSettingsFilePath)).toBe(false);
           const settingsManager = new JSONSettingsManager(tmpSettingsFilePath);
           
           expect(existsSync(tmpSettingsFilePath)).toBe(true);

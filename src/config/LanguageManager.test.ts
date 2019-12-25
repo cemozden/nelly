@@ -12,6 +12,7 @@ describe('LanguageManager', () => {
     describe('JSONLanguageManager', () => {
 
         it('should create "language" folder if it does not exist', () => {        
+            expect(existsSync(tmpLanguageFolderPath)).toBe(false);
             const languageManager = new JSONLanguageManager(tmpLanguageFolderPath);
 
             expect(existsSync(tmpLanguageFolderPath)).toBe(true);
@@ -24,13 +25,13 @@ describe('LanguageManager', () => {
             writeFileSync(`${tmpLanguageFolderPath}${sep}dummy.json`, JSON.stringify({}));
             sync(tmpLanguageFolderPath);
 
-            const languageManager = new JSONLanguageManager(tmpLanguageFolderPath);
             const englishLanguageFilePath = `${tmpLanguageFolderPath}${sep}lang_en.json`;
+            expect(existsSync(englishLanguageFilePath)).toBe(false);
 
+            const languageManager = new JSONLanguageManager(tmpLanguageFolderPath);
             expect(existsSync(englishLanguageFilePath)).toBe(true);
 
             const englishLanguage : Language = JSON.parse(readFileSync(englishLanguageFilePath).toString());
-            
             expect(englishLanguage).toEqual(DEFAULT_ENGLISH_LANGUAGE);
         });
 
