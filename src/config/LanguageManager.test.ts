@@ -1,5 +1,5 @@
 import { join } from "path";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { sync } from "rimraf";
 import JSONLanguageManager from "./JSONLanguageManager";
 import { sep } from "path";
@@ -18,10 +18,15 @@ describe('LanguageManager', () => {
             sync(tmpLanguageFolderPath);
         });
 
-        it('should create the english language file if the folder does not contain any language file', () => {
+        it('should create the english language file if the folder does not contain any "lang_*.json" file', () => {
+            // Write dummy file to lang folder in order to check that the constructor only looks for lang_*.json files
+            mkdirSync(tmpLanguageFolderPath);
+            writeFileSync(`${tmpLanguageFolderPath}${sep}dummy.json`, JSON.stringify({}));
+            sync(tmpLanguageFolderPath);
+
             const languageManager = new JSONLanguageManager(tmpLanguageFolderPath);
             const englishLanguageFilePath = `${tmpLanguageFolderPath}${sep}lang_en.json`;
-            
+
             expect(existsSync(englishLanguageFilePath)).toBe(true);
 
             const englishLanguage : Language = JSON.parse(readFileSync(englishLanguageFilePath).toString());

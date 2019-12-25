@@ -1,6 +1,6 @@
 import { LanguageManager, InvalidLanguageFileError } from "./LanguageManager";
 import { Language, DEFAULT_ENGLISH_LANGUAGE } from "./Language";
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "fs";
 import { sep } from "path";
 
 export default class JSONLanguageManager implements LanguageManager {
@@ -15,10 +15,11 @@ export default class JSONLanguageManager implements LanguageManager {
 
         const englishLanguageFilePath = `${languageFolderPath}${sep}${this.ENGLISH_LANGUAGE_FILE_NAME}`;
 
-        if(!existsSync(englishLanguageFilePath)){
+        // If there is no "lang_*.json" file in the language folder then create default english language file.
+        if(readdirSync(languageFolderPath)
+            .filter(fileName => fileName.match('lang_[a-z]{2}\.json') !== null).length === 0)
             writeFileSync(englishLanguageFilePath, JSON.stringify(DEFAULT_ENGLISH_LANGUAGE));
-        }
-
+        
         this.LANGUAGE_FOLDER_PATH = languageFolderPath;
     }
 
