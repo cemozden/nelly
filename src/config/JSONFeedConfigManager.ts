@@ -1,4 +1,4 @@
-import { FeedConfigManager, FeedConfig, FeedCategory, isFeedConfig, InvalidFeedConfigIdError } from "./FeedManager";
+import { FeedConfigManager, FeedConfig, FeedCategory, isFeedConfig, InvalidFeedConfigIdError } from "./FeedConfigManager";
 import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, rename } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";

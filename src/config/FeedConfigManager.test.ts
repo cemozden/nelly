@@ -1,8 +1,8 @@
 import { join, sep } from "path";
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from "fs";
 import { sync } from "rimraf";
-import JSONFeedConfigManager from "./JSONFeedManager";
-import { FeedCategory, FeedConfig, isFeedConfig, InvalidFeedConfigIdError } from "./FeedManager";
+import JSONFeedConfigManager from "./JSONFeedConfigManager";
+import { FeedCategory, FeedConfig, isFeedConfig, InvalidFeedConfigIdError } from "./FeedConfigManager";
 import { TimeUnit } from "../time/TimeUnit";
 
 describe('FeedManager', () => {

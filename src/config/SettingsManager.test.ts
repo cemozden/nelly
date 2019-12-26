@@ -23,6 +23,21 @@ describe('SettingsManager', () => {
 
           expect(writtenDefaultSettings).toEqual(defaultSettingsToExpect);
         });
+
+        describe('#writeSettings(newSettings : SystemSettings)', () => {
+            it('should write the settings to the file', async () => {
+                const languageManager = new JSONSettingsManager(tmpSettingsFilePath);
+                const newSettings : SystemSettings = {
+                    language : "tr",
+                    windowMaximized : true
+                };
+                const settingsWritten = await languageManager.writeSettings(newSettings);
+                const writtenSettings : SystemSettings = JSON.parse(readFileSync(tmpSettingsFilePath).toString());
+
+                expect(settingsWritten).toBe(true);
+                expect(writtenSettings).toEqual(newSettings);
+            });
+        });
         
     });
 

@@ -28,10 +28,14 @@ export default class JSONSettingsManager implements SettingsManager {
         return this.systemSettings;
     }
 
-    writeSettings(newSettings : SystemSettings) {
-        writeFile(this.SETTINGS_FILE_PATH, newSettings, (err) => {
-            //TODO: Write error log to logs.
+    writeSettings(newSettings : SystemSettings) : Promise<boolean> {
+        const writeSettingsPromise = new Promise<boolean>((resolve, reject) => {
+            writeFile(this.SETTINGS_FILE_PATH, JSON.stringify(newSettings), err => {
+                if (err) reject(err);
+                else resolve(true);
+            });
         });
+        return writeSettingsPromise;
     }
     
 }

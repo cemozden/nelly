@@ -5,5 +5,5 @@ export interface SystemSettings {
 
 export interface SettingsManager {
     getSettings() : SystemSettings,
-    writeSettings(newSettings : SystemSettings) : void,
+    writeSettings(newSettings : SystemSettings) : Promise<boolean>,
 }

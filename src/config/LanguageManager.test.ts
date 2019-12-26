@@ -45,6 +45,14 @@ describe('LanguageManager', () => {
                     .toThrowError(new InvalidLanguageFileError(`The language file does not exist! Language File Path: ${languageFilePath}`));
 
             });
+
+            it('should load the language from the file', () => {
+                const languageManager = new JSONLanguageManager(tmpLanguageFolderPath);
+                
+                const englishLanguage : Language = languageManager.loadLanguage('en');
+                expect(englishLanguage).toEqual(DEFAULT_ENGLISH_LANGUAGE);
+            });
+
         });
 
     });
