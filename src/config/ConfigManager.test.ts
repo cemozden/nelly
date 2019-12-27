@@ -5,7 +5,7 @@ import { existsSync } from "fs";
 import { sync } from "rimraf";
 
 describe('ConfigManager', () => {
-    const tmpConfigFolder = join(__dirname, '../../testresources/config');
+    const tmpConfigFolder = join(process.env.CONFIG_DIR as string, 'config/');
 
     describe('JSONConfigManager', () => {
         
@@ -17,18 +17,13 @@ describe('ConfigManager', () => {
         });
 
         it('should create the "config" folder if it does not exist', () => {
-
+            sync(tmpConfigFolder);
+            expect(existsSync(tmpConfigFolder)).toBe(false);
             const configManager = new JSONConfigManager(tmpConfigFolder);
 
             expect(existsSync(tmpConfigFolder)).toBe(true);
         });
 
-
-    });
-
-    afterAll(() => {
-        //Clean up the temporary config folder.
-        sync(tmpConfigFolder); 
     });
 
 });

@@ -7,6 +7,7 @@ export default class JSONLanguageManager implements LanguageManager {
 
     private readonly LANGUAGE_FOLDER_PATH : string;
     private readonly ENGLISH_LANGUAGE_FILE_NAME = 'lang_en.json';
+    private readonly LANGUAGE_FILE_PATTERN : string = 'lang_[a-z]{2}\.json';
 
     constructor(languageFolderPath : string) {
         
@@ -17,7 +18,7 @@ export default class JSONLanguageManager implements LanguageManager {
 
         // If there is no "lang_*.json" file in the language folder then create default english language file.
         if(readdirSync(languageFolderPath)
-            .filter(fileName => fileName.match('lang_[a-z]{2}\.json') !== null).length === 0)
+            .filter(fileName => fileName.match(this.LANGUAGE_FILE_PATTERN) !== null).length === 0)
             writeFileSync(englishLanguageFilePath, JSON.stringify(DEFAULT_ENGLISH_LANGUAGE));
         
         this.LANGUAGE_FOLDER_PATH = languageFolderPath;
@@ -33,6 +34,11 @@ export default class JSONLanguageManager implements LanguageManager {
         const language : Language = JSON.parse(readFileSync(langFilePath).toString());
 
         return language;
+    }
+
+    getLanguageCount() : number {
+        return readdirSync(this.LANGUAGE_FOLDER_PATH)
+            .filter(fileName => fileName.match(this.LANGUAGE_FILE_PATTERN)).length;
     }
 
 }

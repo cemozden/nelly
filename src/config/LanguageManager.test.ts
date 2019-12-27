@@ -7,11 +7,12 @@ import { Language, DEFAULT_ENGLISH_LANGUAGE } from "./Language";
 import { InvalidLanguageFileError } from "./LanguageManager";
 
 describe('LanguageManager', () => {
-    const tmpLanguageFolderPath = join(__dirname, '../../testresources/lang');
+    const tmpLanguageFolderPath = join(process.env.CONFIG_DIR as string, 'lang/');
 
     describe('JSONLanguageManager', () => {
-
+ 
         it('should create "language" folder if it does not exist', () => {        
+            sync(tmpLanguageFolderPath);
             expect(existsSync(tmpLanguageFolderPath)).toBe(false);
             const languageManager = new JSONLanguageManager(tmpLanguageFolderPath);
 
@@ -21,9 +22,9 @@ describe('LanguageManager', () => {
 
         it('should create the english language file if the folder does not contain any "lang_*.json" file', () => {
             // Write dummy file to lang folder in order to check that the constructor only looks for lang_*.json files
+            sync(tmpLanguageFolderPath);
             mkdirSync(tmpLanguageFolderPath);
             writeFileSync(`${tmpLanguageFolderPath}${sep}dummy.json`, JSON.stringify({}));
-            sync(tmpLanguageFolderPath);
 
             const englishLanguageFilePath = `${tmpLanguageFolderPath}${sep}lang_en.json`;
             expect(existsSync(englishLanguageFilePath)).toBe(false);
@@ -32,6 +33,8 @@ describe('LanguageManager', () => {
             expect(existsSync(englishLanguageFilePath)).toBe(true);
 
             const englishLanguage : Language = JSON.parse(readFileSync(englishLanguageFilePath).toString());
+            
+            expect(languageManager.getLanguageCount()).toBe(1);
             expect(englishLanguage).toEqual(DEFAULT_ENGLISH_LANGUAGE);
         });
 
@@ -54,10 +57,7 @@ describe('LanguageManager', () => {
             });
 
         });
-
+ 
     });
 
-    afterAll(() => {
-        sync(tmpLanguageFolderPath);
-    })
 });

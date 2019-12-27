@@ -1,4 +1,4 @@
-import { FeedConfigManager, FeedConfig, FeedCategory, isFeedConfig, InvalidFeedConfigIdError } from "./FeedConfigManager";
+import { FeedConfigManager, FeedConfig, FeedCategory, isFeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError } from "./FeedConfigManager";
 import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, rename } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";
@@ -31,10 +31,13 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
     }
 
     addFeedConfig(feed : FeedConfig) : Promise<boolean> {
-        
-        const feedJSON = JSON.stringify(feed);
-        
         const addFeedPromise : Promise<boolean> = new Promise((resolve, reject) => {
+            if (this.FEED_CONFIGS.map(fc => fc.feedId).includes(feed.feedId)) {
+                reject(new NotUniqueFeedConfigIdError(`The feed config id is not unique. There is already a feed config which has the same feed config id ${feed.feedId}`));
+                return;
+            }
+            
+            const feedJSON = JSON.stringify(feed);
             writeFile(`${this.FEEDS_FOLDER}${sep}${feed.feedId}.json`, feedJSON, (err) => {
                 if (err) reject(err);
                 else{
@@ -104,6 +107,10 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
     getFeedConfig(feedId: string): FeedConfig | null {
         const filteredFeedConfig = this.FEED_CONFIGS.filter(fc => fc.feedId === feedId);
         return filteredFeedConfig.length !== 0 ? filteredFeedConfig[0] : null;
+    }
+
+    getFeedConfigCount() : number {
+        return this.FEED_CONFIGS.length;
     }
 
 }

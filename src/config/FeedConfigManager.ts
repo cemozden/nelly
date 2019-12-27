@@ -28,10 +28,17 @@ export interface FeedConfigManager {
     updateFeedCategory(feedCategory : FeedCategory) : void,
     deleteFeedCategory(feedCategory : FeedCategory) : void,
     getFeedConfigs() : FeedConfig[],
-    getFeedConfig(feedId : string) : FeedConfig | null;
+    getFeedConfig(feedId : string) : FeedConfig | null,
+    getFeedConfigCount() : number    
 }
 
 export class InvalidFeedConfigIdError extends Error {
+    constructor(message : string) {
+        super(message);
+    }
+}
+
+export class NotUniqueFeedConfigIdError extends Error {
     constructor(message : string) {
         super(message);
     }

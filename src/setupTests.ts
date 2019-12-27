@@ -4,5 +4,9 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
 import { sep } from "path";
+import { existsSync, mkdirSync } from 'fs';
 process.env.APPLICATION_DIR = process.env.PWD;
-process.env.CONFIG_DIR = `${process.env.APPLICATION_DIR}${sep}config${sep}`
+process.env.CONFIG_DIR = `${process.env.APPLICATION_DIR}${sep}testresources${sep}`;
+
+if (!existsSync(process.env.CONFIG_DIR))
+    mkdirSync(process.env.CONFIG_DIR);

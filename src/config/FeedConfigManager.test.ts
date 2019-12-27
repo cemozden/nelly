@@ -2,13 +2,13 @@ import { join, sep } from "path";
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from "fs";
 import { sync } from "rimraf";
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
-import { FeedCategory, FeedConfig, isFeedConfig, InvalidFeedConfigIdError } from "./FeedConfigManager";
+import { FeedCategory, FeedConfig, isFeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError } from "./FeedConfigManager";
 import { TimeUnit } from "../time/TimeUnit";
 
 describe('FeedManager', () => {
-    const tmpFeedsFolder = join(__dirname, '../../testresources/feeds/');
+    const tmpFeedsFolder = join(process.env.CONFIG_DIR as string, 'feeds/');
 
-    beforeEach(() => {
+    beforeAll(() => {
         sync(tmpFeedsFolder);
     });
 
@@ -41,6 +41,7 @@ describe('FeedManager', () => {
     describe('JSONFeedManager', () => {
 
         it('should create "feeds" folder if feeds folder does not exist', () => {
+            sync(tmpFeedsFolder);
             expect(existsSync(tmpFeedsFolder)).toBe(false);
 
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
@@ -49,9 +50,16 @@ describe('FeedManager', () => {
         });
 
         it('should initialize the feed config list empty if there is no configuration file', () => {
+            // Delete feed config files before creating the JSONFeedConfigManager object.
+            if (existsSync(tmpFeedsFolder)) 
+                readdirSync(tmpFeedsFolder)
+                    .filter(fileName => fileName.match('[a-zA-Z0-9]{8}\.json'))
+                    .forEach(f => sync(`${tmpFeedsFolder}${sep}${f}`));
+            
+
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
 
-            expect(feedManager.getFeedConfigs().length).toBe(0);
+            expect(feedManager.getFeedConfigCount()).toBe(0);
         });
 
         it('should load the feed configurations into the feed configuration list if any exist', () => {
@@ -66,12 +74,14 @@ describe('FeedManager', () => {
                 url : 'https://example.com'
             };
 
-            mkdirSync(tmpFeedsFolder);
+            if (!existsSync(tmpFeedsFolder)) 
+                mkdirSync(tmpFeedsFolder);
+            
             writeFileSync(`${tmpFeedsFolder}${sep}${feedId}.json`, JSON.stringify(feedConfig));
             
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
             
-            expect(feedManager.getFeedConfigs().length).toBe(1);
+            expect(feedManager.getFeedConfigCount()).toBeGreaterThan(0);
         });
        
         describe('#addFeedConfig(feed : FeedConfig)', () => {
@@ -81,7 +91,7 @@ describe('FeedManager', () => {
                 const configFilePath = `${tmpFeedsFolder}${sep}${feedId}.json`;  
                 const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
 
-                const feed : FeedConfig = {
+                const feedConfig : FeedConfig = {
                     feedId : feedId,
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
@@ -90,7 +100,7 @@ describe('FeedManager', () => {
                     enabled : true
                 };
 
-                const addFeedPromise = feedManager.addFeedConfig(feed);
+                const addFeedPromise = feedManager.addFeedConfig(feedConfig);
                 
                 return addFeedPromise.then(feedConfigAdded => {
                     expect(existsSync(configFilePath)).toBe(true);
@@ -99,9 +109,29 @@ describe('FeedManager', () => {
 
             });
 
+            it('should not allow to add a feed config if feed config id is already existing', async () => {
+                const feedConfigId = '12345678';
+                const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
+                
+                const feedConfig : FeedConfig = {
+                    feedId : feedConfigId,
+                    categoryId : '',
+                    fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
+                    name : 'Example RSS FeedConfig',
+                    url : 'https://example.com',
+                    enabled : true
+                };
+
+                const firstFeedAdded = await feedManager.addFeedConfig(feedConfig);
+                expect(firstFeedAdded).toBe(true);
+
+                return expect(feedManager.addFeedConfig(feedConfig)).rejects.toThrowError(new NotUniqueFeedConfigIdError(`The feed config id is not unique. There is already a feed config which has the same feed config id ${feedConfigId}`));
+            });
+
             it('should add the feed into the feeds config list', () => {
                 
-                const feedId = 'eb4d45b1';
+                const feedId = 'ab4d45b1';
+                
                 const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
 
                 const feed : FeedConfig = {
@@ -113,10 +143,12 @@ describe('FeedManager', () => {
                     enabled : true
                 };
 
+                const feedConfigCount = feedManager.getFeedConfigCount();
                 const addFeedPromise = feedManager.addFeedConfig(feed);
                 
-                return addFeedPromise.then(feed => {
-                    expect(feedManager.getFeedConfigs().length).toEqual(1);
+                return addFeedPromise.then(feedAdded => {
+                    expect(feedAdded).toBe(true);
+                    expect(feedManager.getFeedConfigCount()).toEqual(feedConfigCount + 1);
                 });
             });
         });
@@ -125,7 +157,7 @@ describe('FeedManager', () => {
             it('should return a "rejected" Promise with an error reason if feedId cannot be found in the feed config list', async () => {
                 const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
                 const feedToBeAdded : FeedConfig = {
-                    feedId : 'xxxxxxxx',
+                    feedId : 'notexist',
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -165,7 +197,7 @@ describe('FeedManager', () => {
 
         it('should update the feed config file with the new values', async () => {
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
-            const feedId = 'xxxxxxxx';
+            const feedId = 'xaxxxxxx';
 
             const feedToBeAddedUpdated : FeedConfig = {
                 feedId : feedId,
@@ -195,7 +227,7 @@ describe('FeedManager', () => {
         it('should return a "rejected" Promise with an error reason if feedId cannot be found in the feed config list', async () => {
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
             const feedToBeAdded : FeedConfig = {
-                    feedId : 'xxxxxxxx',
+                    feedId : 'xbxxxxxx',
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -213,7 +245,7 @@ describe('FeedManager', () => {
 
         it('should remove the feed config from the feed config list', async () => {
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
-            const feedId = 'xxxxxxxx';
+            const feedId = 'xcxxxxxx';
 
             const feedToBeAddedDeleted : FeedConfig = {
                 feedId : feedId,
@@ -229,13 +261,13 @@ describe('FeedManager', () => {
 
             const feedConfigDeleted = await feedManager.deleteFeedConfig(feedId);
             
-            expect(feedManager.getFeedConfig(feedId)).toBeNull();
             expect(feedConfigDeleted).toBe(true);
+            expect(feedManager.getFeedConfig(feedId)).toBeNull();
         });
 
         it('should delete the feed config file', async () => {
             const feedManager = new JSONFeedConfigManager(tmpFeedsFolder);
-            const feedId = 'xxxxxxxx';
+            const feedId = 'xdxxxxxx';
  
             const feedToBeAddedDeleted : FeedConfig = {
                 feedId : feedId,
@@ -255,6 +287,18 @@ describe('FeedManager', () => {
             expect(feedConfigDeleted).toBe(true);
             expect(existsSync(deletedFileConfigFilePath)).toBe(false);
         });
+
+    });
+
+    describe.skip('#addFeedCategory(feedCategory : FeedCategory)', () => {
+
+    });
+
+    describe.skip('#updateFeedCategory(feedCategory : FeedCategory)', () => {
+
+    });
+
+    describe.skip('#deleteFeedCategory(feedCategory : FeedCategory)', () => {
 
     });
 
