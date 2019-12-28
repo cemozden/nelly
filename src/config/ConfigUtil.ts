@@ -29,3 +29,18 @@ export function categoryIdExist(categoryId : string, feedCategory : FeedCategory
 
     return false;
 }
+
+export function deleteFeedCategoryFromCategoryTree(feedCategoryToDelete : FeedCategory, categoryTree : FeedCategory) : boolean {
+    const categoryIndex = categoryTree.childCategories.indexOf(feedCategoryToDelete);
+    if (categoryIndex !== -1) {
+        categoryTree.childCategories.splice(categoryIndex, 1);
+        return true;
+    }
+    else {
+        for (const cc of categoryTree.childCategories) {
+            if (deleteFeedCategoryFromCategoryTree(feedCategoryToDelete, cc)) return true;
+        }
+    }
+
+    return false;
+}

@@ -448,7 +448,66 @@ describe('FeedManager', () => {
 
     });
 
-    describe.skip('#deleteFeedCategory(feedCategory : FeedCategory)', () => {
+    describe('#deleteFeedCategory(feedCategory : FeedCategory)', () => {
+        
+        it('should not delete the root category', () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            
+            return expect(feedConfigManager.deleteFeedCategory(feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
+        });
+
+        it.skip('should not delete a feed category which is not existing', async () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            const notExistFeedCategory : FeedCategory = {
+                categoryId : 'xx123',
+                childCategories : [],
+                name : 'xx123456',
+                visible : true
+            }; 
+            const feedDeleted = await feedConfigManager.deleteFeedCategory(notExistFeedCategory);
+
+            expect(feedDeleted).toBe(false);
+        });
+
+        it('should write to the category.json file after deletion succeeds', async () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            
+            const newFeedCategory : FeedCategory = {
+                categoryId : '5a35567895',
+                childCategories : [],
+                name : 'Blogs',
+                visible : true
+            };
+
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            expect(feedCategoryAdded).toBe(true);
+
+            const feedDeleted = await feedConfigManager.deleteFeedCategory(newFeedCategory);
+            expect(feedDeleted).toBe(true);
+
+            const categoriesFromFile : FeedCategory = JSON.parse(readFileSync(categoryJSONFilePath).toString());
+            expect(categoriesFromFile).toEqual(feedConfigManager.getRootCategory());
+
+        });
+
+        it('should delete the feed category successfully if the category exist', async () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            
+            const newFeedCategory : FeedCategory = {
+                categoryId : '5a35az7895',
+                childCategories : [],
+                name : 'Blogs_123',
+                visible : true
+            };
+
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            expect(feedCategoryAdded).toBe(true);
+
+            const feedDeleted = await feedConfigManager.deleteFeedCategory(newFeedCategory);
+            expect(feedDeleted).toBe(true);
+
+            expect(feedCategoryExist(newFeedCategory, feedConfigManager.getRootCategory())).toBeNull();
+        });
 
     });
 

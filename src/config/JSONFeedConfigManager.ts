@@ -1,8 +1,8 @@
-import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError } from "./FeedConfigManager";
-import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, rename, writeFileSync, write } from "fs";
+import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError } from "./FeedConfigManager";
+import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, writeFileSync, } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";
-import { isFeedConfig, feedCategoryExist, categoryIdExist} from "./ConfigUtil";
+import { isFeedConfig, feedCategoryExist, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
 
 export default class JSONFeedConfigManager implements FeedConfigManager {
        
@@ -155,7 +155,33 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
     }
 
     deleteFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
-        throw new Error("Method not implemented.");
+
+        const deleteFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
+            if (feedCategory === this.ROOT_CATEGORY) {
+                reject(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
+                return;
+            }
+
+            if (!feedCategoryExist(feedCategory, this.ROOT_CATEGORY)) {
+                resolve(false);
+                return;
+            }
+
+            const feedCategoryDeletedFromTree = deleteFeedCategoryFromCategoryTree(feedCategory, this.ROOT_CATEGORY);
+
+            if (!feedCategoryDeletedFromTree) {
+                resolve(false);
+                return;
+            }
+
+            writeFile(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(this.ROOT_CATEGORY), err => {
+                if (err) reject(err);
+                else resolve(true);
+            });
+
+        });
+
+        return deleteFeedCategoryPromise;
     }
 
     getRootCategory() : FeedCategory {

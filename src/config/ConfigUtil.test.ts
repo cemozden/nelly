@@ -1,4 +1,4 @@
-import { isFeedConfig, feedCategoryExist, categoryIdExist } from "./ConfigUtil";
+import { isFeedConfig, feedCategoryExist, categoryIdExist, deleteFeedCategoryFromCategoryTree } from "./ConfigUtil";
 
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
 
@@ -154,5 +154,68 @@ describe('ConfigUtil', () => {
         });
     
     });
+
+    describe('#deleteFeedCategoryFromCategoryTree(feedCategoryToDelete : FeedCategory, categoryTree : FeedCategory)', () => {
+        it('should return true if the given feed category is deleted', async () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            const exampleId1 = 'exampleFeedCategory4_5';
+            const exampleId2 = 'exampleFeedCategory2_6';
+    
+            const exampleFeedCategory1 : FeedCategory = {
+                categoryId : exampleId1,
+                childCategories : [],
+                name : 'Example Feed Category 1',
+                visible : true
+            };
+    
+            const exampleFeedCategory2 : FeedCategory = {
+                categoryId : exampleId2,
+                childCategories : [],
+                name : 'Example Feed Category 2',
+                visible : true
+            };
+    
+            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory());
+            expect(feedConfig1Added).toBe(true);
+            
+            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1);
+            expect(feedConfig2Added).toBe(true);
+
+            const rootFeedCategoryExist = deleteFeedCategoryFromCategoryTree(exampleFeedCategory2, feedConfigManager.getRootCategory());
+            expect(rootFeedCategoryExist).toBe(true);
+            
+            const exampleFeedCategoryExist = deleteFeedCategoryFromCategoryTree(exampleFeedCategory1, feedConfigManager.getRootCategory());
+            expect(exampleFeedCategoryExist).toBe(true);
+
+        });
+    
+        it('should return false if the given feed category is not existing, or not deleted', async () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            const exampleId3 = 'exampleFeedCategory3_9';
+            const exampleId4 = 'exampleFeedCategory4_9';
+
+            const exampleFeedCategory1 : FeedCategory = {
+                categoryId : exampleId3,
+                childCategories : [],
+                name : 'Example Feed Category 1',
+                visible : true
+            };
+    
+            const exampleFeedCategory2 : FeedCategory = {
+                categoryId : exampleId4,
+                childCategories : [],
+                name : 'Example Feed Category 2',
+                visible : true
+            };
+
+            const exampleFeedCategory3Exist = deleteFeedCategoryFromCategoryTree(exampleFeedCategory1, feedConfigManager.getRootCategory());
+            const exampleFeedCategory4Exist = deleteFeedCategoryFromCategoryTree(exampleFeedCategory2, feedConfigManager.getRootCategory());
+    
+            expect(exampleFeedCategory3Exist).toBe(false);
+            expect(exampleFeedCategory4Exist).toBe(false);
+        });
+    
+    });
+
 
 });
