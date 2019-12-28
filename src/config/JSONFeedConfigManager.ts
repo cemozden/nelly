@@ -1,18 +1,25 @@
-import { FeedConfigManager, FeedConfig, FeedCategory, isFeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError } from "./FeedConfigManager";
-import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, rename } from "fs";
+import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError } from "./FeedConfigManager";
+import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, rename, writeFileSync, write } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";
+import { isFeedConfig, feedCategoryExist, categoryIdExist } from "./ConfigUtil";
 
 export default class JSONFeedConfigManager implements FeedConfigManager {
-    
-    private readonly FEEDS_FOLDER : string;
-    private readonly FEED_CONFIGS : FeedConfig[];
+       
     private readonly FEED_CONFIG_FILE_PATTERN : string = '[a-zA-Z0-9]{8}\.json';
+    private readonly CATEGORY_LIST_FILE_NAME = 'category.json';
+
+    private readonly FEEDS_FOLDER : string;
+    private readonly CATEGORY_LIST_FILE_PATH : string;
     
+    private readonly FEED_CONFIGS : FeedConfig[];
+    private readonly ROOT_CATEGORY : FeedCategory;
+
     constructor(feedsFolderPath : string) {
         this.FEED_CONFIGS = [];
         this.FEEDS_FOLDER = feedsFolderPath;
-
+        this.CATEGORY_LIST_FILE_PATH = `${this.FEEDS_FOLDER}${sep}${this.CATEGORY_LIST_FILE_NAME}`;
+        
         if (!existsSync(feedsFolderPath))
             mkdirSync(feedsFolderPath);
 
@@ -27,6 +34,12 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 this.FEED_CONFIGS.push(fcObject);
 
         });
+        
+        if (!existsSync(this.CATEGORY_LIST_FILE_PATH)) {
+            writeFileSync(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(DEFAULT_ROOT_CATEGORY));
+            this.ROOT_CATEGORY = DEFAULT_ROOT_CATEGORY;
+        }
+        else this.ROOT_CATEGORY = JSON.parse(readFileSync(this.CATEGORY_LIST_FILE_PATH).toString());
 
     }
 
@@ -90,14 +103,40 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return deletePromise;
     }
 
-    addFeedCategory(feedCategory: FeedCategory): void {
+
+    addFeedCategory(feedCategory: FeedCategory, parent : FeedCategory): Promise<boolean> {
+        const addFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
+            
+            if (!feedCategoryExist(parent, this.ROOT_CATEGORY)){
+                reject(new NotExistFeedCategoryError(`The feed category provided is not existing the category tree!`));
+                return;
+            }
+
+            if (categoryIdExist(feedCategory.categoryId, this.ROOT_CATEGORY)) {
+                reject(new InvalidFeedCategoryIdError(`The feed category id "${feedCategory.categoryId}" is already existing in the category tree!`));
+                return;
+            }
+
+            parent.childCategories.push(feedCategory);
+            
+            writeFile(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(this.ROOT_CATEGORY), err => {
+                if (err) reject(err);
+                else resolve(true);
+            });
+
+        });
+
+        return addFeedCategoryPromise;
+    }
+    updateFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    updateFeedCategory(feedCategory: FeedCategory): void {
+    deleteFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    deleteFeedCategory(feedCategory: FeedCategory): void {
-        throw new Error("Method not implemented.");
+
+    getRootCategory() : FeedCategory {
+        return this.ROOT_CATEGORY;
     }
 
     getFeedConfigs(): FeedConfig[] {

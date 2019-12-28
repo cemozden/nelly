@@ -10,23 +10,32 @@ export interface FeedConfig {
     enabled : boolean
 }
 
-const mandatoryFeedConfigParams = ['feedId', 'categoryId', 'name', 'url', 'fetchPeriod', 'enabled'];
+export const MANDATORY_FEED_CONFIG_PARAMS = ['feedId', 'categoryId', 'name', 'url', 'fetchPeriod', 'enabled'];
 
 export interface FeedCategory {
     categoryId : string,
-    parentCategory : FeedCategory | null,
     name : string,
     childCategories : FeedCategory[],
     visible? : boolean
 }
 
+export const DEFAULT_ROOT_CATEGORY : FeedCategory = {
+    categoryId : 'root',
+    childCategories : [],
+    name : 'Root',
+    visible : true
+};
+
 export interface FeedConfigManager {
     addFeedConfig(feedConfig : FeedConfig) : Promise<boolean>,
     updateFeedConfig(feedId : string, feedConfig : FeedConfig) : Promise<boolean>,
     deleteFeedConfig(feedId : string) : Promise<boolean>,
-    addFeedCategory(feedCategory : FeedCategory) : void,
-    updateFeedCategory(feedCategory : FeedCategory) : void,
-    deleteFeedCategory(feedCategory : FeedCategory) : void,
+    
+    addFeedCategory(feedCategory : FeedCategory, parent : FeedCategory) : Promise<boolean>,
+    updateFeedCategory(feedCategory : FeedCategory) : Promise<boolean>,
+    deleteFeedCategory(feedCategory : FeedCategory) : Promise<boolean>,
+    getRootCategory() : FeedCategory,
+
     getFeedConfigs() : FeedConfig[],
     getFeedConfig(feedId : string) : FeedConfig | null,
     getFeedConfigCount() : number    
@@ -44,10 +53,14 @@ export class NotUniqueFeedConfigIdError extends Error {
     }
 }
 
-export function isFeedConfig(obj : any) : obj is FeedConfig {
-    
-    const objectKeys = Object.keys(obj);
+export class NotExistFeedCategoryError extends Error {
+    constructor(message : string) {
+        super(message);
+    }
+}
 
-    return mandatoryFeedConfigParams
-        .filter(k => !objectKeys.includes(k)).length === 0;
+export class InvalidFeedCategoryIdError extends Error {
+    constructor(message : string) {
+        super(message);
+    }
 }
