@@ -456,7 +456,7 @@ describe('FeedManager', () => {
             return expect(feedConfigManager.deleteFeedCategory(feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
         });
 
-        it.skip('should not delete a feed category which is not existing', async () => {
+        it('should not delete a feed category which is not existing', async () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             const notExistFeedCategory : FeedCategory = {
                 categoryId : 'xx123',
