@@ -2,7 +2,7 @@ import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, 
 import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, rename, writeFileSync, write } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";
-import { isFeedConfig, feedCategoryExist, categoryIdExist } from "./ConfigUtil";
+import { isFeedConfig, feedCategoryExist, categoryIdExist} from "./ConfigUtil";
 
 export default class JSONFeedConfigManager implements FeedConfigManager {
        
@@ -103,7 +103,6 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return deletePromise;
     }
 
-
     addFeedCategory(feedCategory: FeedCategory, parent : FeedCategory): Promise<boolean> {
         const addFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
             
@@ -128,9 +127,33 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
 
         return addFeedCategoryPromise;
     }
-    updateFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
-        throw new Error("Method not implemented.");
+
+    updateFeedCategory(newFeedCategory: FeedCategory, oldFeedCategory : FeedCategory): Promise<boolean> {
+        const updateFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
+        const feedCategoryToUpdate = feedCategoryExist(oldFeedCategory, this.ROOT_CATEGORY); 
+            
+            if (!feedCategoryToUpdate) {
+                reject(new NotExistFeedCategoryError(`The feed category to be updated is not existing in the category tree!`));
+                return;
+            }
+
+            if(categoryIdExist(newFeedCategory.categoryId, this.ROOT_CATEGORY)) {
+                reject(new InvalidFeedCategoryIdError(`The updated feed category has a category id which is already existing in the category tree!`));
+                return;
+            }
+            
+            Object.assign(feedCategoryToUpdate, newFeedCategory);
+            
+            writeFile(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(this.ROOT_CATEGORY), err => {
+                if(err) reject(err);
+                else resolve(true);
+            });
+
+        });
+
+        return updateFeedCategoryPromise;
     }
+
     deleteFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
         throw new Error("Method not implemented.");
     }

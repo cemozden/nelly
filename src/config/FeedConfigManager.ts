@@ -32,7 +32,7 @@ export interface FeedConfigManager {
     deleteFeedConfig(feedId : string) : Promise<boolean>,
     
     addFeedCategory(feedCategory : FeedCategory, parent : FeedCategory) : Promise<boolean>,
-    updateFeedCategory(feedCategory : FeedCategory) : Promise<boolean>,
+    updateFeedCategory(newFeedCategory : FeedCategory, oldFeedCategory : FeedCategory) : Promise<boolean>,
     deleteFeedCategory(feedCategory : FeedCategory) : Promise<boolean>,
     getRootCategory() : FeedCategory,
 
@@ -61,6 +61,12 @@ export class NotExistFeedCategoryError extends Error {
 
 export class InvalidFeedCategoryIdError extends Error {
     constructor(message : string) {
+        super(message);
+    }
+}
+
+export class InvalidFeedCategoryError extends Error {
+    constructor(message: string) {
         super(message);
     }
 }

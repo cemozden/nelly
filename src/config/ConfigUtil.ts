@@ -8,14 +8,16 @@ export function isFeedConfig(obj : any) : obj is FeedConfig {
         .filter(k => !objectKeys.includes(k)).length === 0;
 }
 
-export function feedCategoryExist(objToSearch: FeedCategory, objToLookFor : FeedCategory): boolean {
-    
-    if (JSON.stringify(objToSearch) === JSON.stringify(objToLookFor)) return true;
+export function feedCategoryExist(objToSearch: FeedCategory, objToLookFor : FeedCategory) : FeedCategory | null {
+    const param1Json = JSON.stringify(objToSearch);
+    const param2Json = JSON.stringify(objToLookFor);
+
+    if (param1Json === param2Json) return objToLookFor;
     
     for (const cc of objToLookFor.childCategories)
-        if(feedCategoryExist(objToSearch, cc)) return true;
+        if(feedCategoryExist(objToSearch, cc)) return cc;
     
-    return false;
+    return null;
 }
 
 export function categoryIdExist(categoryId : string, feedCategory : FeedCategory) : boolean {
