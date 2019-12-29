@@ -34,7 +34,7 @@ describe('ConfigUtil', () => {
         });
     
         it ('should return true if the object is FeedConfig object', () => {
-            const sample = {feedId : "", categoryId : "", name : "", url : "", fetchPeriod : null, enabled : false};
+            const sample = {feedConfigId : "", categoryId : "", name : "", url : "", fetchPeriod : null, enabled : false};
     
             expect(isFeedConfig(sample)).toBe(true);
         });

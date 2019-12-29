@@ -3,6 +3,12 @@ import { Language, DEFAULT_ENGLISH_LANGUAGE } from "./Language";
 import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "fs";
 import { sep } from "path";
 
+/**
+ * The language manager class that manages Nelly UI language by using loadLanguage method.
+ * The class also provides getLanguageCount() method to retrieve the number of languages available in the system.
+ * @author cemozden
+ * @see LanguageManager
+ */
 export default class JSONLanguageManager implements LanguageManager {
 
     private readonly LANGUAGE_FOLDER_PATH : string;
@@ -24,6 +30,12 @@ export default class JSONLanguageManager implements LanguageManager {
         this.LANGUAGE_FOLDER_PATH = languageFolderPath;
     }
 
+    /**
+     * The method that returns the language according to the language alias provided as parameter.
+     * @param langAlias The alias of the language to be loaded. Such as "en" for lang_en.json file.
+     * @throws InvalidLanguageFileError when the language file does not exist according to the language alias.
+     * @returns Language object that contains the specific language statements.
+     */
     loadLanguage(langAlias : string) : Language {
 
         const langFilePath = `${this.LANGUAGE_FOLDER_PATH}${sep}lang_${langAlias}.json`;
@@ -36,6 +48,10 @@ export default class JSONLanguageManager implements LanguageManager {
         return language;
     }
 
+    /**
+     * Returns the number of languages available in the system by checking the lang folder according to the language file pattern.
+     * @returns number of languages available.
+     */
     getLanguageCount() : number {
         return readdirSync(this.LANGUAGE_FOLDER_PATH)
             .filter(fileName => fileName.match(this.LANGUAGE_FILE_PATTERN)).length;

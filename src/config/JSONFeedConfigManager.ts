@@ -4,6 +4,11 @@ import { sep } from "path";
 import { sync } from "rimraf";
 import { isFeedConfig, feedCategoryExist, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
 
+/**
+ * The feed configuration manager class that represents how feed configurations are dealt in Nelly via JSON format. 
+ * @author cemozden
+ * @see FeedConfigManager
+ */
 export default class JSONFeedConfigManager implements FeedConfigManager {
        
     private readonly FEED_CONFIG_FILE_PATTERN : string = '[a-zA-Z0-9]{8}\.json';
@@ -15,6 +20,9 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
     private readonly FEED_CONFIGS : FeedConfig[];
     private readonly ROOT_CATEGORY : FeedCategory;
 
+    /**
+     * @param feedsFolderPath A folder path that will be used to place and read feed configurations as well as the feed categories.
+     */
     constructor(feedsFolderPath : string) {
         this.FEED_CONFIGS = [];
         this.FEEDS_FOLDER = feedsFolderPath;
@@ -23,6 +31,9 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         if (!existsSync(feedsFolderPath))
             mkdirSync(feedsFolderPath);
 
+        /* Read existing feed configurations and place them into FEED_CONFIGS array.
+           The file format is a string which is 8 length. with .json extension
+        */
         const feedConfigFiles = readdirSync(feedsFolderPath)
             .filter(fileName => fileName.match(this.FEED_CONFIG_FILE_PATTERN));
 
@@ -30,11 +41,15 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
             const fileAbsolutePath = `${this.FEEDS_FOLDER}${sep}${feedConfigFile}`;
             const fcObject = JSON.parse(readFileSync(fileAbsolutePath).toString())
 
+            // If the read object is only a FeedConfig object then add it.
+            // Skip other files that matches the given pattern. 
             if (isFeedConfig(fcObject))
                 this.FEED_CONFIGS.push(fcObject);
 
         });
         
+        // If category.json file is not existing, then create it and write the root category into the file.
+        // Otherwise directly read it from category.json file
         if (!existsSync(this.CATEGORY_LIST_FILE_PATH)) {
             writeFileSync(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(DEFAULT_ROOT_CATEGORY));
             this.ROOT_CATEGORY = DEFAULT_ROOT_CATEGORY;
@@ -43,18 +58,26 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
 
     }
 
-    addFeedConfig(feed : FeedConfig) : Promise<boolean> {
+    /**
+     * The method that adds the given feed configuration into the system.
+     * it makes sure that all feed configurations have unique ids.
+     * If the given feed config has an id that is alreadt existing, it throws NotUniqueFeedConfigIdError error.
+     * @returns A promise that yields true if feed config is added successfully. Otherwise it might throw an error. 
+     * @throws NotUniqueFeedConfigIdError
+     */
+    addFeedConfig(feedConfig : FeedConfig) : Promise<boolean> {
         const addFeedPromise : Promise<boolean> = new Promise((resolve, reject) => {
-            if (this.FEED_CONFIGS.map(fc => fc.feedId).includes(feed.feedId)) {
-                reject(new NotUniqueFeedConfigIdError(`The feed config id is not unique. There is already a feed config which has the same feed config id ${feed.feedId}`));
+            // If feed config list has a feed that has the same id with the given parameter then throw NotUniqueFeedConfigIdError.
+            if (this.FEED_CONFIGS.map(fc => fc.feedConfigId).includes(feedConfig.feedConfigId)) {
+                reject(new NotUniqueFeedConfigIdError(`The feed config id is not unique. There is already a feed config which has the same feed config id ${feedConfig.feedConfigId}`));
                 return;
             }
-            
-            const feedJSON = JSON.stringify(feed);
-            writeFile(`${this.FEEDS_FOLDER}${sep}${feed.feedId}.json`, feedJSON, (err) => {
+            // Write the feed config into the file and add it into FEED_CONFIGS list.
+            const feedJSON = JSON.stringify(feedConfig);
+            writeFile(`${this.FEEDS_FOLDER}${sep}${feedConfig.feedConfigId}.json`, feedJSON, (err) => {
                 if (err) reject(err);
                 else{
-                   this.FEED_CONFIGS.push(feed);
+                   this.FEED_CONFIGS.push(feedConfig);
                    resolve(true);
                 } 
             });
@@ -63,17 +86,27 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return addFeedPromise;
     }
 
-    updateFeedConfig(feedId : string, feed: FeedConfig): Promise<boolean> {
+    /**
+     * The method that updates a specific feed configuration defined already in the system.
+     * The method makes sure that a given feed id is already existing in the feed configuration.
+     * @param feedConfigId The id of a feed configuration which will be updated
+     * @param feedConfig The feed that will be replaced.
+     * @throws InvalidFeedConfigIdError if the given feed id is not existing.
+     * @returns a promise with a true value if update operation succeeds otherwise it might 
+     */
+    updateFeedConfig(feedConfigId : string, feedConfig: FeedConfig): Promise<boolean> {
         const updatePromise = new Promise<boolean>((resolve, reject) => {
-            const feedIdIndex = this.FEED_CONFIGS.map(fc => fc.feedId).indexOf(feedId);
+            const feedIdIndex = this.FEED_CONFIGS.map(fc => fc.feedConfigId).indexOf(feedConfigId);
             
             if (feedIdIndex === -1) 
-                reject(new InvalidFeedConfigIdError(`Update failed. There is no feed config with the id "${feedId}".`));
+                reject(new InvalidFeedConfigIdError(`Update failed. There is no feed config with the id "${feedConfigId}".`));
+            else if (feedConfigId !== feedConfig.feedConfigId)
+                reject(new InvalidFeedConfigIdError(`The feed configuration id of a specific feed configuration cannot be updated`));
             else {
-                this.FEED_CONFIGS[feedIdIndex] = feed;
+                this.FEED_CONFIGS[feedIdIndex] = feedConfig;
                 
-                const feedConfigFilePath = `${this.FEEDS_FOLDER}${sep}${feedId}.json`;
-                writeFile(feedConfigFilePath, JSON.stringify(feed), err => {
+                const feedConfigFilePath = `${this.FEEDS_FOLDER}${sep}${feedConfigId}.json`;
+                writeFile(feedConfigFilePath, JSON.stringify(feedConfig), err => {
                     if (err) reject(err);
                     else resolve(true);
                 });
@@ -84,9 +117,16 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return updatePromise;
     }
     
+    /**
+     * The method that deletes a specific feed configuration by receiving its id as a parameter.
+     * The method makes sure that the given feed id is already existing in the system.
+     * @param feedId The feed id of a specific feed configuration that needs to be deleted.
+     * @throws InvalidFeedConfigIdError if the given feed config is not existing.
+     * @returns a promise with a value of true if the deletion succeeds otherwise it might yield an error.
+     */
     deleteFeedConfig(feedId : string): Promise<boolean> {
         const deletePromise = new Promise<boolean>((resolve, reject) => {
-            const feedIdIndex = this.FEED_CONFIGS.map(fc => fc.feedId).indexOf(feedId);
+            const feedIdIndex = this.FEED_CONFIGS.map(fc => fc.feedConfigId).indexOf(feedId);
             
             if (feedIdIndex === -1) 
                 reject(new InvalidFeedConfigIdError(`Deletion failed. There is no feed config with the id "${feedId}".`));
@@ -103,6 +143,16 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return deletePromise;
     }
 
+    /**
+     * The method that adds a given feed category into the category tree.
+     * The method makes sure that it does not try to add the new feed category to a non-existing feed category node.
+     * The method also makes sure that the new feed category does provide a unique category id.
+     * @param feedCategory The feed category that needs to be added into the category tree.
+     * @param parent The feed category object that will be the parent node of the new feed category.
+     * @throws NotExistFeedCategoryError If the parent is not existing in the category tree.
+     * @throws InvalidFeedCategoryIdError if the given category id is already existing in the system.
+     * @returns a promise with a value of true if adding a new feed category is successful.
+     */
     addFeedCategory(feedCategory: FeedCategory, parent : FeedCategory): Promise<boolean> {
         const addFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
             
@@ -116,6 +166,7 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 return;
             }
 
+            // Add the given new category into the child category list of its parent.
             parent.childCategories.push(feedCategory);
             
             writeFile(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(this.ROOT_CATEGORY), err => {
@@ -128,6 +179,16 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return addFeedCategoryPromise;
     }
 
+    /**
+     * The method that updates a specific feed category in the category tree.
+     * The method makes sure that the category tree that will be replaced is already existing in the system.
+     * The method also makes sure that the new updated feed category id is not existing in the category tree.
+     * @param newFeedCategory The new feed category that will take place of the second parameter.
+     * @param oldFeedCategory The feed category that will be replaced by the first parameter.
+     * @throws NotExistFeedCategoryError if the oldFeedCategory is not existing in the category tree.
+     * @throws InvalidFeedCategoryIdError if the new feed category has an id that is already defined in the category tree.
+     * @returns a promise with a value of true if the update operation succeeds otherwise it might throw an error.
+     */
     updateFeedCategory(newFeedCategory: FeedCategory, oldFeedCategory : FeedCategory): Promise<boolean> {
         const updateFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
         const feedCategoryToUpdate = feedCategoryExist(oldFeedCategory, this.ROOT_CATEGORY); 
@@ -154,6 +215,13 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         return updateFeedCategoryPromise;
     }
 
+    /**
+     * The method that deletes a given feed category from a category tree.
+     * It makes sure that the root category is not being deleted.
+     * @param feedCategory The feed category that needs to be deleted.
+     * @throws InvalidFeedCategoryError if root category is intented to be deleted.
+     * @returns a promise with a value of true if the deletion of feed category succeeds otherwise it might throw an error.
+     */
     deleteFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
 
         const deleteFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
@@ -161,12 +229,13 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 reject(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
                 return;
             }
-
+            // If the given feed category is not existing in the category tree at all, then return resolved with false value.
             if (!feedCategoryExist(feedCategory, this.ROOT_CATEGORY)) {
                 resolve(false);
                 return;
             }
 
+            // Delete the object from the memory representation of the tree.
             const feedCategoryDeletedFromTree = deleteFeedCategoryFromCategoryTree(feedCategory, this.ROOT_CATEGORY);
 
             if (!feedCategoryDeletedFromTree) {
@@ -193,7 +262,7 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
     }
 
     getFeedConfig(feedId: string): FeedConfig | null {
-        const filteredFeedConfig = this.FEED_CONFIGS.filter(fc => fc.feedId === feedId);
+        const filteredFeedConfig = this.FEED_CONFIGS.filter(fc => fc.feedConfigId === feedId);
         return filteredFeedConfig.length !== 0 ? filteredFeedConfig[0] : null;
     }
 

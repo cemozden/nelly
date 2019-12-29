@@ -45,7 +45,7 @@ describe('FeedManager', () => {
             const feedConfig : FeedConfig = {
                 categoryId : '',
                 enabled : true,
-                feedId : feedId,
+                feedConfigId : feedId,
                 fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                 name : 'Test Feed',
                 url : 'https://example.com'
@@ -80,7 +80,7 @@ describe('FeedManager', () => {
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
 
                 const feedConfig : FeedConfig = {
-                    feedId : feedId,
+                    feedConfigId : feedId,
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -102,7 +102,7 @@ describe('FeedManager', () => {
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
                 
                 const feedConfig : FeedConfig = {
-                    feedId : feedConfigId,
+                    feedConfigId : feedConfigId,
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -123,7 +123,7 @@ describe('FeedManager', () => {
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
 
                 const feed : FeedConfig = {
-                    feedId : feedId,
+                    feedConfigId : feedId,
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -145,7 +145,7 @@ describe('FeedManager', () => {
             it('should return a "rejected" Promise with an error reason if feedId cannot be found in the feed config list', async () => {
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
                 const feedToBeAdded : FeedConfig = {
-                    feedId : 'notexist',
+                    feedConfigId : 'notexist',
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -160,10 +160,39 @@ describe('FeedManager', () => {
                 return expect(feedConfigManager.updateFeedConfig(invalidFeedId, feedToBeAdded)).rejects.toThrowError(new InvalidFeedConfigIdError(`Update failed. There is no feed config with the id "${invalidFeedId}".`));
         });
 
+            it('should not allow to update if newFeedCategory changed the category id.', async () => {
+                const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+
+                const feedToBeAdded : FeedConfig = {
+                    feedConfigId : '4444444444',
+                    categoryId : '',
+                    fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
+                    name : 'Example RSS FeedConfig',
+                    url : 'https://example.com',
+                    enabled : true
+                };
+
+                const feedToBeAddedUpdated : FeedConfig = {
+                    feedConfigId : '4444444445',
+                    categoryId : '',
+                    fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
+                    name : 'Example RSS FeedConfig',
+                    url : 'https://example.com',
+                    enabled : true
+                };
+
+                const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAdded);
+                expect(feedConfigAdded).toBe(true);
+
+                return expect(feedConfigManager.updateFeedConfig('4444444444', feedToBeAddedUpdated)).rejects.toThrowError(new InvalidFeedConfigIdError(`The feed configuration id of a specific feed configuration cannot be updated`));
+
+            });
+
         it('should update the updated feed config in the feed config list', async () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            const feedConfigId = 'xxxxxabx';
             const feedToBeAddedUpdated : FeedConfig = {
-                feedId : 'xxxxxxxx',
+                feedConfigId : feedConfigId,
                 categoryId : '',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
@@ -176,10 +205,10 @@ describe('FeedManager', () => {
             expect(feedConfigAdded).toBe(true);
             feedToBeAddedUpdated.name = 'Updated RSS Config';
 
-            const feedConfigUpdated = await feedConfigManager.updateFeedConfig('xxxxxxxx', feedToBeAddedUpdated);
+            const feedConfigUpdated = await feedConfigManager.updateFeedConfig(feedConfigId, feedToBeAddedUpdated);
             expect(feedConfigUpdated).toBe(true);
 
-            const updatedFeed = feedConfigManager.getFeedConfig(feedToBeAddedUpdated.feedId);
+            const updatedFeed = feedConfigManager.getFeedConfig(feedToBeAddedUpdated.feedConfigId);
             expect(updatedFeed === feedToBeAddedUpdated);
         });
 
@@ -188,7 +217,7 @@ describe('FeedManager', () => {
             const feedId = 'xaxxxxxx';
 
             const feedToBeAddedUpdated : FeedConfig = {
-                feedId : feedId,
+                feedConfigId : feedId,
                 categoryId : '',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
@@ -215,7 +244,7 @@ describe('FeedManager', () => {
         it('should return a "rejected" Promise with an error reason if feedId cannot be found in the feed config list', async () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             const feedToBeAdded : FeedConfig = {
-                    feedId : 'xbxxxxxx',
+                    feedConfigId : 'xbxxxxxx',
                     categoryId : '',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
@@ -236,7 +265,7 @@ describe('FeedManager', () => {
             const feedId = 'xcxxxxxx';
 
             const feedToBeAddedDeleted : FeedConfig = {
-                feedId : feedId,
+                feedConfigId : feedId,
                 categoryId : '',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
@@ -258,7 +287,7 @@ describe('FeedManager', () => {
             const feedId = 'xdxxxxxx';
  
             const feedToBeAddedDeleted : FeedConfig = {
-                feedId : feedId,
+                feedConfigId : feedId,
                 categoryId : '',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',

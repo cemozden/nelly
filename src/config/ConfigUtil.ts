@@ -1,5 +1,9 @@
 import { FeedConfig, FeedCategory, MANDATORY_FEED_CONFIG_PARAMS } from "./FeedConfigManager";
 
+/**
+ * FeedConfig type guard that is used to check that parameter obj is a FeedConfig instance.
+ * @param obj The object that is going to be checked.
+ */
 export function isFeedConfig(obj : any) : obj is FeedConfig {
     
     const objectKeys = Object.keys(obj);
@@ -8,6 +12,13 @@ export function isFeedConfig(obj : any) : obj is FeedConfig {
         .filter(k => !objectKeys.includes(k)).length === 0;
 }
 
+/**
+ * The function that checks whether a given FeedCategory object exist in a tree.
+ * 
+ * @param objToSearch The object that will be searched on the feed category tree.
+ * @param objToLookFor The feed category tree that will be looked for.
+ * @see JSONFeedConfigManager
+ */
 export function feedCategoryExist(objToSearch: FeedCategory, objToLookFor : FeedCategory) : FeedCategory | null {
     const param1Json = JSON.stringify(objToSearch);
     const param2Json = JSON.stringify(objToLookFor);
@@ -20,6 +31,13 @@ export function feedCategoryExist(objToSearch: FeedCategory, objToLookFor : Feed
     return null;
 }
 
+/**
+ * The function that returns true if the given category id exist in the given feed category tree.
+
+ * @param categoryId The category id that will be searched
+ * @param feedCategory The category tree that id will be searched in
+ * @see JSONFeedConfigManager
+ */
 export function categoryIdExist(categoryId : string, feedCategory : FeedCategory) : boolean {
     if (feedCategory.categoryId === categoryId) return true;
 
@@ -30,6 +48,12 @@ export function categoryIdExist(categoryId : string, feedCategory : FeedCategory
     return false;
 }
 
+/**
+ * The function that deletes a given feed category from a feed category tree.
+ * @param feedCategoryToDelete The feed category that will be deleted from the tree
+ * @param categoryTree The category tree that the given feed category will be looked and deleted.
+ * @see JSONFeedConfigManager
+ */
 export function deleteFeedCategoryFromCategoryTree(feedCategoryToDelete : FeedCategory, categoryTree : FeedCategory) : boolean {
     const categoryIndex = categoryTree.childCategories.indexOf(feedCategoryToDelete);
     if (categoryIndex !== -1) {

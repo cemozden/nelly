@@ -1,5 +1,5 @@
 import JSONConfigManager from "./JSONConfigManager";
-import { ConfigPathNotAvailableError, InvalidConfigPathError } from "./ConfigManager";
+import { ConfigPathNotAvailableError } from "./ConfigManager";
 import { join } from "path";
 import { existsSync } from "fs";
 import { sync } from "rimraf";
@@ -20,7 +20,7 @@ describe('ConfigManager', () => {
             sync(tmpConfigFolder);
             expect(existsSync(tmpConfigFolder)).toBe(false);
             const configManager = new JSONConfigManager(tmpConfigFolder);
-
+        
             expect(existsSync(tmpConfigFolder)).toBe(true);
         });
 

@@ -1,7 +1,10 @@
 import Duration from "../time/Duration";
 
+/**
+ * The interface that represents a specific RSS feed configuration.
+ */
 export interface FeedConfig {
-    feedId : string,
+    feedConfigId : string,
     categoryId : string,
     name : string,
     url : string,
@@ -10,8 +13,14 @@ export interface FeedConfig {
     enabled : boolean
 }
 
-export const MANDATORY_FEED_CONFIG_PARAMS = ['feedId', 'categoryId', 'name', 'url', 'fetchPeriod', 'enabled'];
+/** Mandatory feed config parameters to be checked during runtime.
+  * @see ConfigUtil
+*/
+export const MANDATORY_FEED_CONFIG_PARAMS = ['feedConfigId', 'categoryId', 'name', 'url', 'fetchPeriod', 'enabled'];
 
+/**
+ * A tree that represents the feed categories in Nelly.
+ */
 export interface FeedCategory {
     categoryId : string,
     name : string,
@@ -19,6 +28,11 @@ export interface FeedCategory {
     visible? : boolean
 }
 
+/**
+ * The root category of Nelly.
+ * This category is written to category.json file if no category.json file is existing. 
+ * @see JSONFeedConfigManager
+ */
 export const DEFAULT_ROOT_CATEGORY : FeedCategory = {
     categoryId : 'root',
     childCategories : [],
@@ -26,6 +40,11 @@ export const DEFAULT_ROOT_CATEGORY : FeedCategory = {
     visible : true
 };
 
+/**
+ * The interface that represents the operations regarding feed configurations.
+ * All classes that implement this interface is considered as managers of feed configurations.
+ * @see JSONFeedConfigManager
+ */
 export interface FeedConfigManager {
     addFeedConfig(feedConfig : FeedConfig) : Promise<boolean>,
     updateFeedConfig(feedId : string, feedConfig : FeedConfig) : Promise<boolean>,
