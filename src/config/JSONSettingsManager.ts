@@ -12,7 +12,7 @@ import { sep } from "path";
  */
 export default class JSONSettingsManager implements SettingsManager {
     
-    private systemSettings : SystemSettings;
+    private readonly SYSTEM_SETTINGS : SystemSettings;
     private readonly SETTINGS_FILE_PATH : string;
     private readonly SETTINGS_FILE_NAME : string = 'settings.json';
 
@@ -27,14 +27,14 @@ export default class JSONSettingsManager implements SettingsManager {
             }
 
             writeFileSync(this.SETTINGS_FILE_PATH, JSON.stringify(defaultSystemSettings));
-            this.systemSettings = defaultSystemSettings;
+            this.SYSTEM_SETTINGS = defaultSystemSettings;
         }
         else 
-            this.systemSettings = JSON.parse(readFileSync(this.SETTINGS_FILE_PATH).toString());
+            this.SYSTEM_SETTINGS = JSON.parse(readFileSync(this.SETTINGS_FILE_PATH).toString());
     }
     
     getSettings() : SystemSettings {
-        return this.systemSettings;
+        return this.SYSTEM_SETTINGS;
     }
 
     writeSettings(newSettings : SystemSettings) : Promise<boolean> {
