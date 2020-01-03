@@ -19,7 +19,11 @@ describe('RSSValidator', () => {
             it('should throw an error if channel tag does not exist in rss tag', () => {
                 const rssValidator = new RSS20Validator();
                 const rssObject = {
-                    rss : {param1 : 'value1'}
+                    rss : {
+                        $ : {
+                            version : '2.0'
+                        },
+                        param1 : 'value1'}
                 };
 
                 expect(() => rssValidator.validate(rssObject)).toThrowError(new RSSValidationError('Channel tag <channel> does not exist between <rss> tags!'));
@@ -29,6 +33,9 @@ describe('RSSValidator', () => {
                 const rssValidator = new RSS20Validator();
                 const rssObject = {
                     rss : { 
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             param1 : 'value1'
                         } 
@@ -42,6 +49,9 @@ describe('RSSValidator', () => {
                 const rssValidator = new RSS20Validator();
                 const rssObject = {
                     rss : { 
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             title : 'Example Title',
                             description : 'Example Description'
@@ -56,6 +66,9 @@ describe('RSSValidator', () => {
                 const rssValidator = new RSS20Validator();
                 const rssObject = {
                     rss : { 
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link'
@@ -70,6 +83,9 @@ describe('RSSValidator', () => {
                 const rssValidator = new RSS20Validator();
                 const rssObject1 = {
                     rss : { 
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
@@ -88,7 +104,10 @@ describe('RSSValidator', () => {
                 };
 
                 const rssObject2 = {
-                    rss : { 
+                    rss : {
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
@@ -104,10 +123,34 @@ describe('RSSValidator', () => {
                 expect(() => rssValidator.validate(rssObject2)).toThrowError(new RSSValidationError('The item tag must have either title or description tag!'));
             });
 
+            it('should thrown an error if the version attribute of rss tag is missing', () => {
+                const rssValidator = new RSS20Validator();
+                const rssObject = {
+                    rss : {
+                        channel : { 
+                            title : 'Example Title',
+                            link : 'Example link',
+                            description : 'Example description'
+                        },
+                        item : [{
+                            title : 'Example title 1'
+                        },
+                        {
+                            title : 'Example title 2',
+                            description : 'Example Description 2'
+                        }]
+                    }
+                };
+                expect(() => rssValidator.validate(rssObject)).toThrowError(new RSSValidationError('The version attribute of rss tag is missing!'));
+            });
+
             it('should return "RSS_20" version if validation succeeds', () => {
                 const rssValidator = new RSS20Validator();
                 const rssObject1 = {
                     rss : { 
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
@@ -125,6 +168,9 @@ describe('RSSValidator', () => {
 
                 const rssObject2 = {
                     rss : { 
+                        $ : {
+                            version : '2.0'
+                        },
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',

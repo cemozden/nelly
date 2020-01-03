@@ -12,6 +12,9 @@ export default class RSS20Validator implements RSSValidator {
         if (obj.rss === undefined) 
             throw new RSSValidationError('The RSS tag (<rss>) is not existing in the XML document!');
 
+        if(obj.rss.$ === undefined || obj.rss.$.version === undefined || obj.rss.$.version !== '2.0')
+            throw new RSSValidationError('The version attribute of rss tag is missing!');
+
         if(obj.rss.channel === undefined)
             throw new RSSValidationError('Channel tag <channel> does not exist between <rss> tags!');
 

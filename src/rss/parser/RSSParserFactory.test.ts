@@ -18,6 +18,9 @@ describe('RSSParserFactory', () => {
         it('should give an RSS Parser for RSS 2.0 specification if rss object is valid for RSS 2.0 Specification', () => {
             const rssObject = {
                 rss : { 
+                    $ : {
+                        version : '2.0'
+                    },
                     channel : { 
                         title : 'Example Title',
                         link : 'Example link',
