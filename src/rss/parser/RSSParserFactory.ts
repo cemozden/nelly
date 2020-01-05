@@ -4,8 +4,11 @@ import RSS20Validator from "./validators/RSS20Validator";
 import { RSSVersion } from "../specifications/RSSVersion";
 import RSS20Parser from "./RSS20Parser";
 import { parseStringPromise, OptionsV2 } from "xml2js";
+import logger from "../../utils/Logger";
 
 export default class RSSParserFactory {
+
+    private static readonly LOG_LABEL : string = 'RSSParserFactory'; 
 
     private constructor() {}
     private static readonly rssValidators : RSSValidator[] = [
@@ -35,7 +38,7 @@ export default class RSSParserFactory {
                     return rssParser;
             }
             catch (err) {
-                //TODO: Log this on console in dev mode.
+                logger.error(`[${this.LOG_LABEL}] ${err.message}`);
             }
             
         }

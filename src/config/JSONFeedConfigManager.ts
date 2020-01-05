@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, writeFileS
 import { sep } from "path";
 import { sync } from "rimraf";
 import { isFeedConfig, feedCategoryExist, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
+import logger from "../utils/Logger";
 
 /**
  * The feed configuration manager class that represents how feed configurations are dealt in Nelly via JSON format. 
@@ -16,7 +17,8 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
 
     private readonly FEEDS_FOLDER : string;
     private readonly CATEGORY_LIST_FILE_PATH : string;
-    
+    private readonly LOG_LABEL = 'FeedConfig';
+
     private readonly FEED_CONFIGS : FeedConfig[];
     private readonly ROOT_CATEGORY : FeedCategory;
 
@@ -28,9 +30,11 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         this.FEEDS_FOLDER = feedsFolderPath;
         this.CATEGORY_LIST_FILE_PATH = `${this.FEEDS_FOLDER}${sep}${this.CATEGORY_LIST_FILE_NAME}`;
         
-        if (!existsSync(feedsFolderPath))
+        if (!existsSync(feedsFolderPath)){
+            logger.info(`[${this.LOG_LABEL}] Feeds folder does not exist.`);
             mkdirSync(feedsFolderPath);
-
+            logger.info(`[${this.LOG_LABEL}] Feeds folder created. Path: ${feedsFolderPath}`);
+        }
         /* Read existing feed configurations and place them into FEED_CONFIGS array.
            The file format is a string which is 8 length. with .json extension
         */
@@ -40,12 +44,13 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         feedConfigFiles.forEach(feedConfigFile => {
             const fileAbsolutePath = `${this.FEEDS_FOLDER}${sep}${feedConfigFile}`;
             const fcObject = JSON.parse(readFileSync(fileAbsolutePath).toString())
-
+            
             // If the read object is only a FeedConfig object then add it.
             // Skip other files that matches the given pattern. 
-            if (isFeedConfig(fcObject))
+            if (isFeedConfig(fcObject)) {
                 this.FEED_CONFIGS.push(fcObject);
-
+                logger.verbose(`[${this.LOG_LABEL}] ${feedConfigFile} is loaded.`);
+            }
         });
         
         // If category.json file is not existing, then create it and write the root category into the file.
@@ -53,6 +58,7 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         if (!existsSync(this.CATEGORY_LIST_FILE_PATH)) {
             writeFileSync(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(DEFAULT_ROOT_CATEGORY));
             this.ROOT_CATEGORY = DEFAULT_ROOT_CATEGORY;
+            logger.info(`[${this.LOG_LABEL}] category.json is created. Path: ${this.CATEGORY_LIST_FILE_PATH}`);
         }
         else this.ROOT_CATEGORY = JSON.parse(readFileSync(this.CATEGORY_LIST_FILE_PATH).toString());
 

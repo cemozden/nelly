@@ -1,6 +1,7 @@
 import { SettingsManager, SystemSettings } from "./SettingsManager";
 import { existsSync, writeFile, readFileSync, writeFileSync } from "fs";
 import { sep } from "path";
+import logger from "../utils/Logger";
 
 /**
  * The settings manager class that manages the general settings of the application.
@@ -15,6 +16,7 @@ export default class JSONSettingsManager implements SettingsManager {
     private readonly SYSTEM_SETTINGS : SystemSettings;
     private readonly SETTINGS_FILE_PATH : string;
     private readonly SETTINGS_FILE_NAME : string = 'settings.json';
+    private readonly LOG_LABEL : string = 'SettingsManager';
 
     constructor(configPath : string) {
         this.SETTINGS_FILE_PATH = `${configPath}${sep}${this.SETTINGS_FILE_NAME}`;
@@ -26,7 +28,10 @@ export default class JSONSettingsManager implements SettingsManager {
                 windowMaximized : false
             }
 
+            logger.info(`[${this.LOG_LABEL}] Settings file does not exist! Creating one.`);
             writeFileSync(this.SETTINGS_FILE_PATH, JSON.stringify(defaultSystemSettings));
+            logger.info(`[${this.LOG_LABEL}] Settings file created. Path: ${this.SETTINGS_FILE_PATH}`);
+
             this.SYSTEM_SETTINGS = defaultSystemSettings;
         }
         else 
@@ -41,7 +46,10 @@ export default class JSONSettingsManager implements SettingsManager {
         const writeSettingsPromise = new Promise<boolean>((resolve, reject) => {
             writeFile(this.SETTINGS_FILE_PATH, JSON.stringify(newSettings), err => {
                 if (err) reject(err);
-                else resolve(true);
+                else {
+                    resolve(true);
+                    logger.info(`[${this.LOG_LABEL}] Settings saved. New Settings ${JSON.stringify(newSettings)}`);
+                }
             });
         });
         return writeSettingsPromise;
