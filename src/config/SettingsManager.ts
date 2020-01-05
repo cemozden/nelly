@@ -7,6 +7,11 @@ export interface SystemSettings {
     windowMaximized : boolean
 }
 
+export const DEFAULT_SYSTEM_SETTINGS : SystemSettings = {
+    language : "en",
+    windowMaximized : false
+}
+
 export interface SettingsManager {
     getSettings() : SystemSettings,
     writeSettings(newSettings : SystemSettings) : Promise<boolean>,

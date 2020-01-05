@@ -1,4 +1,4 @@
-import { SettingsManager, SystemSettings } from "./SettingsManager";
+import { SettingsManager, SystemSettings, DEFAULT_SYSTEM_SETTINGS } from "./SettingsManager";
 import { existsSync, writeFile, readFileSync, writeFileSync } from "fs";
 import { sep } from "path";
 import logger from "../utils/Logger";
@@ -23,16 +23,13 @@ export default class JSONSettingsManager implements SettingsManager {
 
         // If the settings file does not exist then create default settings
         if (!existsSync(this.SETTINGS_FILE_PATH)) {
-            const defaultSystemSettings : SystemSettings = {
-                language : "en",
-                windowMaximized : false
-            }
+            
 
             logger.info(`[${this.LOG_LABEL}] Settings file does not exist! Creating one.`);
-            writeFileSync(this.SETTINGS_FILE_PATH, JSON.stringify(defaultSystemSettings));
+            writeFileSync(this.SETTINGS_FILE_PATH, JSON.stringify(DEFAULT_SYSTEM_SETTINGS));
             logger.info(`[${this.LOG_LABEL}] Settings file created. Path: ${this.SETTINGS_FILE_PATH}`);
 
-            this.SYSTEM_SETTINGS = defaultSystemSettings;
+            this.SYSTEM_SETTINGS = DEFAULT_SYSTEM_SETTINGS;
         }
         else 
             this.SYSTEM_SETTINGS = JSON.parse(readFileSync(this.SETTINGS_FILE_PATH).toString());
