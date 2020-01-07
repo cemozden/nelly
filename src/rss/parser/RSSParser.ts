@@ -4,7 +4,7 @@
  * Throw errors in the case of failure of RSS feed.
  */
 export interface RSSParser<T> {
-    parseRSS(rssString : any) : Promise<T>
+    parseRSS(rssObject : any) : Promise<T>
 }
 
 export class RSSParserError extends Error {

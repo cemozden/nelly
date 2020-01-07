@@ -1,6 +1,6 @@
 import RSS20Parser from "./RSS20Parser";
 
-describe.skip('RSSParser', () => {
+describe('RSSParser', () => {
     describe('RSS20Parser', () => {
         let rssObject : any = null;
 
