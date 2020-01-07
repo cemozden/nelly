@@ -66,23 +66,19 @@ export default class RSS20Parser implements RSSParser<Feed> {
         return feedItems;
     }
 
-    parseRSS(rssObject : any): Promise<Feed> {
+    parseRSS(rssObject : any): Feed {
         rssObject = rssObject.rss;
 
-        const parseRSSPromise = new Promise<Feed>((resolve, reject) => {
-            // Create feed id from 3 mandatory fields by concatenating them and generate crc32 result. 
-            const feedId = crc32(rssObject.channel.title + rssObject.channel.link + rssObject.channel.description).toString(16);
-            
-            const feed : Feed = {
-                feedId : feedId,
-                feedMetadata : this.parseFeedMedata(rssObject.channel),
-                items : this.parseFeedItems(rssObject.item)
-            };
+        // Create feed id from 3 mandatory fields by concatenating them and generate crc32 result. 
+        const feedId = crc32(rssObject.channel.title + rssObject.channel.link + rssObject.channel.description).toString(16);
+        
+        const feed : Feed = {
+            feedId : feedId,
+            feedMetadata : this.parseFeedMedata(rssObject.channel),
+            items : this.parseFeedItems(rssObject.item)
+        };
 
-            resolve(feed);
-        });
-
-        return parseRSSPromise;
+        return feed;
     }
     
 }

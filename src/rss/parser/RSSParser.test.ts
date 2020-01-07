@@ -28,19 +28,19 @@ describe('RSSParser', () => {
 
         describe('#parseRSS(rssString: string)', () => {
 
-            it('should create feed id from title, link and description info of the feed', async () => {
+            it('should create feed id from title, link and description info of the feed', () => {
                 const rssParser = new RSS20Parser();
 
-                const parsedRSS = await rssParser.parseRSS(rssObject);
+                const parsedRSS = rssParser.parseRSS(rssObject);
 
                 expect(parsedRSS.feedId).not.toBeUndefined();
                 expect(parsedRSS.feedId).not.toBeNull();
             });
 
-            it('should initialize title, link and description values of the feed', async () => {
+            it('should initialize title, link and description values of the feed', () => {
                 const rssParser = new RSS20Parser();
 
-                const parsedRSS = await rssParser.parseRSS(rssObject);
+                const parsedRSS = rssParser.parseRSS(rssObject);
 
                 expect(parsedRSS.feedMetadata.title).not.toBeUndefined();
                 expect(parsedRSS.feedMetadata.link).not.toBeUndefined();
@@ -50,25 +50,25 @@ describe('RSSParser', () => {
                 expect(parsedRSS.feedMetadata.description).not.toBeNull();
             });
 
-            it('should fetch feed categories correctly', async () => {
+            it('should fetch feed categories correctly', () => {
                 const rssParser = new RSS20Parser();
 
                 // Check for more than 1 category case.
                 rssObject.rss.channel.category = ['news', 'sport'];
 
-                let parsedRSS = await rssParser.parseRSS(rssObject);
+                let parsedRSS = rssParser.parseRSS(rssObject);
 
                 expect(parsedRSS.feedMetadata.category).toEqual(rssObject.rss.channel.category);
                 
                 // Check for only 1 category.
                 rssObject.rss.channel.category = 'news';
-                parsedRSS = await rssParser.parseRSS(rssObject);
+                parsedRSS = rssParser.parseRSS(rssObject);
                 expect(parsedRSS.feedMetadata.category).toEqual(['news']);
                 
                 rssObject.rss.channel.category = undefined;
             });
 
-            it('should initialize optional elements of channel tag correctly', async () => {
+            it('should initialize optional elements of channel tag correctly', () => {
                 const rssParser = new RSS20Parser();
                 
                 rssObject.rss.channel.language = 'en-gb';
@@ -106,7 +106,7 @@ describe('RSSParser', () => {
                     link : 'https://link.com'
                 };
 
-                const parsedRSS = await rssParser.parseRSS(rssObject);
+                const parsedRSS = rssParser.parseRSS(rssObject);
 
                 expect(parsedRSS.feedMetadata.language).not.toBeUndefined();
                 expect(parsedRSS.feedMetadata.language).toBe(rssObject.rss.channel.language);

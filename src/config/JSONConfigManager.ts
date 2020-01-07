@@ -39,7 +39,7 @@ export default class JSONConfigManager implements ConfigManager {
      */
     constructor(configPath : string | undefined) {
         // If the config path is not a string then throw the ConfigPathNotAvailableError error.
-        if (typeof configPath === 'undefined') 
+        if (configPath === undefined) 
             throw new ConfigPathNotAvailableError('Configuration folder path is not a string.');
 
         // Check for existance of config folder.
