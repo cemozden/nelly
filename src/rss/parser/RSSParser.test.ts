@@ -27,14 +27,27 @@ describe('RSSParser', () => {
         });
 
         describe('#parseRSS(rssString: string)', () => {
+
+            it('should create feed id from title, link and description info of the feed', async () => {
+                const rssParser = new RSS20Parser();
+
+                const parsedRSS = await rssParser.parseRSS(rssObject);
+
+                expect(parsedRSS.feedId).not.toBeUndefined();
+                expect(parsedRSS.feedId).not.toBeNull();
+            });
+
             it('should initialize title, link and description values of the feed', async () => {
                 const rssParser = new RSS20Parser();
 
-                const parsedRSS =  await rssParser.parseRSS(rssObject);
+                const parsedRSS = await rssParser.parseRSS(rssObject);
 
                 expect(parsedRSS.feedMetadata.title).not.toBeUndefined();
                 expect(parsedRSS.feedMetadata.link).not.toBeUndefined();
                 expect(parsedRSS.feedMetadata.description).not.toBeUndefined();
+                expect(parsedRSS.feedMetadata.title).not.toBeNull();
+                expect(parsedRSS.feedMetadata.link).not.toBeNull();
+                expect(parsedRSS.feedMetadata.description).not.toBeNull();
             });
         });
     });
