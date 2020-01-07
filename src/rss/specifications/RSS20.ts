@@ -1,3 +1,26 @@
+export interface FeedMetadataCloud {
+    domain : string,
+    port : number,
+    path : string,
+    registerProcedure : string,
+    protocol : string
+}
+
+export interface FeedMetadataImage {
+    url : string,
+    title : string,
+    link : string,
+    width? : number,
+    height? : number
+}
+
+export interface FeedMetadataTextInput {
+    title : string,
+    description : string,
+    name : string,
+    link : string
+}
+
 /**
  * The metedata interface that contains information regarding the RSS feed.
  * Usually this information is collected from the channel tag of the RSS feed.
@@ -15,11 +38,11 @@ export interface FeedMetadata {
     category? : string[],
     generator? : string,
     docs? : string,
-    cloud? : string,
+    cloud? : FeedMetadataCloud,
     ttl? : number,
-    image? : string,
+    image? : FeedMetadataImage,
     rating? : string,
-    textInput? : string,
+    textInput? : FeedMetadataTextInput,
     skipHours? : number,
     skipDays? : number
 }
