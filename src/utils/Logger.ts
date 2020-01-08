@@ -27,7 +27,7 @@ const options : LoggerOptions = {
       new transports.File({
           filename : `${logsDir}${sep}nelly.log`, 
           level : 'info',
-          maxsize : 20480,
+          maxsize : 20971520,
       })
   ]
 };
