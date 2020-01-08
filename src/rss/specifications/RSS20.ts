@@ -1,3 +1,5 @@
+import { RSSVersion } from "./RSSVersion";
+
 export interface FeedMetadataCloud {
     domain : string,
     port : number,
@@ -87,6 +89,7 @@ export interface FeedItem {
  */
 export interface Feed {
     feedId : string,
+    version : RSSVersion,
     feedMetadata : FeedMetadata,
     items : FeedItem[]
 }

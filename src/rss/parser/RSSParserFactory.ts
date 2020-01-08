@@ -5,6 +5,7 @@ import { RSSVersion } from "../specifications/RSSVersion";
 import RSS20Parser from "./RSS20Parser";
 import { parseStringPromise, OptionsV2 } from "xml2js";
 import logger from "../../utils/Logger";
+import { Feed } from "../specifications/RSS20";
 
 export default class RSSParserFactory {
 
@@ -23,11 +24,11 @@ export default class RSSParserFactory {
         explicitArray : false
     };
 
-    private static isRSSParser(parser : RSSParser<any> | undefined) : parser is RSSParser<any> {
+    private static isRSSParser(parser : RSSParser<Feed> | undefined) : parser is RSSParser<any> {
         return parser !== undefined;
     }
     
-    static generateRSSParser(rssObject : any) : RSSParser<any> {
+    static generateRSSParser(rssObject : any) : RSSParser<Feed> {
            
         for (const validator of this.rssValidators) {
             try {

@@ -1,7 +1,5 @@
 import RSS20Parser from "./RSS20Parser";
-import { parseStringPromise } from "xml2js";
-import { readFileSync } from "fs";
-import RSSParserFactory from "./RSSParserFactory";
+import { crc32 } from "crc";
 
 describe('RSSParser', () => {
     describe('RSS20Parser', () => {
@@ -149,6 +147,43 @@ describe('RSSParser', () => {
                 rssObject.rss.channel.skipDays = undefined;
                 rssObject.rss.channel.image =  undefined;
                 rssObject.rss.channel.textInput =  undefined;
+            });
+
+            it('should generate feed item according to guid if exist', () => {
+                const rssParser = new RSS20Parser();
+                const guidUrl = 'https://example.com/';
+
+                rssObject.rss.channel.item = {
+                    title : 'Example title 1',
+                    description : 'Example description 1',
+                    link : 'https://link.com',
+                    author : 'test@test.com',
+                    comments : 'https://example.com',
+                    pubDate : 'Wed, 01 Jan 2020 01:00:47 GMT',
+                    enclosure : {
+                        $ : {
+                            url : 'https://example.com',
+                            length : 12216320,
+                            type : 'audio/mpeg'
+                        }
+                    },
+                    guid : {
+                        _: guidUrl,
+                        $ : {
+                          "isPermaLink": "true"
+                        }
+                    },
+                    source : {
+                        _: "Example Source",
+                        $ : {
+                          "url": "https://example.com/"
+                        }
+                    }
+                };
+
+                const feed = rssParser.parseRSS(rssObject);
+                
+                expect(feed.items[0].itemId).toEqual(crc32(guidUrl).toString(16));
             });
 
             it('should fetch feed items as an array of feed items', () => {

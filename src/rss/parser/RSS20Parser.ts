@@ -1,6 +1,7 @@
 import { RSSParser } from "./RSSParser";
 import { Feed, FeedMetadata, FeedItem } from "../specifications/RSS20";
 import { crc32 } from "crc";
+import { RSSVersion } from "../specifications/RSSVersion";
 
 /**
  * The RSS parser class that parses RSS feeds that is designed according to RSS 2.0 Specification.
@@ -121,6 +122,7 @@ export default class RSS20Parser implements RSSParser<Feed> {
         
         const feed : Feed = {
             feedId : feedId,
+            version : RSSVersion.RSS_20,
             feedMetadata : this.parseFeedMedata(rssObject.channel),
             items : this.parseFeedItems(rssObject.channel.item)
         };
