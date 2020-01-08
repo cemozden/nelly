@@ -89,17 +89,18 @@ describe('RSSValidator', () => {
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
-                            description : 'Example description'
+                            description : 'Example description',
+                            item : [{
+                                title : 'Example title 1'
+                            },
+                            {
+                                description : 'Example title 2'
+                            },
+                            {
+                                invalidTag : 'Invalid Value'
+                            }]
                         },
-                        item : [{
-                            title : 'Example title 1'
-                        },
-                        {
-                            description : 'Example title 2'
-                        },
-                        {
-                            invalidTag : 'Invalid Value'
-                        }]
+                        
                     }
                 };
 
@@ -111,10 +112,10 @@ describe('RSSValidator', () => {
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
-                            description : 'Example description'
-                        },
-                        item : {
-                            invalidTag : 'Invalid Value'
+                            description : 'Example description',
+                            item : {
+                                invalidTag : 'Invalid Value'
+                            }
                         }
                     }
                 };
@@ -130,15 +131,15 @@ describe('RSSValidator', () => {
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
-                            description : 'Example description'
-                        },
-                        item : [{
-                            title : 'Example title 1'
-                        },
-                        {
-                            title : 'Example title 2',
-                            description : 'Example Description 2'
-                        }]
+                            description : 'Example description',
+                            item : [{
+                                title : 'Example title 1'
+                            },
+                            {
+                                title : 'Example title 2',
+                                description : 'Example Description 2'
+                            }]
+                        }
                     }
                 };
                 expect(() => rssValidator.validate(rssObject)).toThrowError(new RSSValidationError('The version attribute of rss tag is missing!'));
@@ -154,15 +155,16 @@ describe('RSSValidator', () => {
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
-                            description : 'Example description'
+                            description : 'Example description',
+                            item : [{
+                                title : 'Example title 1'
+                            },
+                            {
+                                title : 'Example title 2',
+                                description : 'Example Description 2'
+                            }]
                         },
-                        item : [{
-                            title : 'Example title 1'
-                        },
-                        {
-                            title : 'Example title 2',
-                            description : 'Example Description 2'
-                        }]
+                        
                     }
                 };
 
@@ -174,11 +176,12 @@ describe('RSSValidator', () => {
                         channel : { 
                             title : 'Example Title',
                             link : 'Example link',
-                            description : 'Example description'
-                        },
-                        item : {
-                            title : 'Example title'
+                            description : 'Example description',
+                            item : {
+                                title : 'Example title'
+                            }
                         }
+                        
                     }
                 };
 

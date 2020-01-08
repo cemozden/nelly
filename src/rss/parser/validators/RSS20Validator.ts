@@ -28,15 +28,15 @@ export default class RSS20Validator implements RSSValidator {
             throw new RSSValidationError('Description tag <description> does not exist between <channel> tags!');
 
         // If there is a item tag, make sure the item tag contains either title or description tag.
-        if (obj.rss.item !== undefined) {
-            if (Array.isArray(obj.rss.item)) {
-                obj.rss.item.forEach((item : any, index : number) => {
+        if (obj.rss.channel.item !== undefined) {
+            if (Array.isArray(obj.rss.channel.item)) {
+                obj.rss.channel.item.forEach((item : any, index : number) => {
                     if (item.title === undefined && item.description === undefined)
                         throw new RSSValidationError(`Neither title nor description tags exist in one of the item list. Item Index: ${index}`);
                 });
 
             }
-            else if (obj.rss.item.title === undefined && obj.rss.item.description === undefined)
+            else if (obj.rss.channel.item.title === undefined && obj.rss.channel.item.description === undefined)
                 throw new RSSValidationError('The item tag must have either title or description tag!');
         }
 

@@ -21,6 +21,22 @@ export interface FeedMetadataTextInput {
     link : string
 }
 
+export interface FeedItemEnclosure {
+    url : string,
+    length : number,
+    type : string
+}
+
+export interface FeedItemGuid {
+    value : string,
+    permaLink? : boolean
+}
+
+export interface FeedItemSource {
+    url : string,
+    value : string
+}
+
 /**
  * The metedata interface that contains information regarding the RSS feed.
  * Usually this information is collected from the channel tag of the RSS feed.
@@ -55,7 +71,15 @@ export interface FeedMetadata {
 export interface FeedItem {
     itemId : string,
     title : string,
-    description : string
+    description : string,
+    link? : string,
+    author? : string,
+    category? : string[],
+    comments? : string,
+    pubDate? : Date,
+    enclosure? : FeedItemEnclosure,
+    guid? : FeedItemGuid,
+    source? : FeedItemSource
 }
 
 /**

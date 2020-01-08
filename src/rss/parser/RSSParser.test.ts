@@ -1,4 +1,7 @@
 import RSS20Parser from "./RSS20Parser";
+import { parseStringPromise } from "xml2js";
+import { readFileSync } from "fs";
+import RSSParserFactory from "./RSSParserFactory";
 
 describe('RSSParser', () => {
     describe('RSS20Parser', () => {
@@ -151,7 +154,7 @@ describe('RSSParser', () => {
             it('should fetch feed items as an array of feed items', () => {
                 const rssParser = new RSS20Parser();
 
-                rssObject.rss.item = {
+                rssObject.rss.channel.item = {
                     title : 'Example title 1',
                     description : 'Example description 1'
                 };
@@ -161,10 +164,10 @@ describe('RSSParser', () => {
                 expect(feed.items.length).toBe(1);
                 expect(feed.items[0]).not.toBeUndefined();
                 expect(feed.items[0].itemId).not.toBeUndefined();
-                expect(feed.items[0].title).toEqual(rssObject.rss.item.title);
-                expect(feed.items[0].description).toEqual(rssObject.rss.item.description);
+                expect(feed.items[0].title).toEqual(rssObject.rss.channel.item.title);
+                expect(feed.items[0].description).toEqual(rssObject.rss.channel.item.description);
 
-                rssObject.rss.item = [{
+                rssObject.rss.channel.item = [{
                         title : 'Example title 1',
                         description : 'Example description 1'
                     },
@@ -179,12 +182,84 @@ describe('RSSParser', () => {
                 expect(feed.items.length).toBe(2);
                 expect(feed.items[0]).not.toBeUndefined();
                 expect(feed.items[0].itemId).not.toBeUndefined();
-                expect(feed.items[0].title).toEqual(rssObject.rss.item[0].title);
-                expect(feed.items[0].description).toEqual(rssObject.rss.item[0].description);
+                expect(feed.items[0].title).toEqual(rssObject.rss.channel.item[0].title);
+                expect(feed.items[0].description).toEqual(rssObject.rss.channel.item[0].description);
                 expect(feed.items[1]).not.toBeUndefined();
                 expect(feed.items[1].itemId).not.toBeUndefined();
-                expect(feed.items[1].title).toEqual(rssObject.rss.item[1].title);
-                expect(feed.items[1].description).toEqual(rssObject.rss.item[1].description);
+                expect(feed.items[1].title).toEqual(rssObject.rss.channel.item[1].title);
+                expect(feed.items[1].description).toEqual(rssObject.rss.channel.item[1].description);
+            });
+
+            it('should initialize feed item categories correctly', () => {
+                const rssParser = new RSS20Parser();
+
+                rssObject.rss.channel.item = {
+                    title : 'Example title 1',
+                    description : 'Example description 1',
+                    category : ['news', 'sport']
+                };
+
+                let feed = rssParser.parseRSS(rssObject);
+
+                expect(feed.items[0].category).not.toBeUndefined();
+                expect(feed.items[0].category).toEqual(rssObject.rss.channel.item.category);
+
+                rssObject.rss.channel.item.category = 'news';
+
+                feed = rssParser.parseRSS(rssObject);
+
+                expect(feed.items[0].category).not.toBeUndefined();
+                expect(feed.items[0].category).toEqual([rssObject.rss.channel.item.category]);
+            });
+
+            it('should initialize optional elements of feed items', () => {
+                const rssParser = new RSS20Parser();
+
+                rssObject.rss.channel.item = {
+                    title : 'Example title 1',
+                    description : 'Example description 1',
+                    link : 'https://link.com',
+                    author : 'test@test.com',
+                    comments : 'https://example.com',
+                    pubDate : 'Wed, 01 Jan 2020 01:00:47 GMT',
+                    enclosure : {
+                        $ : {
+                            url : 'https://example.com',
+                            length : 12216320,
+                            type : 'audio/mpeg'
+                        }
+                    },
+                    guid : {
+                        _: "https://example.com/",
+                        $ : {
+                          "isPermaLink": "true"
+                        }
+                    },
+                    source : {
+                        _: "Example Source",
+                        $ : {
+                          "url": "https://example.com/"
+                        }
+                    }
+                };
+
+                const feed = rssParser.parseRSS(rssObject);
+                const feedItem = feed.items[0];
+
+                expect(feedItem.link).not.toBeUndefined();
+                expect(feedItem.link).toEqual(rssObject.rss.channel.item.link);
+                expect(feedItem.author).not.toBeUndefined();
+                expect(feedItem.author).toEqual(rssObject.rss.channel.item.author);
+                expect(feedItem.comments).not.toBeUndefined();
+                expect(feedItem.comments).toEqual(rssObject.rss.channel.item.comments);
+                expect(feedItem.pubDate).not.toBeUndefined();
+                expect(feedItem.pubDate).toEqual(new Date(rssObject.rss.channel.item.pubDate));
+                expect(feedItem.enclosure).not.toBeUndefined();
+                expect(feedItem.enclosure).toEqual(rssObject.rss.channel.item.enclosure.$);
+                expect(feedItem.guid).not.toBeUndefined();
+                expect(feedItem.guid).toEqual({ value : 'https://example.com/', permaLink : true });
+                expect(feedItem.source).not.toBeUndefined();
+                expect(feedItem.source).toEqual({ url : 'https://example.com/', value : 'Example Source' });
             });
 
 
