@@ -22,15 +22,15 @@ export default class RSS20Parser implements RSSParser<Feed> {
             title : channel.title,
             link : channel.link,
             description : channel.description,
-            language : typeof channel.language === 'string' ? channel.language : undefined,
-            copyright : typeof channel.copyright === 'string' ? channel.copyright : undefined,
-            managingEditor : typeof channel.managingEditor === 'string' ? channel.managingEditor : undefined,
-            webMaster : typeof channel.webMaster === 'string' ? channel.webMaster : undefined,
+            language : channel.language,
+            copyright : channel.copyright,
+            managingEditor : channel.managingEditor,
+            webMaster : channel.webMaster,
             pubDate : typeof channel.pubDate === 'string' ? new Date(channel.pubDate) : undefined,
             lastBuildDate : typeof channel.lastBuildDate === 'string' ? new Date(channel.lastBuildDate) : undefined,
             category : getCategories(channel.category),
-            generator : typeof channel.generator === 'string' ? channel.generator : undefined,
-            docs : typeof channel.docs === 'string' ? channel.docs : undefined,
+            generator : channel.generator,
+            docs : channel.docs,
             cloud : channel.cloud !== undefined && channel.cloud.$ !== undefined ? {
                 domain : channel.cloud.$.domain,
                 path : channel.cloud.$.path,
@@ -38,16 +38,16 @@ export default class RSS20Parser implements RSSParser<Feed> {
                 protocol : channel.cloud.$.protocol,
                 registerProcedure : channel.cloud.$.registerProcedure
             } : undefined,
-            ttl : channel.ttl !== undefined ? channel.ttl : undefined,
-            rating : typeof channel.rating === 'string' ? channel.rating : undefined,
-            skipDays : channel.skipDays !== undefined ? channel.skipDays : undefined,
-            skipHours : channel.skipHours !== undefined ? channel.skipHours : undefined,
+            ttl : channel.ttl,
+            rating : channel.rating,
+            skipDays : channel.skipDays,
+            skipHours : channel.skipHours,
             image : channel.image !== undefined ? {
                 link : channel.image.link,
                 title : channel.image.title,
                 url : channel.image.url,
-                width : channel.image.width !== undefined ? channel.image.width : undefined,
-                height : channel.image.height !== undefined ? channel.image.height : undefined
+                width : channel.image.width,
+                height : channel.image.height
             } : undefined,
             textInput : channel.textInput !== undefined ? {
                 description : channel.textInput.description,
@@ -63,6 +63,23 @@ export default class RSS20Parser implements RSSParser<Feed> {
     private parseFeedItems(items : any) : FeedItem[] {
         const feedItems : FeedItem[] = [];
 
+        function parseItem(item : any) : FeedItem {
+            const feedItem : FeedItem = {
+                itemId : crc32(item.title + item.description).toString(16),
+                title : item.title,
+                description : item.description
+            };
+
+            return feedItem;
+        }
+
+        if (items === undefined) 
+            return feedItems;
+        else if (Array.isArray(items)) 
+            items.forEach(item => feedItems.push(parseItem(item)));
+        else 
+            feedItems.push(parseItem(items));
+        
         return feedItems;
     }
 

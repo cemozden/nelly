@@ -14,14 +14,7 @@ describe('RSSParser', () => {
                         title : 'BBC News - Home',
                         link : 'https://www.bbc.co.uk/news/',
                         description : 'BBC News - Home'
-                    },
-                    item : [{
-                        title : 'Example title 1'
-                    },
-                    {
-                        title : 'Example title 2',
-                        description : 'Example Description 2'
-                    }]
+                    }
                 }
             };
         });
@@ -154,6 +147,47 @@ describe('RSSParser', () => {
                 rssObject.rss.channel.image =  undefined;
                 rssObject.rss.channel.textInput =  undefined;
             });
+
+            it('should fetch feed items as an array of feed items', () => {
+                const rssParser = new RSS20Parser();
+
+                rssObject.rss.item = {
+                    title : 'Example title 1',
+                    description : 'Example description 1'
+                };
+
+                let feed = rssParser.parseRSS(rssObject);
+
+                expect(feed.items.length).toBe(1);
+                expect(feed.items[0]).not.toBeUndefined();
+                expect(feed.items[0].itemId).not.toBeUndefined();
+                expect(feed.items[0].title).toEqual(rssObject.rss.item.title);
+                expect(feed.items[0].description).toEqual(rssObject.rss.item.description);
+
+                rssObject.rss.item = [{
+                        title : 'Example title 1',
+                        description : 'Example description 1'
+                    },
+                    {
+                        title : 'Example title 2',
+                        description : 'Example description 2'
+                    }
+                ];
+
+                feed = rssParser.parseRSS(rssObject);
+
+                expect(feed.items.length).toBe(2);
+                expect(feed.items[0]).not.toBeUndefined();
+                expect(feed.items[0].itemId).not.toBeUndefined();
+                expect(feed.items[0].title).toEqual(rssObject.rss.item[0].title);
+                expect(feed.items[0].description).toEqual(rssObject.rss.item[0].description);
+                expect(feed.items[1]).not.toBeUndefined();
+                expect(feed.items[1].itemId).not.toBeUndefined();
+                expect(feed.items[1].title).toEqual(rssObject.rss.item[1].title);
+                expect(feed.items[1].description).toEqual(rssObject.rss.item[1].description);
+            });
+
+
         });
     });
 });
