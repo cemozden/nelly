@@ -22,15 +22,6 @@ describe('RSSParser', () => {
 
         describe('#parseRSS(rssString: string)', () => {
 
-            it('should create feed id from title, link and description info of the feed', () => {
-                const rssParser = new RSS20Parser();
-
-                const parsedRSS = rssParser.parseRSS(rssObject);
-
-                expect(parsedRSS.feedId).not.toBeUndefined();
-                expect(parsedRSS.feedId).not.toBeNull();
-            });
-
             it('should initialize title, link and description values of the feed', () => {
                 const rssParser = new RSS20Parser();
 

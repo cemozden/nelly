@@ -39,6 +39,39 @@ describe('FeedManager', () => {
             expect(feedConfigManager.getFeedConfigCount()).toBe(0);
         });
 
+        it('should throw an error if all feed configurations do not have unique ids', () => {
+            if (!existsSync(tmpFeedsFolder)) 
+                mkdirSync(tmpFeedsFolder);
+            const feedId = 'aabbccdd';
+
+                const feedConfig1 : FeedConfig = {
+                    categoryId : '',
+                    enabled : true,
+                    feedConfigId : feedId,
+                    fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
+                    name : 'Test Feed',
+                    url : 'https://example.com'
+                };
+
+                const feedConfig2 : FeedConfig = {
+                    categoryId : '',
+                    enabled : true,
+                    feedConfigId : feedId,
+                    fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
+                    name : 'Test Feed',
+                    url : 'https://example.com'
+                };
+
+                writeFileSync(`${tmpFeedsFolder}${sep}${feedId}.json`, JSON.stringify(feedConfig1));
+                writeFileSync(`${tmpFeedsFolder}${sep}aabbccee.json`, JSON.stringify(feedConfig2));
+
+                expect(() => { new JSONFeedConfigManager(tmpFeedsFolder); }).toThrowError(new NotUniqueFeedConfigIdError('Unable to load feed configurations. All feed configurations must have unique ids!'));
+
+                sync(`${tmpFeedsFolder}${sep}${feedId}.json`);
+                sync(`${tmpFeedsFolder}${sep}aabbccee.json`);
+
+        });
+
         it('should load the feed configurations into the feed configuration list if any exist', () => {
             const feedId = 'eb4d45b1';
 

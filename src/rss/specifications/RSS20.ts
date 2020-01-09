@@ -88,7 +88,6 @@ export interface FeedItem {
  * The interface that covers the whole RSS feed read from the server.
  */
 export interface Feed {
-    feedId : string,
     version : RSSVersion,
     feedMetadata : FeedMetadata,
     items : FeedItem[]

@@ -48,6 +48,12 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
             // If the read object is only a FeedConfig object then add it.
             // Skip other files that matches the given pattern. 
             if (isFeedConfig(fcObject)) {
+
+                // If the read id is already existing in the feed config list then throw error.
+                // Because all ids must be unique.
+                if (this.FEED_CONFIGS.map(fc => fc.feedConfigId).includes(fcObject.feedConfigId))
+                    throw new NotUniqueFeedConfigIdError('Unable to load feed configurations. All feed configurations must have unique ids!');
+
                 this.FEED_CONFIGS.push(fcObject);
                 logger.verbose(`[${this.LOG_LABEL}] ${feedConfigFile} is loaded.`);
             }
