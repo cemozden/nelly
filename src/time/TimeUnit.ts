@@ -3,5 +3,5 @@ export enum TimeUnit {
     MINUTES,
     HOURS,
     DAYS,
-    YEARS
+    MONTHS
 }
