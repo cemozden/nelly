@@ -4,9 +4,14 @@ import { existsSync, mkdirSync } from "fs";
 import logger from "../utils/Logger";
 import { dialog, BrowserWindow } from "electron";
 
-
+/**
+ * The function that generates the SQLite database instance of the application.
+ * If any error occurs while trying to create/access the file, then the function shows up messages box with the error and exits the applcation.
+ * @param databaseFolderPath The folder path where the database file will be located.
+ */
 function getDatabaseObject(databaseFolderPath : string) : sqlite3.Database {
     
+    // If the environment is not production, then use db in test folder.
     if (process.env.NODE_ENV !== 'production')
         databaseFolderPath = typeof process.env.DATABASE_FOLDER === 'string' ? process.env.DATABASE_FOLDER : '';
 
@@ -20,6 +25,7 @@ function getDatabaseObject(databaseFolderPath : string) : sqlite3.Database {
             logger.error('[SQLiteDatabase] An error occured while trying to connect to the database!');
             logger.error(`[SQLiteDatabase] ${err?.message}`);
             
+            // If the error occurs in a CI server then don't show up the messagebox.
             if (process.env.CI === undefined) {
                 const options = {
                     type: 'error',
