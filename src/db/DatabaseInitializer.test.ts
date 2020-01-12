@@ -1,7 +1,7 @@
 import { DATABASE_INSTANCE } from "./SQLiteDatabase";
 import { FEEDS_TABLE_NAME, FEED_ITEMS_TABLE_NAME, initializeDb } from "./DatabaseInitializer";
 describe('DatabaseInitializer', () => {
-
+/**WTFFFFFFFFFFF */
    it('should create feeds table', async () => {
     const feedTableCreationPromise = new Promise<boolean>((resolve, reject) => {
         
@@ -44,5 +44,9 @@ describe('DatabaseInitializer', () => {
     }); 
 
     expect(feedItemsTableCreationPromise).resolves.toBe(true);
+   });
+
+   afterAll(() => {
+       initializeDb();
    });
 });
