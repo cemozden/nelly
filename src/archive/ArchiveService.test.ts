@@ -5,6 +5,11 @@ import { FeedItem, Feed } from "../rss/specifications/RSS20";
 import { RSSVersion } from "../rss/specifications/RSSVersion";
 
 describe('ArchiveService', () => {
+
+    beforeAll(() => {
+        initializeDb();
+    })
+
     describe('SQLiteArchiveService', () => {
 
         beforeEach(async () => {
@@ -24,10 +29,6 @@ describe('ArchiveService', () => {
             });
 
             await deleteTableDataPromise;
-        });
-
-        beforeAll(() => {
-            initializeDb();
         });
 
         afterAll(async () => {
