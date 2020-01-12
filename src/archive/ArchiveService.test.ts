@@ -1,5 +1,5 @@
 import { DATABASE_INSTANCE } from "../db/SQLiteDatabase";
-import { FEED_ITEMS_TABLE_NAME, FEEDS_TABLE_NAME } from "../db/DatabaseInitializer";
+import { FEED_ITEMS_TABLE_NAME, FEEDS_TABLE_NAME, initializeDb } from "../db/DatabaseInitializer";
 import SQLiteArchiveService from "./SQLiteArchiveService";
 import { FeedItem, Feed } from "../rss/specifications/RSS20";
 import { RSSVersion } from "../rss/specifications/RSSVersion";
@@ -7,6 +7,27 @@ import { RSSVersion } from "../rss/specifications/RSSVersion";
 describe('ArchiveService', () => {
     describe('SQLiteArchiveService', () => {
 
+        beforeEach(async () => {
+            const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
+                DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
+                    if (err) throw err;
+
+                    resolve(true);
+                });
+
+                DATABASE_INSTANCE.run(`DELETE FROM ${FEEDS_TABLE_NAME};`, async (err) => {
+                    if (err) throw err;
+
+                    resolve(true);
+                });
+
+            });
+
+            await deleteTableDataPromise;
+        });
+        beforeAll(() => {
+            initializeDb();
+        });
         afterAll(async () => {
             const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
                 DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
@@ -52,25 +73,6 @@ describe('ArchiveService', () => {
         }
 
         describe('#getFeedItemIds(feedId : string)', () => {
-
-            beforeEach(async () => {
-                const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
-                    DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
-                        if (err) throw err;
-
-                        resolve(true);
-                    });
-
-                    DATABASE_INSTANCE.run(`DELETE FROM ${FEEDS_TABLE_NAME};`, async (err) => {
-                        if (err) throw err;
-
-                        resolve(true);
-                    });
-
-                });
-
-                await deleteTableDataPromise;
-            });
             
             it('should return empty array if no feed item is found for the given feed', async () => {
                 const archiveService = new SQLiteArchiveService();
@@ -94,18 +96,6 @@ describe('ArchiveService', () => {
         });
 
         describe('#addFeed(feeds : Feed[])', () => {
-            
-            beforeEach(async () => {
-                const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
-                    DATABASE_INSTANCE.run(`DELETE FROM ${FEEDS_TABLE_NAME};`, async (err) => {
-                        if (err) throw err;
-
-                        resolve(true);
-                    });
-                });
-
-                await deleteTableDataPromise;
-            });
 
             it('should add feeds successfully', async () => {
                 const archiveService = new SQLiteArchiveService();
@@ -157,6 +147,17 @@ describe('ArchiveService', () => {
                 
                 expect(feedItemsAdded).toBe(true);
                 expect(await archiveService.getFeedItemIds(exampleFeedId)).toEqual(feedItems.map(fi => fi.itemId));
+            });
+
+        });
+
+        describe.skip('#getFeed(feedId: string)', () => {
+            it('should return null if feed id does not exist in the archive', () => {
+
+            });
+
+            it('should return Feed object if feed object exists in the archive', () => {
+
             });
 
         });

@@ -121,6 +121,11 @@ export default class SQLiteArchiveService implements ArchiveService {
         return addFeedItemsPromise;
     }
 
+    /**
+     * The method that gives the feed according to the feed id given as a parameter.
+     * @returns Feed object if feedId exist in the archive otherwise returns null
+     * @param feedId The feed id that will be looked in the archive.
+     */
     getFeed(feedId: string): Feed | null {
         throw new Error("Method not implemented.");
     }
