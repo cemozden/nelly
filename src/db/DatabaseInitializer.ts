@@ -1,4 +1,5 @@
 import { DATABASE_INSTANCE } from "./SQLiteDatabase";
+import logger from "../utils/Logger";
 
 export const FEEDS_TABLE_NAME = 'feeds';
 export const FEED_ITEMS_TABLE_NAME = 'feedItems';
@@ -11,7 +12,11 @@ export function initializeDb() : void {
         title varchar(255) NOT NULL,
         link varchar(255) NOT NULL,
         description varchar(255) NOT NULL
-    );`);
+    );`, err => {
+		if (err) {
+			logger.error(`[initializeDb] ${err.message}`);
+		};
+	});
 
     DATABASE_INSTANCE.run(`CREATE TABLE IF NOT EXISTS ${FEED_ITEMS_TABLE_NAME} (
         itemId char(8) NOT NULL,
@@ -27,6 +32,10 @@ export function initializeDb() : void {
 	    guid TEXT,
 	    source TEXT,
 	    FOREIGN KEY(feedId) REFERENCES feeds(feedId) ON DELETE CASCADE
-    );`);
+    );`,err => {
+		if (err) {
+			logger.error(`[initializeDb] ${err.message}`);
+		};
+	});
 
 }

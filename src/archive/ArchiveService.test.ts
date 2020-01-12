@@ -25,9 +25,11 @@ describe('ArchiveService', () => {
 
             await deleteTableDataPromise;
         });
+
         beforeAll(() => {
             initializeDb();
         });
+
         afterAll(async () => {
             const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
                 DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
@@ -153,11 +155,75 @@ describe('ArchiveService', () => {
 
         describe.skip('#getFeed(feedId: string)', () => {
             it('should return null if feed id does not exist in the archive', () => {
+                const archiveService = new SQLiteArchiveService();
+                const notExistFeedId = 'xxxxxxxx';
 
+                const feed = archiveService.getFeed(notExistFeedId);
+
+                expect(feed).toBeNull();
             });
 
-            it('should return Feed object if feed object exists in the archive', () => {
+            it('should return Feed object if feed object exists in the archive', async () => {
+                const archiveService = new SQLiteArchiveService();
+                const exampleFeedId = '01472583';
 
+                const feed : Feed = {
+                    version : RSSVersion.RSS_20,
+                    feedMetadata : {
+                        title : 'Example Title',
+                        description : 'Example Description',
+                        link : 'https://example.com'
+                    },
+                    items : [
+                        {
+                            description : 'Feed Item description',
+                            itemId : '36925814',
+                            title : 'Feed Item Title'
+                        }
+                    ]
+                };
+
+                const feedAdded = await archiveService.addFeed(feed, exampleFeedId);
+                expect(feedAdded).toBe(true);
+
+                const feedItemsAdded = await archiveService.addFeedItems(feed.items, exampleFeedId);
+                expect(feedItemsAdded).toBe(true);
+
+                const getFeed = archiveService.getFeed(exampleFeedId);
+
+                expect(getFeed).not.toBeNull();
+            });
+
+            it('should return feed with items', async () => {
+                const archiveService = new SQLiteArchiveService();
+                const exampleFeedId = '01472583';
+
+                const feed : Feed = {
+                    version : RSSVersion.RSS_20,
+                    feedMetadata : {
+                        title : 'Example Title',
+                        description : 'Example Description',
+                        link : 'https://example.com'
+                    },
+                    items : [
+                        {
+                            description : 'Feed Item description',
+                            itemId : '36925814',
+                            title : 'Feed Item Title'
+                        }
+                    ]
+                };
+
+                const feedAdded = await archiveService.addFeed(feed, exampleFeedId);
+                expect(feedAdded).toBe(true);
+
+                const feedItemsAdded = await archiveService.addFeedItems(feed.items, exampleFeedId);
+                expect(feedItemsAdded).toBe(true);
+
+                const getFeed = archiveService.getFeed(exampleFeedId);
+
+                expect(getFeed).not.toBeNull();
+                expect(getFeed?.items).toEqual(feed.items);
             });
 
         });
