@@ -107,9 +107,9 @@ export default class SQLiteArchiveService implements ArchiveService {
      * @param feedId The feed id that will be looked in the archive.
      */
     getFeed(feedId: string): Feed | undefined {
-        const feedIdColumn = 'feedId';
+        
         try {
-            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${feedIdColumn} LIKE ?`).get(feedId);
+            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
             
             if (sqlFeed === undefined) return undefined;
             
@@ -118,7 +118,7 @@ export default class SQLiteArchiveService implements ArchiveService {
             };
             feed.items = [];
 
-            const sqlFeedItems = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${feedIdColumn} LIKE ?`).all(feedId);
+            const sqlFeedItems = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).all(feedId);
             // convert data read from db to feed item. parse json data to real objects...
             for (const sfi of sqlFeedItems) {
                 const feedItem : FeedItem = {
@@ -136,7 +136,6 @@ export default class SQLiteArchiveService implements ArchiveService {
                 }
                 feed.items.push(feedItem);
             }
-
             return feed;
         }
         catch(err) {
