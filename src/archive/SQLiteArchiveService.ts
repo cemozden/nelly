@@ -1,8 +1,7 @@
 import { ArchiveService } from "./ArchiveService";
-import { DATABASE_INSTANCE } from "../db/SQLiteDatabase";
-import { FEED_ITEMS_TABLE_NAME, FEEDS_TABLE_NAME } from "../db/DatabaseInitializer";
 import logger from "../utils/Logger";
 import { FeedItem, Feed } from "../rss/specifications/RSS20";
+import SQLiteDatabase from "../db/SQLiteDatabase";
 
 /**
  * The archive service implemention that manages archive using SQLite database.
@@ -22,17 +21,19 @@ export default class SQLiteArchiveService implements ArchiveService {
      */
     getFeedItemIds(feedId: string): Promise<string[]> {
         const feedItemPromise = new Promise<string[]>((resolve, reject) => {
-            const feedItemQry = `SELECT ${this.itemIdColumn} FROM ${FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`;
-            DATABASE_INSTANCE.all(feedItemQry, [feedId], (err, rows) => {
-                if(err) {
-                    logger.error(`[SQLiteArchiveService] [getFeedItemIds] ${err.message}`);
+            const feedItemQry = `SELECT ${this.itemIdColumn} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`;
+            try {
+                const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all(feedId);
+                const itemIds = rows.map(row => row.itemId);
+
+                resolve(itemIds);
+            }
+            catch(err) {
+                logger.error(`[SQLiteArchiveService:getFeedItemIds] ${err.message}`);
                     reject(err);
                     return;
-                }
-                // Convert row objects into string array which is a collection of feed ids.
-                const itemIds = rows.map(row => row.itemId);
-                resolve(itemIds);
-            });
+            }
+        
         });
 
         return feedItemPromise;
@@ -56,18 +57,18 @@ export default class SQLiteArchiveService implements ArchiveService {
             
             // Create placeholders according to the size of tableData
             const placeHolder = tableData.map(td => '?').join(',');
-            const addFeedQry = `INSERT INTO ${FEEDS_TABLE_NAME} VALUES (${placeHolder})`;
+            const addFeedQry = `INSERT INTO ${SQLiteDatabase.FEEDS_TABLE_NAME} VALUES (${placeHolder})`;
 
-            DATABASE_INSTANCE.run(addFeedQry, tableData, err => {
-                if (err) {
-                    logger.error(`[SQLiteArchiveService] [addFeed] ${err.message}`);
-                    reject(err);
-                    return;
-                }
-
+            try {
+                SQLiteDatabase.getDatabaseInstance().prepare(addFeedQry).run(tableData);
                 resolve(true);
-            });
-
+            }
+            catch(err) {
+                logger.error(`[SQLiteArchiveService:addFeed] ${err.message}`);
+                reject(err);
+                return;
+            }
+       
         });
 
         return addFeedPromise;
@@ -86,7 +87,7 @@ export default class SQLiteArchiveService implements ArchiveService {
                 resolve(false);
                 return;
             }
-            const tableValues : any[] = [];
+            let tableValues : any[] = [];
 
             feedItems.forEach(fi => {
                 tableValues.push(fi.itemId);
@@ -97,24 +98,26 @@ export default class SQLiteArchiveService implements ArchiveService {
                 tableValues.push(fi.author);
                 tableValues.push(fi.category !== undefined ? JSON.stringify(fi.category) : null);
                 tableValues.push(fi.comments);
-                tableValues.push(fi.pubDate);
+                tableValues.push(fi.pubDate?.toISOString());
                 tableValues.push(fi.enclosure !== undefined ? JSON.stringify(fi.enclosure) : null);
                 tableValues.push(fi.guid !== undefined ? JSON.stringify(fi.guid) : null);
                 tableValues.push(fi.source !== undefined ? JSON.stringify(fi.source) : null );
             });
+            
+            console.log(tableValues);
 
             const placeHolder = feedItems.map(fi => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?)').join(',');
-            const addFeedItemsQry = `INSERT INTO ${FEED_ITEMS_TABLE_NAME} VALUES ${placeHolder}`;
-
-            DATABASE_INSTANCE.run(addFeedItemsQry, tableValues, err => {
-                if(err) {
-                    logger.error(`[SQLiteArchiveService] [addFeedItems] ${err.message}`);
-                    reject(err);
-                    return;
-                }
-
+            const addFeedItemsQry = `INSERT INTO ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} VALUES ${placeHolder}`;
+            
+            try {
+                SQLiteDatabase.getDatabaseInstance().prepare(addFeedItemsQry).run(tableValues);
                 resolve(true);
-            });
+            }
+            catch(err) {
+                logger.error(`[SQLiteArchiveService:addFeedItems] ${err.message}`);
+                reject(err);
+                return;
+            }
 
         });
 

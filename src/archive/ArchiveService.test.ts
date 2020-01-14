@@ -1,53 +1,20 @@
-import { DATABASE_INSTANCE } from "../db/SQLiteDatabase";
-import { FEED_ITEMS_TABLE_NAME, FEEDS_TABLE_NAME, initializeDb } from "../db/DatabaseInitializer";
 import SQLiteArchiveService from "./SQLiteArchiveService";
 import { FeedItem, Feed } from "../rss/specifications/RSS20";
 import { RSSVersion } from "../rss/specifications/RSSVersion";
+import SQLiteDatabase from "../db/SQLiteDatabase";
 
 describe('ArchiveService', () => {
 
-    beforeAll(() => {
-        initializeDb();
-    })
-
     describe('SQLiteArchiveService', () => {
 
-        beforeEach(async () => {
-            const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
-                DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
-                    if (err) throw err;
-
-                    resolve(true);
-                });
-
-                DATABASE_INSTANCE.run(`DELETE FROM ${FEEDS_TABLE_NAME};`, async (err) => {
-                    if (err) throw err;
-
-                    resolve(true);
-                });
-
-            });
-
-            await deleteTableDataPromise;
+        beforeEach(() => {
+            SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME};`).run();
+            SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`).run();
         });
 
-        afterAll(async () => {
-            const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
-                DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
-                    if (err) throw err;
-
-                    resolve(true);
-                });
-
-                DATABASE_INSTANCE.run(`DELETE FROM ${FEEDS_TABLE_NAME};`, async (err) => {
-                    if (err) throw err;
-
-                    resolve(true);
-                });
-
-            });
-
-            await deleteTableDataPromise;
+        afterAll(() => {
+            SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME};`).run();
+            SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`).run();
         });
 
         const exampleFeedId = '14725836';
@@ -121,23 +88,9 @@ describe('ArchiveService', () => {
         });
 
         describe('#addFeedItems(feedItems : FeedItem[])', () => {
-            beforeEach(async () => {
-                const deleteTableDataPromise = new Promise<boolean>((resolve, reject) => {
-                    DATABASE_INSTANCE.run(`DELETE FROM ${FEED_ITEMS_TABLE_NAME};`, async (err) => {
-                        if (err) throw err;
-
-                        resolve(true);
-                    });
-
-                    DATABASE_INSTANCE.run(`DELETE FROM ${FEEDS_TABLE_NAME};`, async (err) => {
-                        if (err) throw err;
-
-                        resolve(true);
-                    });
-
-                });
-
-                await deleteTableDataPromise;
+            beforeEach(() => {
+                SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME};`);
+                SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`);
             });
 
             it('should add feed items successfully', async () => {
