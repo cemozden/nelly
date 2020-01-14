@@ -9,13 +9,13 @@ import { FeedItem, Feed } from "../rss/specifications/RSS20";
  */
 export interface ArchiveService {
 
-    getFeedItemIds(feedId : string) : Promise<string[]>,
+    getFeedItemIds(feedId : string) : string[],
     
-    getFeed(feedId : string): Feed | null,
-    addFeed(feed : Feed, feedId : string) : Promise<boolean>,
-    updateFeed(feedId : string, feed : Feed) : Promise<boolean>,
-    deleteFeed(feedId : string) : Promise<boolean>,
+    getFeed(feedId : string): Feed | undefined,
+    addFeed(feed : Feed, feedId : string) : boolean,
+    updateFeed(feedId : string, feed : Feed) : boolean,
+    deleteFeed(feedId : string) : boolean,
 
-    addFeedItems(feedItems : FeedItem[], feedId : string) : Promise<boolean>;
-    deleteFeedItems(itemIds : string[])  : Promise<boolean>
+    addFeedItems(feedItems : FeedItem[], feedId : string) : boolean;
+    deleteFeedItems(itemIds : string[])  : boolean
 }

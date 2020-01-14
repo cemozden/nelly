@@ -13,8 +13,8 @@ describe('ArchiveService', () => {
         });
 
         afterAll(() => {
-            SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME};`).run();
-            SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`).run();
+            //SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME};`).run();
+            //SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`).run();
         });
 
         const exampleFeedId = '14725836';
@@ -44,30 +44,30 @@ describe('ArchiveService', () => {
 
         describe('#getFeedItemIds(feedId : string)', () => {
             
-            it('should return empty array if no feed item is found for the given feed', async () => {
+            it('should return empty array if no feed item is found for the given feed',  () => {
                 const archiveService = new SQLiteArchiveService();
-                const feedItemIdList = await archiveService.getFeedItemIds('12345678');
+                const feedItemIdList = archiveService.getFeedItemIds('12345678');
 
                 expect(feedItemIdList.length).toBe(0);
             });
 
-            it('should return an array of feed item ids if given feedId is found', async () => {
+            it('should return an array of feed item ids if given feedId is found',  () => {
                 const archiveService = new SQLiteArchiveService();
 
-                const feedAdded = await archiveService.addFeed(feed, exampleFeedId);
+                const feedAdded = archiveService.addFeed(feed, exampleFeedId);
                 expect(feedAdded).toBe(true);
 
-                const feedItemsAdded = await archiveService.addFeedItems(feedItems, exampleFeedId);
+                const feedItemsAdded = archiveService.addFeedItems(feedItems, exampleFeedId);
                 
                 expect(feedItemsAdded).toBe(true);
-                expect(await archiveService.getFeedItemIds(exampleFeedId)).toEqual(feedItems.map(fi => fi.itemId));
+                expect(archiveService.getFeedItemIds(exampleFeedId)).toEqual(feedItems.map(fi => fi.itemId));
             });
 
         });
 
         describe('#addFeed(feeds : Feed[])', () => {
 
-            it('should add feeds successfully', async () => {
+            it('should add feeds successfully',  () => {
                 const archiveService = new SQLiteArchiveService();
                 const exampleFeedId = '14725836';
 
@@ -81,7 +81,7 @@ describe('ArchiveService', () => {
                         version : RSSVersion.RSS_20
                 }
 
-                const feedAdded = await archiveService.addFeed(feeds, exampleFeedId);
+                const feedAdded = archiveService.addFeed(feeds, exampleFeedId);
                 
                 expect(feedAdded).toBe(true);
             });
@@ -93,31 +93,31 @@ describe('ArchiveService', () => {
                 SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`);
             });
 
-            it('should add feed items successfully', async () => {
+            it('should add feed items successfully',  () => {
                 const archiveService = new SQLiteArchiveService();
 
-                const feedAdded = await archiveService.addFeed(feed, exampleFeedId);
+                const feedAdded = archiveService.addFeed(feed, exampleFeedId);
                 expect(feedAdded).toBe(true);
 
-                const feedItemsAdded = await archiveService.addFeedItems(feedItems, exampleFeedId);
+                const feedItemsAdded = archiveService.addFeedItems(feedItems, exampleFeedId);
                 
                 expect(feedItemsAdded).toBe(true);
-                expect(await archiveService.getFeedItemIds(exampleFeedId)).toEqual(feedItems.map(fi => fi.itemId));
+                expect(archiveService.getFeedItemIds(exampleFeedId)).toEqual(feedItems.map(fi => fi.itemId));
             });
 
         });
 
-        describe.skip('#getFeed(feedId: string)', () => {
+        describe('#getFeed(feedId: string)', () => {
             it('should return null if feed id does not exist in the archive', () => {
                 const archiveService = new SQLiteArchiveService();
                 const notExistFeedId = 'xxxxxxxx';
 
                 const feed = archiveService.getFeed(notExistFeedId);
 
-                expect(feed).toBeNull();
+                expect(feed).toBeUndefined();
             });
 
-            it('should return Feed object if feed object exists in the archive', async () => {
+            it('should return Feed object if feed object exists in the archive',  () => {
                 const archiveService = new SQLiteArchiveService();
                 const exampleFeedId = '01472583';
 
@@ -132,15 +132,30 @@ describe('ArchiveService', () => {
                         {
                             description : 'Feed Item description',
                             itemId : '36925814',
-                            title : 'Feed Item Title'
+                            title : 'Feed Item Title',
+                            pubDate : new Date(),
+                            category : ['testCategory1', 'testCategory2'],
+                            enclosure : {
+                                length: 5,
+                                type : 'enclosure_type',
+                                url : 'https://example.com'
+                            },
+                            guid : {
+                                value : 'xyz',
+                                permaLink : false
+                            },
+                            source : {
+                                url : 'https://example.com',
+                                value : 'dsad'
+                            }
                         }
                     ]
                 };
 
-                const feedAdded = await archiveService.addFeed(feed, exampleFeedId);
+                const feedAdded = archiveService.addFeed(feed, exampleFeedId);
                 expect(feedAdded).toBe(true);
 
-                const feedItemsAdded = await archiveService.addFeedItems(feed.items, exampleFeedId);
+                const feedItemsAdded = archiveService.addFeedItems(feed.items, exampleFeedId);
                 expect(feedItemsAdded).toBe(true);
 
                 const getFeed = archiveService.getFeed(exampleFeedId);
@@ -148,7 +163,7 @@ describe('ArchiveService', () => {
                 expect(getFeed).not.toBeNull();
             });
 
-            it('should return feed with items', async () => {
+            it('should return feed with items', () => {
                 const archiveService = new SQLiteArchiveService();
                 const exampleFeedId = '01472583';
 
@@ -163,15 +178,30 @@ describe('ArchiveService', () => {
                         {
                             description : 'Feed Item description',
                             itemId : '36925814',
-                            title : 'Feed Item Title'
+                            title : 'Feed Item Title',
+                            pubDate : new Date(),
+                            category : ['testCategory1', 'testCategory2'],
+                            enclosure : {
+                                length: 5,
+                                type : 'enclosure_type',
+                                url : 'https://example.com'
+                            },
+                            guid : {
+                                value : 'xyz',
+                                permaLink : false
+                            },
+                            source : {
+                                url : 'https://example.com',
+                                value : 'dsad'
+                            }
                         }
                     ]
                 };
 
-                const feedAdded = await archiveService.addFeed(feed, exampleFeedId);
+                const feedAdded = archiveService.addFeed(feed, exampleFeedId);
                 expect(feedAdded).toBe(true);
 
-                const feedItemsAdded = await archiveService.addFeedItems(feed.items, exampleFeedId);
+                const feedItemsAdded = archiveService.addFeedItems(feed.items, exampleFeedId);
                 expect(feedItemsAdded).toBe(true);
 
                 const getFeed = archiveService.getFeed(exampleFeedId);
