@@ -7,20 +7,14 @@ import { FeedItem, Feed } from "../rss/specifications/RSS20";
  * 
  * @author cemozden
  */
-export interface ArchiveService {
+export interface FeedItemArchiveService {
 
     getFeedItemIds(feedId : string) : string[],
-    
-    getFeed(feedId : string): Feed | undefined,
-    addFeed(feed : Feed, feedId : string) : boolean,
-    updateFeed(feedId : string, feed : Feed) : boolean,
-    deleteFeed(feedId : string) : boolean,
-
     addFeedItems(feedItems : FeedItem[], feedId : string) : boolean;
-    deleteFeedItems(itemIds : string[])  : boolean
+    deleteFeedItems(itemIds : string[])  : number
 }
 
-export class InvalidFeedIdError extends Error {
+export class InvalidFeedItemIdError extends Error {
     constructor(message : string) {
         super(message);
     }

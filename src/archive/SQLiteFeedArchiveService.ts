@@ -1,44 +1,34 @@
-import { ArchiveService, InvalidFeedIdError } from "./ArchiveService";
-import logger from "../utils/Logger";
-import { FeedItem, Feed } from "../rss/specifications/RSS20";
+import { FeedArchiveService, InvalidFeedIdError } from "./FeedArchiveService";
+import { Feed, FeedItem } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
-import { RSSVersion } from "../rss/specifications/RSSVersion";
+import logger from "../utils/Logger";
 
 /**
- * The archive service implemention that manages archive using SQLite database.
+ * The archive service implemention that manages archive using SQLite database for feeds.
  * 
  * @author cemozden
- * 
- * @see ArchiveService
+ * @see FeedArchiveService
  */
-export default class SQLiteArchiveService implements ArchiveService {
+export default class SQLiteFeedArchiveService implements FeedArchiveService {
     
-    private readonly itemIdColumn = 'itemId';
     private readonly feedIdColumn = 'feedId';
 
     /**
-     * The method that returns a list of ids of feed items that belongs to a specific feed.
-     * @param feedId The id of the feed that feed items have.
-     */
-    getFeedItemIds(feedId: string): string[] {
-        const feedItemQry = `SELECT ${this.itemIdColumn} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`;
-        
-        try {
-            const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all(feedId);
-            const itemIds = rows.map(row => row.itemId);
-            return itemIds;
-        }
-        catch(err) {
-            logger.error(`[SQLiteArchiveService:getFeedItemIds] ${err.message}`);
-        }
-        return [];
-    }  /**
      * The method that adds the given feed into the archive.
      * The second parameter "feedId" must be the id given to the configuration of the feed. @see FeedConfig
      * @param feed The feed that will be added.
      * @param feedId The feed id that will be the id of the feed.
+     * @throws InvalidFeedIdError if the given feed id is already existing in the database.
      */
     addFeed(feed: Feed, feedId : string): boolean {
+
+        // Check whether feedId is existing
+        const feedQryCheckQry = `SELECT feedId FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE feedId LIKE ?`;
+        const feedQryCheckResult = SQLiteDatabase.getDatabaseInstance().prepare(feedQryCheckQry).all(feedId);
+
+        if (feedQryCheckResult.length > 0)
+            throw new InvalidFeedIdError(`Given feed id "${feedId} is already existing in the archive!"`);
+
         const tableData = [
             feedId,
             feed.version,
@@ -57,47 +47,6 @@ export default class SQLiteArchiveService implements ArchiveService {
         }
         catch(err) {
             logger.error(`[SQLiteArchiveService:addFeed] ${err.message}`);
-        }
-        return false;
-    }
-
-    /**
-     * The method that adds the given feed items to the archive.
-     * The second parameter "feedId" represents the id of the feed that will own the given feed items. 
-     * @param feedItems The feed items that needs to be added.
-     * @param feedId The id of the feed that owns the given feed items.
-     */
-    addFeedItems(feedItems: FeedItem[], feedId : string): boolean {
-        
-        if(feedItems.length === 0) 
-            return false;
-        
-        let tableValues : any[] = [];
-
-        feedItems.forEach(fi => {
-            tableValues.push(fi.itemId);
-            tableValues.push(feedId);
-            tableValues.push(fi.title);
-            tableValues.push(fi.description);
-            tableValues.push(fi.link);
-            tableValues.push(fi.author);
-            tableValues.push(fi.category !== undefined ? JSON.stringify(fi.category) : null);
-            tableValues.push(fi.comments);
-            tableValues.push(fi.pubDate?.toISOString());
-            tableValues.push(fi.enclosure !== undefined ? JSON.stringify(fi.enclosure) : null);
-            tableValues.push(fi.guid !== undefined ? JSON.stringify(fi.guid) : null);
-            tableValues.push(fi.source !== undefined ? JSON.stringify(fi.source) : null );
-        });
-        
-        const placeHolder = feedItems.map(fi => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?)').join(',');
-        const addFeedItemsQry = `INSERT INTO ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} VALUES ${placeHolder}`;
-        
-        try {
-            SQLiteDatabase.getDatabaseInstance().prepare(addFeedItemsQry).run(tableValues);
-            return true;
-        }
-        catch(err) {
-            logger.error(`[SQLiteArchiveService:addFeedItems] ${err.message}`);
         }
         return false;
     }
@@ -193,7 +142,7 @@ export default class SQLiteArchiveService implements ArchiveService {
     deleteFeed(feedId: string): boolean {
         
         try {
-            const qryResult = SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE feedId LIKE ?`).run(feedId);
+            const qryResult = SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).run(feedId);
             return qryResult.changes > 0;
         }
         catch (err) {
@@ -202,8 +151,4 @@ export default class SQLiteArchiveService implements ArchiveService {
 
         return false;
     }
-    deleteFeedItems(itemIds: string[]): boolean {
-        throw new Error("Method not implemented.");
-    }
-
 }
