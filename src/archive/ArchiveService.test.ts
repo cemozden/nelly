@@ -2,6 +2,7 @@ import SQLiteArchiveService from "./SQLiteArchiveService";
 import { FeedItem, Feed } from "../rss/specifications/RSS20";
 import { RSSVersion } from "../rss/specifications/RSSVersion";
 import SQLiteDatabase from "../db/SQLiteDatabase";
+import { InvalidFeedIdError } from "./ArchiveService";
 
 describe('ArchiveService', () => {
 
@@ -161,6 +162,7 @@ describe('ArchiveService', () => {
                 const getFeed = archiveService.getFeed(exampleFeedId);
 
                 expect(getFeed).not.toBeNull();
+                expect(getFeed).toEqual(feed);
             });
 
             it('should return feed with items', () => {
@@ -208,6 +210,69 @@ describe('ArchiveService', () => {
 
                 expect(getFeed).not.toBeNull();
                 expect(getFeed?.items).toEqual(feed.items);
+            });
+
+        });
+
+        describe('#updateFeed(feedId: string, feed: Feed)', () => {
+
+            it('should throw an error if feed id is not a valid string or empty string', () => {
+                const archiveService = new SQLiteArchiveService();
+
+                expect(() => {archiveService.updateFeed('', {
+                    feedMetadata : {
+                        description : 'Example description',
+                        link : 'https://example.com',
+                        title : 'Example Title'
+                    },
+                    items : [],
+                    version : RSSVersion.RSS_20
+                })}).toThrowError(new InvalidFeedIdError(`feedId parameter cannot be empty. Parameter value: ""`));
+
+            });
+
+            it('should return false if no feed is updated', () => {
+                const archiveService = new SQLiteArchiveService();
+                const feedId = '13698521';
+                
+                const updatedFeed : Feed = {
+                    feedMetadata : {
+                        title : 'Updated Feed Title 1',
+                        description : 'Updated Feed Description 1',
+                        link : 'https://example.com'
+                    },
+                    items : [],
+                    version : RSSVersion.RSS_20
+                }
+
+                expect(archiveService.updateFeed(feedId, updatedFeed)).toBe(false);
+
+            });
+
+            it('should return true if feed is updated', () => {
+                const archiveService = new SQLiteArchiveService();
+                const feedId = '13698521';
+                
+                const feedAdded = archiveService.addFeed(feed, feedId);
+                expect(feedAdded).toBe(true);
+
+                const updatedFeed : Feed = {
+                    feedMetadata : {
+                        title : 'Updated Feed Title 1',
+                        description : 'Updated Feed Description 1',
+                        link : 'https://example.com'
+                    },
+                    items : [],
+                    version : RSSVersion.RSS_20
+                }
+
+                expect(archiveService.updateFeed(feedId, updatedFeed)).toBe(true);
+                const updatedFeedFromDb = archiveService.getFeed(feedId);
+
+                expect(updatedFeedFromDb).not.toBeUndefined();
+                expect(updatedFeedFromDb?.feedMetadata).not.toBeUndefined();
+                expect(updatedFeedFromDb?.feedMetadata).toEqual(updatedFeed.feedMetadata);
+                
             });
 
         });

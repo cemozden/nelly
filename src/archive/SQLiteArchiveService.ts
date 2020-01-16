@@ -1,7 +1,8 @@
-import { ArchiveService } from "./ArchiveService";
+import { ArchiveService, InvalidFeedIdError } from "./ArchiveService";
 import logger from "../utils/Logger";
 import { FeedItem, Feed } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
+import { RSSVersion } from "../rss/specifications/RSSVersion";
 
 /**
  * The archive service implemention that manages archive using SQLite database.
@@ -113,10 +114,18 @@ export default class SQLiteArchiveService implements ArchiveService {
             
             if (sqlFeed === undefined) return undefined;
             
+            sqlFeed.version = parseInt(sqlFeed.version);
+            
+            //TODO: Problem with initializing feed metadata check this out.
             const feed : Feed = {
-                ...sqlFeed
+                feedMetadata : {
+                    title : sqlFeed.title,
+                    description : sqlFeed.description,
+                    link : sqlFeed.link
+                },
+                items : [],
+                version : sqlFeed.version
             };
-            feed.items = [];
 
             const sqlFeedItems = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).all(feedId);
             // convert data read from db to feed item. parse json data to real objects...
@@ -146,8 +155,37 @@ export default class SQLiteArchiveService implements ArchiveService {
 
         return undefined;
     }
+
+    /**
+     * The method that updates a specific feed on the database by getting its feedId
+     * @param feedId The id of the feed needs to be updated.
+     * @param feed The new feed object that will replace th existing one.
+     * @throws InvalidFeedIdError if feedId is not a valid feedId.
+     */
     updateFeed(feedId: string, feed: Feed): boolean {
-        throw new Error("Method not implemented.");
+        if (typeof feedId !== 'string' || feedId === '')
+            throw new InvalidFeedIdError(`feedId parameter cannot be empty. Parameter value: "${feedId}"`);
+        
+        const valueMap = new Map<string, any>();
+
+        const feedTableValues : any = {
+            feedId : feedId,
+            version : feed.version,
+            title : feed.feedMetadata.title,
+            link : feed.feedMetadata.link,
+            description : feed.feedMetadata.description
+        };
+
+        const sqlNewValuesStr = Object.keys(feedTableValues)
+            .map(k => `${k} = ?`).join(', ');
+
+        let updateQry = `UPDATE ${SQLiteDatabase.FEEDS_TABLE_NAME} SET ${sqlNewValuesStr} WHERE ${this.feedIdColumn} LIKE ?`;
+        const qryParams = Object.values(feedTableValues);
+        // Push feedId for WHERE condition
+        qryParams.push(feedId);
+
+        const numberOfChanges = SQLiteDatabase.getDatabaseInstance().prepare(updateQry).run(qryParams).changes;
+        return numberOfChanges == 1;
     }
     deleteFeed(feedId: string): boolean {
         throw new Error("Method not implemented.");

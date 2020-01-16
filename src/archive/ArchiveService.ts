@@ -19,3 +19,9 @@ export interface ArchiveService {
     addFeedItems(feedItems : FeedItem[], feedId : string) : boolean;
     deleteFeedItems(itemIds : string[])  : boolean
 }
+
+export class InvalidFeedIdError extends Error {
+    constructor(message : string) {
+        super(message);
+    }
+}
