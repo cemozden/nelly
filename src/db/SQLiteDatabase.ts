@@ -66,7 +66,11 @@ export default class SQLiteDatabase {
                 mkdirSync(this.databaseFolderPath);
 
             try {
-                this.dbInstance = new BetterSQLite3(`${this.databaseFolderPath}nelly.db`);
+                const dbOptions = {
+                    verbose : logger.verbose
+                };
+                // Activate verbose if the environment is not production.
+                this.dbInstance = new BetterSQLite3(`${this.databaseFolderPath}nelly.db`, process.env.NODE_ENV == 'production' ? undefined : dbOptions);
                 this.initializeDb();
             }
             catch (err) {

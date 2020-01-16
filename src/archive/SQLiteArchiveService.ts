@@ -116,7 +116,6 @@ export default class SQLiteArchiveService implements ArchiveService {
             
             sqlFeed.version = parseInt(sqlFeed.version);
             
-            //TODO: Problem with initializing feed metadata check this out.
             const feed : Feed = {
                 feedMetadata : {
                     title : sqlFeed.title,
@@ -152,8 +151,6 @@ export default class SQLiteArchiveService implements ArchiveService {
             return undefined;
         }
         
-
-        return undefined;
     }
 
     /**
@@ -187,8 +184,23 @@ export default class SQLiteArchiveService implements ArchiveService {
         const numberOfChanges = SQLiteDatabase.getDatabaseInstance().prepare(updateQry).run(qryParams).changes;
         return numberOfChanges == 1;
     }
+
+    /**
+     * The method that deletes a specific feed according to the given parameter.
+     * 
+     * @param feedId The id of the feed which needs to be deleted.
+     */
     deleteFeed(feedId: string): boolean {
-        throw new Error("Method not implemented.");
+        
+        try {
+            const qryResult = SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE feedId LIKE ?`).run(feedId);
+            return qryResult.changes > 0;
+        }
+        catch (err) {
+            logger.error(`[SQLiteArchiveService:deleteFeed] ${err.message}`);   
+        }
+
+        return false;
     }
     deleteFeedItems(itemIds: string[]): boolean {
         throw new Error("Method not implemented.");

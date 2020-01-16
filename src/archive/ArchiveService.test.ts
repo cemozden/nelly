@@ -67,7 +67,7 @@ describe('ArchiveService', () => {
         });
 
         describe('#addFeed(feeds : Feed[])', () => {
-
+            
             it('should add feeds successfully',  () => {
                 const archiveService = new SQLiteArchiveService();
                 const exampleFeedId = '14725836';
@@ -273,6 +273,75 @@ describe('ArchiveService', () => {
                 expect(updatedFeedFromDb?.feedMetadata).not.toBeUndefined();
                 expect(updatedFeedFromDb?.feedMetadata).toEqual(updatedFeed.feedMetadata);
                 
+            });
+
+        });
+
+        describe('#deleteFeed(feedId: string)', () => {
+            it('should return false if no feed is deleted', () => {
+                const archiveService = new SQLiteArchiveService();
+
+                expect(archiveService.deleteFeed('no_exist')).toBe(false);
+            });
+
+            it('should return true if feed is deleted', () => {
+                const archiveService = new SQLiteArchiveService();
+                const newFeedId = 'abcdefgh';
+
+                const newFeed : Feed = {
+                    feedMetadata : {
+                        title : 'Updated Feed Title 1',
+                        description : 'Updated Feed Description 1',
+                        link : 'https://example.com'
+                    },
+                    items : [],
+                    version : RSSVersion.RSS_20
+                }
+                expect(archiveService.addFeed(newFeed, newFeedId)).toBe(true);
+                expect(archiveService.deleteFeed(newFeedId)).toBe(true);
+            });
+
+            it('should delete items of the feed', () => {
+                const archiveService = new SQLiteArchiveService();
+                const exampleFeedId = '01472585';
+
+                const feed : Feed = {
+                    version : RSSVersion.RSS_20,
+                    feedMetadata : {
+                        title : 'Example Title',
+                        description : 'Example Description',
+                        link : 'https://example.com'
+                    },
+                    items : [
+                        {
+                            description : 'Feed Item description',
+                            itemId : '36925814',
+                            title : 'Feed Item Title',
+                            pubDate : new Date(),
+                            category : ['testCategory1', 'testCategory2'],
+                            enclosure : {
+                                length: 5,
+                                type : 'enclosure_type',
+                                url : 'https://example.com'
+                            },
+                            guid : {
+                                value : 'xyz',
+                                permaLink : false
+                            },
+                            source : {
+                                url : 'https://example.com',
+                                value : 'dsad'
+                            }
+                        }
+                    ]
+                };
+                
+                expect(archiveService.addFeed(feed, exampleFeedId)).toBe(true);
+                expect(archiveService.addFeedItems(feed.items, exampleFeedId)).toBe(true);
+                expect(archiveService.deleteFeed(exampleFeedId));
+
+                const feedIds = archiveService.getFeedItemIds(exampleFeedId);
+                expect(feedIds.length).toBe(0);
             });
 
         });
