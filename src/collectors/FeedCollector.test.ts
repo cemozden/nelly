@@ -32,5 +32,11 @@ describe('FeedCollector', () => {
             return expect(collectFeed(feedConfig)).rejects.toThrow();
         });
 
+        it('should resolve with a valid value', () => {
+            feedConfig.url = 'https://gizmodo.com/rss';
+            
+            return expect(collectFeed(feedConfig)).resolves.not.toBeUndefined();
+        });
+
     });
 });

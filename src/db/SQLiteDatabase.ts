@@ -30,8 +30,8 @@ export default class SQLiteDatabase {
             this.getDatabaseInstance().exec(`CREATE TABLE IF NOT EXISTS ${this.FEED_ITEMS_TABLE_NAME} (
                 itemId char(8) NOT NULL,
                 feedId char(8) NOT NULL,
-                title TEXT NOT NULL,
-                description TEXT NOT NULL,
+                title TEXT,
+                description TEXT,
                 link varchar(255),
                 author varchar(150),
                 category TEXT,
