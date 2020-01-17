@@ -50,10 +50,15 @@ export default class JSONConfigManager implements ConfigManager {
         }
 
         const configPathStr = configPath as string;
-        
-        this.SETTINGS_MANAGER = new JSONSettingsManager(configPath);
-        this.LANGUAGE_MANAGER = new JSONLanguageManager(`${configPathStr}${sep}${this.LANGUAGE_FOLDER_NAME}`);
-        this.FEED_CONFIG_MANAGER = new JSONFeedConfigManager(`${configPathStr}${sep}${this.FEED_CONFIG_FOLDER_NAME}`);
+        try {
+            this.SETTINGS_MANAGER = new JSONSettingsManager(configPath);
+            this.LANGUAGE_MANAGER = new JSONLanguageManager(`${configPathStr}${sep}${this.LANGUAGE_FOLDER_NAME}`);
+            this.FEED_CONFIG_MANAGER = new JSONFeedConfigManager(`${configPathStr}${sep}${this.FEED_CONFIG_FOLDER_NAME}`);
+        }
+        catch (err) {
+            logger.error(`[JSONConfigManager] ${err.message}`);
+            process.exit(-1);
+        }
     }
 
     getFeedConfigManager() : FeedConfigManager {
