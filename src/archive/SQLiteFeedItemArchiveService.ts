@@ -71,9 +71,10 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             tableValues.push(fi.enclosure !== undefined ? JSON.stringify(fi.enclosure) : null);
             tableValues.push(fi.guid !== undefined ? JSON.stringify(fi.guid) : null);
             tableValues.push(fi.source !== undefined ? JSON.stringify(fi.source) : null );
+            tableValues.push(new Date().toISOString());
         });
         
-        const placeHolder = feedItems.map(fi => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?)').join(',');
+        const placeHolder = feedItems.map(fi => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)').join(',');
         const addFeedItemsQry = `INSERT INTO ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} VALUES ${placeHolder}`;
         
         try {

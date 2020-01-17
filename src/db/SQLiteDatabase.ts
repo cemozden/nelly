@@ -23,7 +23,8 @@ export default class SQLiteDatabase {
                 version char(1) NOT NULL,
                 title varchar(255) NOT NULL,
                 link varchar(255) NOT NULL,
-                description varchar(255) NOT NULL
+                description varchar(255) NOT NULL,
+                insertedAt datetime
             );`);
     
             this.getDatabaseInstance().exec(`CREATE TABLE IF NOT EXISTS ${this.FEED_ITEMS_TABLE_NAME} (
@@ -39,6 +40,7 @@ export default class SQLiteDatabase {
                 enclosure TEXT,
                 guid TEXT,
                 source TEXT,
+                insertedAt datetime,
                 FOREIGN KEY(feedId) REFERENCES feeds(feedId) ON DELETE CASCADE
             );`);
         }
