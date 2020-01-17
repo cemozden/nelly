@@ -27,7 +27,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             return itemIds;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService:getFeedItemIds] ${err.message}`);
+            logger.error(`[SQLiteArchiveService->getFeedItemIds] ${err.message}`);
         }
         return [];
     }  
@@ -82,7 +82,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             return true;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService:addFeedItems] ${err.message}`);
+            logger.error(`[SQLiteArchiveService->addFeedItems] ${err.message}`);
         }
         return false;
     }

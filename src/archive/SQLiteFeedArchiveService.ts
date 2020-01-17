@@ -47,7 +47,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             return true;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService:addFeed] ${err.message}`);
+            logger.error(`[SQLiteArchiveService->addFeed] ${err.message}`);
         }
         return false;
     }
@@ -97,7 +97,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             return feed;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService:getFeed] ${err.message}`);
+            logger.error(`[SQLiteArchiveService->getFeed] ${err.message}`);
             return undefined;
         }
         
@@ -147,7 +147,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             return qryResult.changes > 0;
         }
         catch (err) {
-            logger.error(`[SQLiteArchiveService:deleteFeed] ${err.message}`);   
+            logger.error(`[SQLiteArchiveService->deleteFeed] ${err.message}`);   
         }
 
         return false;

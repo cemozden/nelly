@@ -101,7 +101,7 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
             //Parse XML to JavaScript object.
             parseString(body, xmlParseOptions, (err, rssObject) => {
                 if (err) {
-                    logger.error(`[CollectFeed] [ParsingXML] ${err.message}`);
+                    logger.error(`[CollectFeed->ParsingXML] ${err.message}`);
                     reject(err);
                     return;
                 }

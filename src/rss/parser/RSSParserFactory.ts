@@ -19,11 +19,6 @@ export default class RSSParserFactory {
         [RSSVersion.RSS_20, new RSS20Parser()]
     ]);
 
-    private static readonly xml2jsProps : OptionsV2 = {
-        cdata : true,
-        explicitArray : false
-    };
-
     private static isRSSParser(parser : RSSParser<Feed> | undefined) : parser is RSSParser<any> {
         return parser !== undefined;
     }
