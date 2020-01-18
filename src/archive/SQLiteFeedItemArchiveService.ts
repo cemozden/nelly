@@ -2,6 +2,8 @@ import { FeedItemArchiveService, InvalidFeedItemIdError } from "./FeedItemArchiv
 import logger from "../utils/Logger";
 import { FeedItem, Feed } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
+import Duration from "../time/Duration";
+import { TimeUnit } from "../time/TimeUnit";
 
 /**
  * The archive service implemention that manages archive using SQLite database for feed items.
@@ -98,6 +100,15 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         const qryResult = SQLiteDatabase.getDatabaseInstance().prepare(deleteFeedItemsQry).run(itemIds);
 
         return qryResult.changes;
+    }
+
+    cleanFeedItems(duration : Duration): number {
+        const timeUnitStr = TimeUnit[duration.unit];
+        const sqlDateFilterPattern = `-${duration.value} ${timeUnitStr}`;
+
+        const deleteFeedItemsQry = `DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE strftime('%Y-%m-%d %H:%M:%S', insertedAt) < datetime('now','${sqlDateFilterPattern}');`;
+        
+        return SQLiteDatabase.getDatabaseInstance().prepare(deleteFeedItemsQry).run().changes;
     }
 
 }

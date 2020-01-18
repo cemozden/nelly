@@ -4,6 +4,7 @@ import { RSSVersion } from "../rss/specifications/RSSVersion";
 import SQLiteDatabase from "../db/SQLiteDatabase";
 import { InvalidFeedItemIdError } from "./FeedItemArchiveService";
 import SQLiteFeedArchiveService from "./SQLiteFeedArchiveService";
+import { TimeUnit } from "../time/TimeUnit";
 
 describe('FeedItemArchiveService', () => {
 
@@ -112,6 +113,27 @@ describe('FeedItemArchiveService', () => {
                 expect(feedItemArchiveService.addFeedItems(feedItems, exampleFeedId)).toBe(true);
 
                 expect(feedItemArchiveService.deleteFeedItems(feedItems.map(fi => fi.itemId))).toBeGreaterThan(0);
+            });
+        });
+
+        describe('#cleanFeedItems(duration : Duration)', () => {
+            it('should delete feed items according to the given duration', () => {
+                const feedItemArchiveService = new SQLiteFeedItemArchiveService();
+                const feedArchiveService = new SQLiteFeedArchiveService();
+                const feedId = 'lopiumnb';
+                const twoMonthsAgo = new Date();
+
+                twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+                feedArchiveService.addFeed(feed, feedId);
+
+                const qry1Values = ['abc12345', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, twoMonthsAgo.toISOString()];
+                const qry2Values = ['abc12346', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, twoMonthsAgo.toISOString()];
+                
+                SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry1Values);
+                SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry2Values);
+
+                expect(feedItemArchiveService.cleanFeedItems({unit : TimeUnit.MONTHS, value : 1})).toBe(2);
             });
         });
 
