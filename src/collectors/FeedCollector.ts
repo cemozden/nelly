@@ -68,7 +68,7 @@ function updateExistingFeed(feed : Feed, feedId : string) {
                 throw new FeedFetchError(message);
             }
             /*else {
-                //TODO: Add socket io message sender to UI for the feed.
+                //TODO: Add socket io message sender to UI for the new fresh feed data and feed items.
             }*/
         }
         
@@ -86,8 +86,6 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
 
             if (error) {
                 if (error.code === 'ENOTFOUND') {
-                    //TODO: Send a message through Socket.IO to the UI regarding no internet connection.
-                    
                     logger.error(`[CollectFeed] Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`);
                     reject(new FeedFetchError(`Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`));
                 }
