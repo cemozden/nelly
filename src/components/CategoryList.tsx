@@ -1,30 +1,40 @@
 import React from "react";
-import { FeedConfigManager } from "../config/FeedConfigManager";
+import { FeedConfigManager, FeedCategory } from "../config/FeedConfigManager";
 
 export interface CategoryListProps {
     feedConfigManager : FeedConfigManager
 }
 
-const CategoryList : React.FC<CategoryListProps> = (props) => {
+interface CategoryProps {
+    feedCategory : FeedCategory
+}
+
+const FeedDirectory : React.FC<CategoryProps> = props => {
+    const childCategories = props.feedCategory.childCategories;
+
+    if (childCategories.length != 0) {
+        return (<React.Fragment>
+                <Feed feedCategory={props.feedCategory} />
+                <ol>
+                    {childCategories.map(cc => <FeedDirectory feedCategory={cc} />)}
+                </ol>
+            </React.Fragment>);
+    }
+    else 
+      return <Feed feedCategory={props.feedCategory} />  
+    
+};
+
+const Feed : React.FC<CategoryProps> = props => {
+    return (<li id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>);
+};
+
+const CategoryList : React.FC<CategoryListProps> = props => {
     return <div className="categoryList">
-    <ul>
-        <li id="blogs">- Blogs</li>
-        <ol id="blogs_list">
-            <li id="ubuntuIncident">Ubuntu Incident</li>
-            <li id="cemOzden">Cem Ozden</li>
-        </ol>
-        <li>- News</li>
-        <ol>
-            <li>- BBC</li>
-            <ol>
-                <li>BBC News World</li>
-                <li>BBC News Sport</li>
-                <li>BBC News Technology</li>
-            </ol>
-            <li>NTV</li>
-        </ol>
-    </ul>
-</div>;
+                <ul>
+                    <FeedDirectory feedCategory={props.feedConfigManager.getRootCategory()} />      
+                </ul>
+            </div>;
 };
 
 export default CategoryList;
