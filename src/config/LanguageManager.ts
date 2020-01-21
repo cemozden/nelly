@@ -9,10 +9,4 @@ export interface LanguageManager {
     getLanguageCount() : number
 }
 
-export class InvalidLanguageFileError extends Error {
-
-    constructor(message : string) {
-        super(message);
-    }
-
-}
+export class InvalidLanguageFileError extends Error {}

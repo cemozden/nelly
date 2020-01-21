@@ -60,32 +60,12 @@ export interface FeedConfigManager {
     getFeedConfigCount() : number    
 }
 
-export class InvalidFeedConfigIdError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class InvalidFeedConfigIdError extends Error {}
 
-export class NotUniqueFeedConfigIdError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class NotUniqueFeedConfigIdError extends Error {}
 
-export class NotExistFeedCategoryError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class NotExistFeedCategoryError extends Error {}
 
-export class InvalidFeedCategoryIdError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class InvalidFeedCategoryIdError extends Error {}
 
-export class InvalidFeedCategoryError extends Error {
-    constructor(message: string) {
-        super(message);
-    }
-}
+export class InvalidFeedCategoryError extends Error {}

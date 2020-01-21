@@ -20,10 +20,4 @@ export interface ConfigManager {
  * The class which is thrown in case the configuration path of the application is not a valid string.
  * @see JSONConfigManager
  */
-export class ConfigPathNotAvailableError extends Error {
-    
-    constructor(message : string) {
-        super(message);
-    }
-
-}
+export class ConfigPathNotAvailableError extends Error {}

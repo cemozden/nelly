@@ -14,7 +14,7 @@ export default class JSONLanguageManager implements LanguageManager {
 
     private readonly LANGUAGE_FOLDER_PATH : string;
     private readonly ENGLISH_LANGUAGE_FILE_NAME = 'lang_en.json';
-    private readonly LANGUAGE_FILE_PATTERN : string = 'lang_[a-z]{2}\.json';
+    private readonly LANGUAGE_FILE_PATTERN : string = 'lang_[a-z]{2}\\.json';
     private readonly LOG_LABEL : string = 'LanguageManager';
     
     constructor(languageFolderPath : string) {

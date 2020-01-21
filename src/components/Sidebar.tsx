@@ -2,7 +2,6 @@ import React from "react";
 import CategoryHeader from "./CategoryHeader";
 import CategoryList from "./CategoryList";
 import { FeedConfigManager } from "../config/FeedConfigManager";
-import JSONFeedConfigManager from "../config/JSONFeedConfigManager";
 
 export interface SideBarProps {
     feedConfigManager : FeedConfigManager

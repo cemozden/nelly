@@ -12,7 +12,7 @@ import logger from "../utils/Logger";
  */
 export default class JSONFeedConfigManager implements FeedConfigManager {
        
-    private readonly FEED_CONFIG_FILE_PATTERN : string = '[a-zA-Z0-9]{8}\.json';
+    private readonly FEED_CONFIG_FILE_PATTERN : string = '[a-zA-Z0-9]{8}\\.json';
     private readonly CATEGORY_LIST_FILE_NAME = 'category.json';
 
     private readonly FEEDS_FOLDER : string;

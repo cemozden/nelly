@@ -4,7 +4,6 @@ import SideBar from "./components/Sidebar";
 import { Language, DEFAULT_ENGLISH_LANGUAGE } from './config/Language';
 import { ConfigManager } from './config/ConfigManager';
 import JSONConfigManager from './config/JSONConfigManager';
-import { sep } from 'path';
 
 interface ApplicationState {
   language : Language
