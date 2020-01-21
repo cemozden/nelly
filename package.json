@@ -6,6 +6,7 @@
   "scripts": {
     "start": "env-cmd -f .env.dev craco build && env-cmd -f .env.dev electron public/electron.js",
     "start_electron": "env-cmd -f .env.dev electron public/electron.js",
+    "build": "env-cmd -f .env.prod craco build",
     "test": "craco test",
     "eject": "craco eject",
     "package": "env-cmd -f .env.prod craco build && electron-packager . --overwrite --platform=all --arch=x64 --out=dist"
