@@ -1,41 +1,50 @@
 const electron = require('electron');
-const path = require('path');
-const url = require('url');
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-const NODE_ENV = process.env.NODE_ENV;
 
 let mainWindow;
 
-function createWindow() {
-    mainWindow = new BrowserWindow({width: 800, height: 600});
-    mainWindow.loadURL(NODE_ENV === 'development' ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+const path = require('path');
 
-    mainWindow.on('ready-to-show', () => {
-        mainWindow.show();
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        width: 1100,
+        height: 750,
+        webPreferences: { 
+            nodeIntegration: true, 
+            preload : `${__dirname}${path.sep}preload.js` 
+        }
     });
+
+    mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
     
-    if (NODE_ENV === 'development')
+    if (process.env.NODE_ENV === undefined) process.env.NODE_ENV = 'production';
+    
+    if (process.env.NODE_ENV !== 'production')
         mainWindow.webContents.openDevTools();
 
     mainWindow.on('closed', function () {
-        mainWindow = null
+        mainWindow = null;
+    })
+
+    mainWindow.webContents.on('crashed', () => {
+        console.log(`mainWindow crashed. re-creating.`)
+        mainWindow.destroy();
+        createWindow();
     });
 }
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', function () 
-{
+app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
-        app.quit();
+        app.quit()
     }
 });
 
-app.on('activate', function () 
-{
+app.on('activate', function () {
     if (mainWindow === null) {
-        createWindow();
+        createWindow()
     }
 });

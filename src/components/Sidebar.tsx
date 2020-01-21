@@ -1,36 +1,21 @@
 import React from "react";
+import CategoryHeader from "./CategoryHeader";
+import CategoryList from "./CategoryList";
+import { FeedConfigManager } from "../config/FeedConfigManager";
+import JSONFeedConfigManager from "../config/JSONFeedConfigManager";
 
 export interface SideBarProps {
-
+    feedConfigManager : FeedConfigManager
 }
 
-const SideBar : React.FC<SideBarProps> = (props : SideBarProps) => {
+const SideBar : React.FC<SideBarProps> = (props) => {
+
 
     return (
         <div className="sidebar">
-                <div className="categoriesHeader">
-                    <h3>Categories</h3>
-                </div>
-                <div className="categoryList">
-                    <ul>
-                        <li id="blogs">- Blogs</li>
-                        <ol id="blogs_list">
-                            <li id="ubuntuIncident">Ubuntu Incident</li>
-                            <li id="cemOzden">Cem Ozden</li>
-                        </ol>
-                        <li>- News</li>
-                        <ol>
-                            <li>- BBC</li>
-                            <ol>
-                                <li>BBC News World</li>
-                                <li>BBC News Sport</li>
-                                <li>BBC News Technology</li>
-                            </ol>
-                            <li>NTV</li>
-                        </ol>
-                    </ul>
-                </div>
-            </div>
+            <CategoryHeader title="Categories" />
+            <CategoryList feedConfigManager={props.feedConfigManager} />    
+        </div>
     );
 
 };

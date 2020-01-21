@@ -1,7 +1,7 @@
 import { format } from "logform";
 import { LoggerOptions, transports, createLogger } from "winston";
 import { isString } from "util";
-import { sep, basename } from "path";
+import { sep } from "path";
 
 const logFormat = format.combine(
     format.timestamp(),
@@ -16,9 +16,9 @@ const consoleLogFormat = format.combine(
 
 let logsDir = null;
 
-if (isString(process.env.LOGS_DIR)) 
-    logsDir = process.env.LOGS_DIR;
-
+if (isString((window as any).LOGS_DIR)) 
+    logsDir = `${(window as any).LOGS_DIR}${sep}`;
+else logsDir = process.env.LOGS_DIR;
 
 const options : LoggerOptions = {
   level : 'debug', 

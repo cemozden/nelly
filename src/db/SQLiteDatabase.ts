@@ -11,7 +11,7 @@ import logger from "../utils/Logger";
  */
 export default class SQLiteDatabase {
     private static dbInstance : BetterSQLite3.Database;
-    private static readonly databaseFolderPath =  process.env.NODE_ENV === 'test' ? `${process.env.PWD}${sep}testresources${sep}` : `${process.env.HOME}${sep}.nelly${sep}`;
+    private static readonly databaseFolderPath =  process.env.NODE_ENV === 'test' ? `${process.env.PWD}${sep}testresources${sep}` : (window as any).DATABASE_DIR;
     
     static FEEDS_TABLE_NAME = 'feeds';
     static FEED_ITEMS_TABLE_NAME = 'feedItems';

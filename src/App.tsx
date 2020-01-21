@@ -1,12 +1,16 @@
 import React from 'react';
 import './css/main.css';
 import SideBar from "./components/Sidebar";
+import { Language, DEFAULT_ENGLISH_LANGUAGE } from './config/Language';
+import { ConfigManager } from './config/ConfigManager';
+import JSONConfigManager from './config/JSONConfigManager';
+import { sep } from 'path';
 
 interface ApplicationState {
-  language : string/*ApplicationLanguage*/
+  language : Language
 }
 
-
+const configManager : ConfigManager = new JSONConfigManager((window as any).CONFIG_DIR);
 const className = 'wrapper';
 
 class App extends React.Component<any, ApplicationState> {
@@ -14,14 +18,14 @@ class App extends React.Component<any, ApplicationState> {
   constructor(props : any) {
     super(props);
     this.state = {
-      language : 'en'      
+      language : DEFAULT_ENGLISH_LANGUAGE      
     };
   }
 
   render() {
     return (
       <div className={className}>
-        <SideBar />
+        <SideBar feedConfigManager={configManager.getFeedConfigManager()} />
       </div>
     );
   }
