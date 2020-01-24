@@ -1,9 +1,11 @@
 import React from 'react';
 import './css/main.css';
-import SideBar from "./components/Sidebar";
+import './css/react-contextmenu.css';
+import Sidebar from "./components/Sidebar";
 import { Language, DEFAULT_ENGLISH_LANGUAGE } from './config/Language';
 import { ConfigManager } from './config/ConfigManager';
 import JSONConfigManager from './config/JSONConfigManager';
+import FeedSummaryTable from './components/FeedSummaryTable';
 
 interface ApplicationState {
   language : Language
@@ -24,7 +26,8 @@ class App extends React.Component<any, ApplicationState> {
   render() {
     return (
       <div className={className}>
-        <SideBar feedConfigManager={configManager.getFeedConfigManager()} />
+        <Sidebar feedConfigManager={configManager.getFeedConfigManager()} />
+        <FeedSummaryTable feedItems={[]} />
       </div>
     );
   }
