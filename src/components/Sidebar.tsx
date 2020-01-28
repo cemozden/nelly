@@ -2,6 +2,7 @@ import React from "react";
 import CategoryHeader from "./CategoryHeader";
 import Categories from "./Categories";
 import { FeedConfigManager } from "../config/FeedConfigManager";
+import { ApplicationContext } from "../App";
 
 export interface SideBarProps {
     feedConfigManager : FeedConfigManager
@@ -9,12 +10,16 @@ export interface SideBarProps {
 
 const Sidebar : React.FC<SideBarProps> = (props) => {
 
-    return (
-        <div className="sidebar">
-            <CategoryHeader title="Categories" />
-            <Categories feedConfigManager={props.feedConfigManager} />    
-        </div>
-    );
+    return <ApplicationContext.Consumer>
+                {
+                    ({language}) => (
+                        <div className="sidebar">
+                            <CategoryHeader title={language.categories} />
+                            <Categories feedConfigManager={props.feedConfigManager} />    
+                        </div>
+                    )
+                }
+            </ApplicationContext.Consumer> 
 
 };
 
