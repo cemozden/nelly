@@ -1,6 +1,7 @@
 import React from "react";
 import { FeedConfigManager, FeedCategory, FeedConfig } from "../config/FeedConfigManager";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
+import { ApplicationContext } from "../App";
 
 export interface CategoriesProps {
     feedConfigManager : FeedConfigManager
@@ -38,46 +39,57 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
 
 const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
 
-    return  (<React.Fragment>
+    return  (
+      <ApplicationContext.Consumer>
+        {
+          ({language}) => (
+            <React.Fragment>
               <ContextMenuTrigger id={props.feedCategory.categoryId + '_contextMenu'}>
                 <li id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>
               </ContextMenuTrigger>
               <ContextMenu id={props.feedCategory.categoryId + '_contextMenu'}>
                 <MenuItem  onClick={(e, data) => console.log(1)}>
-                  {`Add Category under ${props.feedCategory.name}`}
+                  {language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)}
                 </MenuItem>
                 <MenuItem onClick={(e, data) => console.log(2)}>
-                {`Add new RSS Feed under ${props.feedCategory.name}`}
+                {language.sidebar.feedCategoryTitle.addNewFeedUnder.replace('$<categoryName>', props.feedCategory.name)}
                 </MenuItem>
                 { props.feedCategory.categoryId !== 'root' ? <React.Fragment>
                   <MenuItem /*data={{foo: 'bar'}}*/ onClick={(e, data) => console.log(3)}>
-                    {`Update ${props.feedCategory.name}`}
+                  {language.sidebar.feedCategoryTitle.updateCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
                   </MenuItem>
                   <MenuItem onClick={(e, data) => console.log(3)}>
-                    {`Delete ${props.feedCategory.name}`}
+                  {language.sidebar.feedCategoryTitle.deleteCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
                   </MenuItem>
                 </React.Fragment> : null}
             </ContextMenu>       
-        </React.Fragment>);
+        </React.Fragment>
+          )
+        } 
+      </ApplicationContext.Consumer>);
 };
 
 const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
-  return <React.Fragment>
-            <ContextMenuTrigger id={props.feedConfig.feedConfigId + '_contextMenu'}>
-                <li id={props.feedConfig.feedConfigId}>{props.feedConfig.name}</li>
-              </ContextMenuTrigger>
-              <ContextMenu id={props.feedConfig.feedConfigId + '_contextMenu'}>
-                <MenuItem onClick={(e, data) => console.log(1)}>
-                  Add new Feed
-                </MenuItem>
-                <MenuItem onClick={(e, data) => console.log(2)}>
-                {`Update ${props.feedConfig.name}`}
-                </MenuItem>
-                <MenuItem onClick={(e, data) => console.log(3)}>
-                  {`Delete ${props.feedConfig.name}`}
-                </MenuItem>
-            </ContextMenu>       
-        </React.Fragment>
+  return  <ApplicationContext.Consumer>
+            {
+              ({language}) => (<React.Fragment>
+                <ContextMenuTrigger id={props.feedConfig.feedConfigId + '_contextMenu'}>
+                    <li id={props.feedConfig.feedConfigId}>{props.feedConfig.name}</li>
+                  </ContextMenuTrigger>
+                  <ContextMenu id={props.feedConfig.feedConfigId + '_contextMenu'}>
+                    <MenuItem onClick={(e, data) => console.log(1)}>
+                      {language.sidebar.feedCategoryMember.addNewFeed}
+                    </MenuItem>
+                    <MenuItem onClick={(e, data) => console.log(2)}>
+                     {language.sidebar.feedCategoryMember.updateFeed.replace('$<feedName>', props.feedConfig.name)}
+                    </MenuItem>
+                    <MenuItem onClick={(e, data) => console.log(3)}>
+                    {language.sidebar.feedCategoryMember.deleteFeed.replace('$<feedName>', props.feedConfig.name)}
+                    </MenuItem>
+                </ContextMenu>       
+            </React.Fragment>)
+            }
+          </ApplicationContext.Consumer> 
 };
 
 const Categories : React.FC<CategoriesProps> = props => {
