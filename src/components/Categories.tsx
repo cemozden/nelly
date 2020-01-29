@@ -2,6 +2,7 @@ import React from "react";
 import { FeedConfigManager, FeedCategory, FeedConfig } from "../config/FeedConfigManager";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { ApplicationContext } from "../App";
+import Modal from "./Modal";
 
 export interface CategoriesProps {
     feedConfigManager : FeedConfigManager
@@ -48,7 +49,10 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                 <li id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>
               </ContextMenuTrigger>
               <ContextMenu id={props.feedCategory.categoryId + '_contextMenu'}>
-                <MenuItem  onClick={(e, data) => console.log(1)}>
+                <MenuItem  onClick={(e, data) => {
+                  const modal = document.getElementById("nellyModal");
+                  (modal as any).style.display = 'block';
+                } }>
                   {language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)}
                 </MenuItem>
                 <MenuItem onClick={(e, data) => console.log(2)}>
@@ -99,6 +103,9 @@ const Categories : React.FC<CategoriesProps> = props => {
                 <ul>
                     <FeedDirectory feedList={props.feedConfigManager.getFeedConfigs()} feedCategory={props.feedConfigManager.getRootCategory()} />
                 </ul>
+                <Modal title="Deneme">
+                  
+                </Modal>
             </div>;
 };
 

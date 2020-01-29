@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/main.css';
 import './css/react-contextmenu.css';
+import './css/modal.css';
 import Sidebar from "./components/Sidebar";
-import { Language } from './config/Language';
 import { ConfigManager } from './config/ConfigManager';
 import JSONConfigManager from './config/JSONConfigManager';
 import FeedSummaryTable from './components/FeedSummaryTable';
 
-interface ApplicationState {
-  language : Language
+interface AppProps {
+
 }
 
 const configManager : ConfigManager = new JSONConfigManager((window as any).CONFIG_DIR);
@@ -18,31 +18,22 @@ const systemLanguage = configManager.getLanguageManager().loadLanguage(languageT
 
 export const ApplicationContext = React.createContext({language : systemLanguage});
 
-class App extends React.Component<any, ApplicationState> {
+const App : React.FC<AppProps> = props => {
+    const [language, setLanguage] = useState(systemLanguage);
 
-  constructor(props : any) {
-    super(props);
-    this.state = {
-      language : systemLanguage
-    };
+    useEffect(() => {
+      document.title = systemLanguage.windowTitle;
+    });
 
-    document.title = systemLanguage.windowTitle;
-
-  }
-
-  render() {
     return (
-      <ApplicationContext.Provider value={this.state}>
+      <ApplicationContext.Provider value={{language}}>
         <div className={className}>
           <Sidebar feedConfigManager={configManager.getFeedConfigManager()} />
           <FeedSummaryTable feedItems={[]} />
         </div>
       </ApplicationContext.Provider>
-      
     );
-  }
 
 }
-
 
 export default App;
