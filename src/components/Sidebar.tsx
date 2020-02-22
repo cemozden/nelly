@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import CategoryHeader from "./CategoryHeader";
 import Categories from "./Categories";
 import { FeedConfigManager } from "../config/FeedConfigManager";
@@ -9,18 +9,12 @@ export interface SideBarProps {
 }
 
 const Sidebar : React.FC<SideBarProps> = (props) => {
-
-    return <ApplicationContext.Consumer>
-                {
-                    ({language}) => (
-                        <div className="sidebar">
-                            <CategoryHeader title={language.categories} />
-                            <Categories feedConfigManager={props.feedConfigManager} />    
-                        </div>
-                    )
-                }
-            </ApplicationContext.Consumer> 
-
+    const appContext = useContext(ApplicationContext);
+    
+    return (<div className="sidebar">
+                <CategoryHeader title={appContext.language.categories} />
+                <Categories feedConfigManager={props.feedConfigManager} />    
+            </div>)
 };
 
 export default Sidebar;
