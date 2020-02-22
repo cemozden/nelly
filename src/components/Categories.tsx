@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useReducer, Reducer } from "react";
 import { FeedConfigManager, FeedCategory, FeedConfig } from "../config/FeedConfigManager";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { ApplicationContext } from "../App";
@@ -10,7 +10,8 @@ export interface CategoriesProps {
 
 interface FeedDirectoryProps {
     feedCategory : FeedCategory,
-    feedList : FeedConfig[]
+    feedList : FeedConfig[],
+    feedCategoryDispatcher : React.Dispatch<any>
 }
 
 interface FeedCategoryTitleProps {
@@ -21,6 +22,11 @@ interface FeedCategoryMemberProps {
     feedConfig : FeedConfig
 }
 
+interface CategoriesState {
+  feeds : FeedConfig[],
+  rootCategory : FeedCategory
+}
+
 const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
     const childCategories = props.feedCategory.childCategories;
 
@@ -28,7 +34,7 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
         return (<React.Fragment>
                 <FeedCategoryTitle feedCategory={props.feedCategory} />
                 <ol>
-                    {childCategories.map(cc => <FeedDirectory feedList={props.feedList} feedCategory={cc} />)}
+                    {childCategories.map(cc => <FeedDirectory feedCategoryDispatcher={props.feedCategoryDispatcher} feedList={props.feedList} feedCategory={cc} />)}
                 </ol>
                 {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember feedConfig={fc} />)}
             </React.Fragment>);
@@ -91,16 +97,32 @@ const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
             </React.Fragment>) 
 };
 
+function categoryReducer(state : CategoriesState, action : any) : CategoriesState {
+    
+  switch(action.type) {
+    case 'setFeeds':
+      return { feeds : action.feeds, rootCategory : state.rootCategory }
+    case 'setRootCategory':
+      return {rootCategory : action.rootCategory, feeds : state.feeds }
+    default:
+      throw new Error('Unable to find the dispatcher')
+  }
+}
+
 const Categories : React.FC<CategoriesProps> = props => {
-    //const [rootCategory, setRootCategory] = useState(props.feedConfigManager.getRootCategory());
-    //const [feeds, setFeeds] = useState(props.feedConfigManager.getFeedConfigs());
+    
+  const initialState : any = {
+      rootCategory : props.feedConfigManager.getRootCategory(),
+      feeds : props.feedConfigManager.getFeedConfigs()
+    };
+
+    const [state, dispatch] = useReducer(categoryReducer, initialState);
+
     return <div className="categoryList">
                 <ul>
-                    <FeedDirectory feedList={props.feedConfigManager.getFeedConfigs()} feedCategory={props.feedConfigManager.getRootCategory()} />
+                    <FeedDirectory feedList={state.feeds} feedCategory={state.rootCategory} feedCategoryDispatcher={dispatch} />
                 </ul>
-                <Modal title="Deneme">
-                  
-                </Modal>
+                <Modal title="Deneme"/>
             </div>;
 };
 
