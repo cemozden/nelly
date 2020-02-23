@@ -178,6 +178,11 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 return;
             }
 
+            if (feedCategory.name.length === 0) {
+                reject(new InvalidFeedCategoryError(`The category name cannot be empty!`));
+                return;
+            }
+
             // Add the given new category into the child category list of its parent.
             parent.childCategories.push(feedCategory);
             

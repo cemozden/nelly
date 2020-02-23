@@ -16,19 +16,19 @@ const className = 'wrapper';
 const languageTag = configManager.getSettingsManager().getSettings().language;
 const systemLanguage = configManager.getLanguageManager().loadLanguage(languageTag);
 
-export const ApplicationContext = React.createContext({language : systemLanguage});
+export const ApplicationContext = React.createContext({language : systemLanguage, configManager : configManager});
 
 const App : React.FC<AppProps> = props => {
-    const [language, setLanguage] = useState(systemLanguage);
-
+    const [language] = useState(systemLanguage);
+    
     useEffect(() => {
-      document.title = systemLanguage.windowTitle;
+      document.title = language.windowTitle;
     });
-
+    
     return (
-      <ApplicationContext.Provider value={{language}}>
+      <ApplicationContext.Provider value={{language, configManager}}>
         <div className={className}>
-          <Sidebar feedConfigManager={configManager.getFeedConfigManager()} />
+          <Sidebar />
           <FeedSummaryTable feedItems={[]} />
         </div>
       </ApplicationContext.Provider>

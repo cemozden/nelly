@@ -1,7 +1,7 @@
 import BetterSQLite3 from "better-sqlite3";
 import { sep } from "path";
 import { existsSync, mkdirSync } from "fs";
-import { dialog, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 import logger from "../utils/Logger";
 
 /**
@@ -53,7 +53,7 @@ export default class SQLiteDatabase {
                     title: 'Nelly',
                     message: err.message
                 };
-                dialog.showMessageBox(null as unknown as BrowserWindow, options);
+                (window as any).electron.dialog.showMessageBox(null as unknown as BrowserWindow, options);
             }
             process.exit(-1);
         }
@@ -83,7 +83,7 @@ export default class SQLiteDatabase {
                         title: 'Nelly',
                         message: err.message
                     };
-                    dialog.showMessageBox(null as unknown as BrowserWindow, options);
+                    (window as any).electron.dialog.showMessageBox(null as unknown as BrowserWindow, options);
                 }
     
                 process.exit(-1);

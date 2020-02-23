@@ -1,11 +1,12 @@
 import React, { useContext, useReducer} from "react";
-import { FeedConfigManager, FeedCategory, FeedConfig } from "../config/FeedConfigManager";
+import { FeedCategory, FeedConfig } from "../config/FeedConfigManager";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { ApplicationContext } from "../App";
 import Modal from "./Modal";
+import AddNewCategory from "./AddNewCategory";
 
 export interface CategoriesProps {
-    feedConfigManager : FeedConfigManager
+  
 }
 
 interface FeedDirectoryProps {
@@ -62,7 +63,7 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                     appContext.language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)
                   });
 
-                    props.categoryDispatch({type : 'setModalContent', modalContent : <div>Hello World!</div>});
+                    props.categoryDispatch({type : 'setModalContent', modalContent : <AddNewCategory categoryDispatch={props.categoryDispatch} parentCategory={props.feedCategory} />});
                     props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
                   } }>
                     {appContext.language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)}
@@ -124,10 +125,11 @@ function categoryReducer(state : CategoriesState, action : any) : CategoriesStat
 }
 
 const Categories : React.FC<CategoriesProps> = props => {
-    
+  const appContext = useContext(ApplicationContext);
+
   const initialState : any = {
-      rootCategory : props.feedConfigManager.getRootCategory(),
-      feeds : props.feedConfigManager.getFeedConfigs(),
+      rootCategory : appContext.configManager.getFeedConfigManager().getRootCategory(),
+      feeds : appContext.configManager.getFeedConfigManager().getFeedConfigs(),
       modalContent : <div></div>,
       modalTitle : 'Modal',
       modalVisible : false

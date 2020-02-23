@@ -409,6 +409,21 @@ describe('FeedManager', () => {
             return expect(feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryIdError(`The feed category id "${newFeedCategory.categoryId}" is already existing in the category tree!`));
         });
 
+        it('should not allow to add a feed category if the category name is empty', () => {
+            
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+            
+            const newFeedCategory : FeedCategory = {
+                categoryId : 'qawe1789',
+                childCategories : [],
+                name : '',
+                visible : true
+            };
+
+            return expect(feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryError(`The category name cannot be empty!`));
+
+        });
+
     });
 
     describe('#updateFeedCategory(newFeedCategory : FeedCategory, oldFeedCategory : FeedCategory)', () => {
