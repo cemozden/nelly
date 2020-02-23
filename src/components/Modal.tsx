@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import * as ReactDOM from "react-dom";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
-    title : string
+    title : string,
+    visible : boolean
 }
 
 const modalRoot = document.getElementById('modal-root');
@@ -25,7 +25,7 @@ const Modal : React.FC<ModalProps> = props => {
     }
     
     return createPortal(
-        <div id="nellyModal" className="modal">
+        <div id="nellyModal" style={props.visible ? {display : 'block'}: {display : 'none'}} className="modal">
             <div className="modal-content">
                 <div className="modal-header">
                     <span className="close" onClick={closeModal}>&times;</span>
