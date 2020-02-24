@@ -203,7 +203,7 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
      * @param newFeedCategory The new feed category that will take place of the second parameter.
      * @param oldFeedCategory The feed category that will be replaced by the first parameter.
      * @throws NotExistFeedCategoryError if the oldFeedCategory is not existing in the category tree.
-     * @throws InvalidFeedCategoryIdError if the new feed category has an id that is already defined in the category tree.
+     * @deprecated @throws InvalidFeedCategoryIdError if the new feed category has an id that is already defined in the category tree.
      * @returns a promise with a value of true if the update operation succeeds otherwise it might throw an error.
      */
     updateFeedCategory(newFeedCategory: FeedCategory, oldFeedCategory : FeedCategory): Promise<boolean> {
@@ -215,11 +215,11 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 return;
             }
 
-            if(categoryIdExist(newFeedCategory.categoryId, this.ROOT_CATEGORY)) {
+            /*if(categoryIdExist(newFeedCategory.categoryId, this.ROOT_CATEGORY)) {
                 reject(new InvalidFeedCategoryIdError(`The updated feed category has a category id which is already existing in the category tree!`));
                 return;
             }
-            
+            */
             Object.assign(feedCategoryToUpdate, newFeedCategory);
             
             writeFile(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(this.ROOT_CATEGORY), err => {

@@ -12,6 +12,7 @@ interface AddNewCategoryProps {
 const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
     
     const appContext = useContext(ApplicationContext);
+    const addNewCategoryLanguage = appContext.language.sidebar.addCategoryUnder;
 
     const [categoryName, setCategoryName] = useState('');
     const [categoryVisible, setCategoryVisible] = useState(true);
@@ -71,12 +72,12 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
 
     return (<form>
                 <table>
-                    <tr><td><label>Category Name:</label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
-                    <tr><td><label><label>Visible: </label></label></td><td><select onChange={handleVisibilityChange}>
-                    <option value="true" selected>Yes</option>
-                    <option value="false">No</option>
+                    <tr><td><label>{addNewCategoryLanguage.categoryName}: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
+                    <tr><td><label><label>{addNewCategoryLanguage.visible}: </label></label></td><td><select onChange={handleVisibilityChange}>
+                    <option value="true" selected>{appContext.language.yes}</option>
+                    <option value="false">{appContext.language.yes}</option>
                     </select></td></tr>
-                    <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Add new category" /></td></tr>
+                    <tr><td colSpan={2}><input type="submit" onClick={handleClick} value={addNewCategoryLanguage.addCategory} /></td></tr>
                 </table>
         </form>)
 };

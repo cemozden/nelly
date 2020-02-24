@@ -4,6 +4,7 @@ import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { ApplicationContext } from "../App";
 import Modal from "./Modal";
 import AddNewCategory from "./AddNewCategory";
+import UpdateFeedCategory from "./UpdateFeedCategory";
 
 export interface CategoriesProps {
   
@@ -72,7 +73,14 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                   {appContext.language.sidebar.feedCategoryTitle.addNewFeedUnder.replace('$<categoryName>', props.feedCategory.name)}
                   </MenuItem>
                   { props.feedCategory.categoryId !== 'root' ? <React.Fragment>
-                    <MenuItem /*data={{foo: 'bar'}}*/ onClick={(e, data) => console.log(3)}>
+                    <MenuItem onClick={(e, data) => {
+                      props.categoryDispatch({type : 'setModalTitle', modalTitle : 
+                      appContext.language.sidebar.feedCategoryTitle.updateCategoryTitle.replace('$<categoryName>', props.feedCategory.name)
+                    });
+  
+                      props.categoryDispatch({type : 'setModalContent', modalContent : <UpdateFeedCategory categoryDispatch={props.categoryDispatch} feedCategory={props.feedCategory} />});
+                      props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
+                    }}>
                     {appContext.language.sidebar.feedCategoryTitle.updateCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
                     </MenuItem>
                     <MenuItem onClick={(e, data) => console.log(3)}>
