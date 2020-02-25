@@ -52,6 +52,58 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
 
 const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
     const appContext = useContext(ApplicationContext);
+    const language = appContext.language;
+
+    async function deleteCategory(feedCategory : FeedCategory) {
+
+      const options = {
+        type: 'question',
+        buttons: [language.yes, language.no],
+        title: language.sidebar.deleteCategory.deleteCategoryMessageTitle.replace('$<categoryName>', feedCategory.name),
+        message : language.sidebar.deleteCategory.deleteConfirmMessage.replace('$<categoryName>', feedCategory.name),
+        detail  : language.sidebar.deleteCategory.deleteConfirmMessageDetails
+      };
+      
+      const messageBoxReturnValuePromise : Promise<Electron.MessageBoxReturnValue> = (window as any).electron.dialog.showMessageBox(null, options);
+      const messageBoxReturnValue = await messageBoxReturnValuePromise;
+
+      if (messageBoxReturnValue.response === 0) {
+        const feedConfigManager = appContext.configManager.getFeedConfigManager();
+        
+        try {
+          const categoryDeleted = await feedConfigManager.deleteFeedCategory(feedCategory);
+
+          if (categoryDeleted) {
+            const rootCategory = feedConfigManager.getRootCategory();
+            
+            //TODO: Remove feeds that belongs to the deleted categories. (CATEGORIES that is, all of them)
+
+            props.categoryDispatch({type : 'setRootCategory', rootCategory : rootCategory});
+            props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
+          }
+          else {
+            const options = {
+              type: 'error',
+              buttons: ['Ok'],
+              title: 'Nelly | ' + language.error,
+              message: language.sidebar.deleteCategory.deleteCategoryError
+          };
+          (window as any).electron.dialog.showMessageBox(null, options);
+          }
+        }
+        catch (err) {
+          const options = {
+            type: 'error',
+            buttons: ['Ok'],
+            title: 'Nelly | ' + language.error,
+            message: err.message
+        };
+        (window as any).electron.dialog.showMessageBox(null, options);
+        }
+
+      }
+      
+    }
 
     return  (
               <React.Fragment>
@@ -59,6 +111,9 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                   <li id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>
                 </ContextMenuTrigger>
                 <ContextMenu id={props.feedCategory.categoryId + '_contextMenu'}>
+                  <MenuItem onClick={(e, data) => console.log(2)}>
+                    {appContext.language.sidebar.feedCategoryTitle.addNewFeedUnder.replace('$<categoryName>', props.feedCategory.name)}
+                  </MenuItem>
                   <MenuItem data={{parentCategory : props.feedCategory}} onClick={(e, data) => {
                     props.categoryDispatch({type : 'setModalTitle', modalTitle : 
                     appContext.language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)
@@ -68,9 +123,6 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                     props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
                   } }>
                     {appContext.language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)}
-                  </MenuItem>
-                  <MenuItem onClick={(e, data) => console.log(2)}>
-                  {appContext.language.sidebar.feedCategoryTitle.addNewFeedUnder.replace('$<categoryName>', props.feedCategory.name)}
                   </MenuItem>
                   { props.feedCategory.categoryId !== 'root' ? <React.Fragment>
                     <MenuItem onClick={(e, data) => {
@@ -83,7 +135,7 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                     }}>
                     {appContext.language.sidebar.feedCategoryTitle.updateCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
                     </MenuItem>
-                    <MenuItem onClick={(e, data) => console.log(3)}>
+                    <MenuItem onClick={async (e, data) => await deleteCategory(props.feedCategory)}>
                     {appContext.language.sidebar.feedCategoryTitle.deleteCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
                     </MenuItem>
                   </React.Fragment> : null}

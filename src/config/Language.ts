@@ -27,6 +27,12 @@ export interface Language {
             updateCategory : string,
             categoryName : string,
             visible : string
+        },
+        deleteCategory : {
+            deleteCategoryMessageTitle : string,
+            deleteConfirmMessage : string,
+            deleteConfirmMessageDetails : string,
+            deleteCategoryError : string
         }
     }
     validations : {
@@ -68,6 +74,12 @@ export const DEFAULT_ENGLISH_LANGUAGE : Language = {
             updateCategory : 'Update Category',
             categoryName : 'Category Name',
             visible : 'Visible'
+        },
+        deleteCategory : {
+            deleteCategoryMessageTitle : 'Delete category $<categoryName>',
+            deleteConfirmMessage : 'Are you sure you want to delete the category "$<categoryName>"?',
+            deleteConfirmMessageDetails : 'Feeds under this category will also be deleted!',
+            deleteCategoryError : 'Unable to delete the feed category! An error occured!'
         }
         
     },
