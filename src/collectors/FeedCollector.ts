@@ -128,8 +128,4 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
     return feedCollectorPromise;
 }
 
-export class FeedFetchError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class FeedFetchError extends Error {}

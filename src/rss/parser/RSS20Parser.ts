@@ -93,7 +93,7 @@ export default class RSS20Parser implements RSSParser<Feed> {
                 } : undefined,
                 guid : item.guid !== undefined ? {
                     value : item.guid._,
-                    permaLink : item.guid.$.isPermaLink == 'true'
+                    permaLink : item.guid.$.isPermaLink === 'true'
                 } : undefined,
                 source : item.source !== undefined ? {
                     url : item.source.$.url,

@@ -7,8 +7,4 @@ export interface RSSParser<T> {
     parseRSS(rssObject : any) : T
 }
 
-export class RSSParserError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class RSSParserError extends Error {}

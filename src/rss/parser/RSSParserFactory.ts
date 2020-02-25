@@ -3,7 +3,6 @@ import { RSSValidator } from "./validators/Validator";
 import RSS20Validator from "./validators/RSS20Validator";
 import { RSSVersion } from "../specifications/RSSVersion";
 import RSS20Parser from "./RSS20Parser";
-import { parseStringPromise, OptionsV2 } from "xml2js";
 import logger from "../../utils/Logger";
 import { Feed } from "../specifications/RSS20";
 

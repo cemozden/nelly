@@ -7,8 +7,4 @@ export interface FeedArchiveService {
     deleteFeed(feedId : string) : boolean,
 }
 
-export class InvalidFeedIdError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class InvalidFeedIdError extends Error {}

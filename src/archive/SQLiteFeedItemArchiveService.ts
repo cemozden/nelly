@@ -1,6 +1,6 @@
 import { FeedItemArchiveService, InvalidFeedItemIdError } from "./FeedItemArchiveService";
 import logger from "../utils/Logger";
-import { FeedItem, Feed } from "../rss/specifications/RSS20";
+import { FeedItem } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
 import Duration from "../time/Duration";
 import { TimeUnit } from "../time/TimeUnit";

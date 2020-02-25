@@ -12,8 +12,4 @@ export interface RSSValidator {
 }
 
 /* The general error class that will be thrown in case object is not a standard RSS feed.*/
-export class RSSValidationError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class RSSValidationError extends Error {}

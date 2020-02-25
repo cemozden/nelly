@@ -1,4 +1,4 @@
-import { FeedItem, Feed } from "../rss/specifications/RSS20";
+import { FeedItem } from "../rss/specifications/RSS20";
 import Duration from "../time/Duration";
 
 /**
@@ -21,8 +21,4 @@ export interface FeedItemArchiveService {
     cleanFeedItems(duration : Duration) : number
 }
 
-export class InvalidFeedItemIdError extends Error {
-    constructor(message : string) {
-        super(message);
-    }
-}
+export class InvalidFeedItemIdError extends Error {}

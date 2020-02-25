@@ -112,8 +112,6 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
     updateFeed(feedId: string, feed: Feed): boolean {
         if (typeof feedId !== 'string' || feedId === '')
             throw new InvalidFeedIdError(`feedId parameter cannot be empty. Parameter value: "${feedId}"`);
-        
-        const valueMap = new Map<string, any>();
 
         const feedTableValues : any = {
             feedId : feedId,
@@ -132,7 +130,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
         qryParams.push(feedId);
 
         const numberOfChanges = SQLiteDatabase.getDatabaseInstance().prepare(updateQry).run(qryParams).changes;
-        return numberOfChanges == 1;
+        return numberOfChanges === 1;
     }
 
     /**
