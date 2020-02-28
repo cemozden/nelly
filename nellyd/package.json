@@ -1,0 +1,42 @@
+{
+  "name": "nellyd",
+  "version": "1.0.0",
+  "description": "nelly daemon",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": "https://github.com/cemozden/nelly",
+  "author": "cemozden",
+  "license": "MIT",
+  "dependencies": {
+    "@types/crc": "^3.4.0",
+    "@types/electron": "^1.6.10",
+    "@types/express": "^4.17.2",
+    "@types/jest": "^25.1.3",
+    "@types/node": "^12.0.0",
+    "@types/node-cron": "^2.0.3",
+    "@types/request": "^2.48.4",
+    "@types/rimraf": "^2.0.3",
+    "@types/socket.io": "^2.1.4",
+    "@types/winston": "^2.4.4",
+    "@types/xml2js": "^0.4.5",
+    "better-sqlite3": "^6.0.1",
+    "crc": "^3.8.0",
+    "electron": "^8.0.2",
+    "env-cmd": "^10.1.0",
+    "express": "^4.17.1",
+    "jest": "^25.1.0",
+    "node-cron": "^2.0.3",
+    "request": "^2.88.2",
+    "rimraf": "^3.0.2",
+    "socket.io": "^2.3.0",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.8.2",
+    "winston": "^3.2.1",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "ts-jest": "^25.2.1"
+  }
+}

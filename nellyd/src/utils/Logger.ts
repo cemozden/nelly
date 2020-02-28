@@ -14,11 +14,7 @@ const consoleLogFormat = format.combine(
     format.printf(info => `${info.timestamp} [${info.level}]: ${info.message}`)
   );
 
-let logsDir = null;
-
-if (isString((window as any).LOGS_DIR)) 
-    logsDir = `${(window as any).LOGS_DIR}${sep}`;
-else logsDir = process.env.LOGS_DIR;
+const logsDir = process.env.LOGS_DIR;
 
 const options : LoggerOptions = {
   level : 'debug', 
