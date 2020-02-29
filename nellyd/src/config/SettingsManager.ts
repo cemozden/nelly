@@ -8,13 +8,15 @@ import { TimeUnit } from "../time/TimeUnit";
 export interface SystemSettings {
     language : string,
     windowMaximized : boolean,
-    archiveCleaningPeriod : Duration
+    archiveCleaningPeriod : Duration,
+    serverPort : number
 }
 
 export const DEFAULT_SYSTEM_SETTINGS : SystemSettings = {
     language : "en",
     windowMaximized : false,
-    archiveCleaningPeriod : {unit : TimeUnit.MONTHS, value : 6}
+    archiveCleaningPeriod : {unit : TimeUnit.MONTHS, value : 6},
+    serverPort : 6150
 }
 
 export interface SettingsManager {

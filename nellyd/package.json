@@ -2,9 +2,10 @@
   "name": "nellyd",
   "version": "1.0.0",
   "description": "nelly daemon",
-  "main": "index.js",
+  "main": "public/EntryPoint.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "tsc && env-cmd -f .env.dev node ."
   },
   "repository": "https://github.com/cemozden/nelly",
   "author": "cemozden",
