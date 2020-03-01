@@ -1,7 +1,7 @@
 import BetterSQLite3 from "better-sqlite3";
 import { sep } from "path";
 import { existsSync, mkdirSync } from "fs";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, dialog } from "electron";
 import logger from "../utils/Logger";
 
 /**
@@ -11,7 +11,7 @@ import logger from "../utils/Logger";
  */
 export default class SQLiteDatabase {
     private static dbInstance : BetterSQLite3.Database;
-    private static readonly databaseFolderPath =  process.env.NODE_ENV === 'test' ? `${process.env.PWD}${sep}testresources${sep}` : (window as any).DATABASE_DIR;
+    private static readonly databaseFolderPath =  process.env.NODE_ENV === 'test' ? `${process.env.PWD}${sep}testresources${sep}` : process.env.DATABASE_DIR;
     
     static FEEDS_TABLE_NAME = 'feeds';
     static FEED_ITEMS_TABLE_NAME = 'feedItems';
@@ -53,7 +53,7 @@ export default class SQLiteDatabase {
                     title: 'Nelly',
                     message: err.message
                 };
-                (window as any).electron.dialog.showMessageBox(null as unknown as BrowserWindow, options);
+                dialog.showMessageBox(null as unknown as BrowserWindow, options);
             }
             process.exit(-1);
         }
@@ -83,7 +83,7 @@ export default class SQLiteDatabase {
                         title: 'Nelly',
                         message: err.message
                     };
-                    (window as any).electron.dialog.showMessageBox(null as unknown as BrowserWindow, options);
+                    dialog.showMessageBox(null as unknown as BrowserWindow, options);
                 }
     
                 process.exit(-1);

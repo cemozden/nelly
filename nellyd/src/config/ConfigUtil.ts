@@ -13,25 +13,6 @@ export function isFeedConfig(obj : any) : obj is FeedConfig {
 }
 
 /**
- * The function that checks whether a given FeedCategory object exist in a tree.
- * 
- * @param objToSearch The object that will be searched on the feed category tree.
- * @param objToLookFor The feed category tree that will be looked for.
- * @see JSONFeedConfigManager
- */
-export function feedCategoryExist(objToSearch: FeedCategory, objToLookFor : FeedCategory) : FeedCategory | null {
-    const param1Json = JSON.stringify(objToSearch);
-    const param2Json = JSON.stringify(objToLookFor);
-
-    if (param1Json === param2Json) return objToLookFor;
-    
-    for (const cc of objToLookFor.childCategories)
-        if(feedCategoryExist(objToSearch, cc)) return cc;
-    
-    return null;
-}
-
-/**
  * The function that returns true if the given category id exist in the given feed category tree.
 
  * @param categoryId The category id that will be searched

@@ -1,4 +1,4 @@
-import { isFeedConfig, feedCategoryExist, categoryIdExist, deleteFeedCategoryFromCategoryTree } from "./ConfigUtil";
+import { isFeedConfig, categoryIdExist, deleteFeedCategoryFromCategoryTree } from "./ConfigUtil";
 
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
 
@@ -40,68 +40,7 @@ describe('ConfigUtil', () => {
         });
     });
     
-    describe('#feedCategoryExist(feedCategory: FeedCategory)', () => {
-        it('should return true if the given parameter exist in the category tree', async () => {
-            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
     
-            const exampleFeedCategory1 : FeedCategory = {
-                categoryId : 'exampleFeedCategory1_2',
-                childCategories : [],
-                name : 'Example Feed Category 1',
-                visible : true
-            };
-    
-            const exampleFeedCategory2 : FeedCategory = {
-                categoryId : 'exampleFeedCategory2_3',
-                childCategories : [],
-                name : 'Example Feed Category 2',
-                visible : true
-            };
-    
-            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory());
-            expect(feedConfig1Added).not.toBeNull();
-    
-            const rootFeedCategoryExist = feedCategoryExist(feedConfigManager.getRootCategory(), feedConfigManager.getRootCategory());
-            expect(rootFeedCategoryExist).not.toBeNull();
-            
-            const exampleFeedCategoryExist = feedCategoryExist(exampleFeedCategory1, feedConfigManager.getRootCategory());
-            expect(exampleFeedCategoryExist).not.toBeNull();
-    
-            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1);
-            expect(feedConfig2Added).not.toBeNull();
-    
-            const feedConfig2Exist = feedCategoryExist(exampleFeedCategory2, feedConfigManager.getRootCategory());
-            const feedConfig3Exist = feedCategoryExist(exampleFeedCategory2, exampleFeedCategory1);
-            
-            expect(feedConfig2Exist).not.toBeNull();
-            expect(feedConfig3Exist).not.toBeNull();
-        });
-    
-        it('should return false if the given parameter does not exist in the category tree', () => {
-            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
-    
-            const exampleFeedCategory3 : FeedCategory = {
-                categoryId : 'exampleFeedCategory3',
-                childCategories : [],
-                name : 'Example Feed Category 3',
-                visible : true
-            };
-    
-            const exampleFeedCategory4 : FeedCategory = {
-                categoryId : 'exampleFeedCategory4',
-                childCategories : [],
-                name : 'Example Feed Category 4',
-                visible : true
-            };
-    
-            const exampleFeedCategory3Exist = feedCategoryExist(exampleFeedCategory3, feedConfigManager.getRootCategory());
-            const exampleFeedCategory4Exist = feedCategoryExist(exampleFeedCategory4, feedConfigManager.getRootCategory());
-    
-            expect(exampleFeedCategory3Exist).toBeNull();
-            expect(exampleFeedCategory4Exist).toBeNull();
-        });
-    
-    });
     
     describe('#categoryIdExist(categoryId : string, feedCategory : FeedCategory)', () => {
         it('should return true if the given category id exist in the feed category', async () => {
@@ -123,7 +62,7 @@ describe('ConfigUtil', () => {
                 visible : true
             };
     
-            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory());
+            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory().categoryId);
             expect(feedConfig1Added).toBe(true);
     
             const rootFeedCategoryExist = categoryIdExist('root', feedConfigManager.getRootCategory());
@@ -132,7 +71,7 @@ describe('ConfigUtil', () => {
             const exampleFeedCategoryExist = categoryIdExist(exampleId1, feedConfigManager.getRootCategory());
             expect(exampleFeedCategoryExist).toBe(true);
     
-            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1);
+            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1.categoryId);
             expect(feedConfig2Added).toBe(true);
     
             const feedConfig2Exist = categoryIdExist(exampleId2, feedConfigManager.getRootCategory());
@@ -175,10 +114,10 @@ describe('ConfigUtil', () => {
                 visible : true
             };
     
-            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory());
+            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory().categoryId);
             expect(feedConfig1Added).toBe(true);
             
-            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1);
+            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1.categoryId);
             expect(feedConfig2Added).toBe(true);
 
             const rootFeedCategoryExist = deleteFeedCategoryFromCategoryTree(exampleFeedCategory2, feedConfigManager.getRootCategory());

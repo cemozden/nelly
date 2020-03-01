@@ -2,9 +2,8 @@ import { join, sep } from "path";
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from "fs";
 import { sync } from "rimraf";
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
-import { FeedCategory, FeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError} from "./FeedConfigManager";
+import { FeedCategory, FeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist} from "./FeedConfigManager";
 import { TimeUnit } from "../time/TimeUnit";
-import { feedCategoryExist } from "./ConfigUtil";
 
 describe('FeedManager', () => {
     const tmpFeedsFolder = join(process.env.CONFIG_DIR as string, 'feeds/');
@@ -24,6 +23,7 @@ describe('FeedManager', () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             
             expect(existsSync(tmpFeedsFolder)).toBe(true);
+            sync(tmpFeedsFolder);
         });
 
         it('should initialize the feed config list empty if there is no configuration file', () => {
@@ -86,12 +86,13 @@ describe('FeedManager', () => {
 
             if (!existsSync(tmpFeedsFolder)) 
                 mkdirSync(tmpFeedsFolder);
-            
-            writeFileSync(`${tmpFeedsFolder}${sep}${feedId}.json`, JSON.stringify(feedConfig));
+            const filePath = `${tmpFeedsFolder}${sep}${feedId}.json`;
+            writeFileSync(filePath, JSON.stringify(feedConfig));
             
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             
             expect(feedConfigManager.getFeedConfigCount()).toBeGreaterThan(0);
+            sync(filePath);
         });
 
         it('should initialize the feed category list if categories.json is not existing', () => {
@@ -126,6 +127,7 @@ describe('FeedManager', () => {
                 return addFeedPromise.then(feedConfigAdded => {
                     expect(existsSync(configFilePath)).toBe(true);
                     expect(feedConfigAdded).toEqual(true);
+                    sync(configFilePath);
                 });
 
             });
@@ -150,9 +152,8 @@ describe('FeedManager', () => {
             });
 
             it('should add the feed into the feeds config list', () => {
-                
                 const feedId = 'ab4d45b1';
-                
+                const configFilePath = `${tmpFeedsFolder}${sep}${feedId}.json`;  
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
 
                 const feed : FeedConfig = {
@@ -170,11 +171,21 @@ describe('FeedManager', () => {
                 return addFeedPromise.then(feedAdded => {
                     expect(feedAdded).toBe(true);
                     expect(feedConfigManager.getFeedConfigCount()).toEqual(feedConfigCount + 1);
+                    sync(configFilePath);
                 });
             });
         });
 
         describe('#updateFeedConfig(feedId : string, feed: FeedConfig)', () => {
+
+            afterAll(() => {
+                const feedConfigPath = `${tmpFeedsFolder}${sep}`;
+                sync(`${feedConfigPath}${sep}notexist.json`);
+                sync(`${feedConfigPath}${sep}4444444444.json`);
+                sync(`${feedConfigPath}${sep}xxxxxabx.json`);
+                sync(`${feedConfigPath}${sep}xaxxxxxx.json`);
+            });
+
             it('should return a "rejected" Promise with an error reason if feedId cannot be found in the feed config list', async () => {
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
                 const feedToBeAdded : FeedConfig = {
@@ -274,6 +285,12 @@ describe('FeedManager', () => {
     });
 
     describe('#deleteFeedConfig(feedId : string)', () => {
+
+        afterAll(() => {
+            const feedConfigPath = `${tmpFeedsFolder}${sep}`;
+            sync(`${feedConfigPath}${sep}xbxxxxxx.json`);
+        });
+
         it('should return a "rejected" Promise with an error reason if feedId cannot be found in the feed config list', async () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             const feedToBeAdded : FeedConfig = {
@@ -340,6 +357,69 @@ describe('FeedManager', () => {
 
     });
 
+    describe('#feedCategoryExist(feedCategory: FeedCategory)', () => {
+        it('should return true if the given parameter exist in the category tree', async () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+    
+            const exampleFeedCategory1 : FeedCategory = {
+                categoryId : 'exampleFeedCategory1_2',
+                childCategories : [],
+                name : 'Example Feed Category 1',
+                visible : true
+            };
+    
+            const exampleFeedCategory2 : FeedCategory = {
+                categoryId : 'exampleFeedCategory2_3',
+                childCategories : [],
+                name : 'Example Feed Category 2',
+                visible : true
+            };
+    
+            const feedConfig1Added = await feedConfigManager.addFeedCategory(exampleFeedCategory1, feedConfigManager.getRootCategory().categoryId);
+            expect(feedConfig1Added).not.toBeNull();
+    
+            const rootFeedCategoryExist = feedCategoryExist(feedConfigManager.getRootCategory().categoryId, feedConfigManager.getRootCategory());
+            expect(rootFeedCategoryExist).not.toBeNull();
+            
+            const exampleFeedCategoryExist = feedCategoryExist(exampleFeedCategory1.categoryId, feedConfigManager.getRootCategory());
+            expect(exampleFeedCategoryExist).not.toBeNull();
+    
+            const feedConfig2Added = await feedConfigManager.addFeedCategory(exampleFeedCategory2, exampleFeedCategory1.categoryId);
+            expect(feedConfig2Added).not.toBeNull();
+    
+            const feedConfig2Exist = feedCategoryExist(exampleFeedCategory2.categoryId, feedConfigManager.getRootCategory());
+            const feedConfig3Exist = feedCategoryExist(exampleFeedCategory2.categoryId, exampleFeedCategory1);
+            
+            expect(feedConfig2Exist).not.toBeNull();
+            expect(feedConfig3Exist).not.toBeNull();
+        });
+    
+        it('should return false if the given parameter does not exist in the category tree', () => {
+            const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+    
+            const exampleFeedCategory3 : FeedCategory = {
+                categoryId : 'exampleFeedCategory3',
+                childCategories : [],
+                name : 'Example Feed Category 3',
+                visible : true
+            };
+    
+            const exampleFeedCategory4 : FeedCategory = {
+                categoryId : 'exampleFeedCategory4',
+                childCategories : [],
+                name : 'Example Feed Category 4',
+                visible : true
+            };
+    
+            const exampleFeedCategory3Exist = feedCategoryExist(exampleFeedCategory3.categoryId, feedConfigManager.getRootCategory());
+            const exampleFeedCategory4Exist = feedCategoryExist(exampleFeedCategory4.categoryId, feedConfigManager.getRootCategory());
+    
+            expect(exampleFeedCategory3Exist).toBeNull();
+            expect(exampleFeedCategory4Exist).toBeNull();
+        });
+    
+    });
+
     describe('#addFeedCategory(feedCategory : FeedCategory)', () => {
      
         it('should allow adding categories only if parent category exist in the category tree', async () => {
@@ -359,7 +439,7 @@ describe('FeedManager', () => {
                 visible : true
             }
 
-            return expect(feedConfigManager.addFeedCategory(categoryToAdd, dummyParentCategory)).rejects.toThrowError(new NotExistFeedCategoryError(`The feed category provided is not existing the category tree!`));
+            return expect(feedConfigManager.addFeedCategory(categoryToAdd, dummyParentCategory.categoryId)).rejects.toThrowError(new NotExistFeedCategoryError(`The feed category provided is not existing the category tree!`));
         });
 
         it('should add the feed into the child category list of its parent', async () => {
@@ -372,7 +452,7 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            const categoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory());
+            const categoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId);
             
             expect(categoryAdded).toBe(true);
             expect(feedConfigManager.getRootCategory().childCategories).toContain(newFeedCategory);
@@ -388,7 +468,7 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId); 
             expect(feedCategoryAdded).toBe(true);
             expect(existsSync(categoryJSONFilePath)).toBe(true);
             
@@ -406,7 +486,7 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            return expect(feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryIdError(`The feed category id "${newFeedCategory.categoryId}" is already existing in the category tree!`));
+            return expect(feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId)).rejects.toThrowError(new InvalidFeedCategoryIdError(`The feed category id "${newFeedCategory.categoryId}" is already existing in the category tree!`));
         });
 
         it('should not allow to add a feed category if the category name is empty', () => {
@@ -420,7 +500,7 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            return expect(feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryError(`The category name cannot be empty!`));
+            return expect(feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId)).rejects.toThrowError(new InvalidFeedCategoryError(`The category name cannot be empty!`));
 
         });
 
@@ -444,7 +524,7 @@ describe('FeedManager', () => {
                 visible : true
             };
  
-            return expect(feedConfigManager.updateFeedCategory(newUpdatedFeedCategory, notExistCategory)).rejects.toThrowError(new NotExistFeedCategoryError(`The feed category to be updated is not existing in the category tree!`));
+            return expect(feedConfigManager.updateFeedCategory(newUpdatedFeedCategory, notExistCategory.categoryId)).rejects.toThrowError(new NotExistFeedCategoryError(`The feed category to be updated is not existing in the category tree!`));
         });
 
         it.skip('should not allow to update, if newFeedCategory contains category id that is already defined in the category tree', async () => {
@@ -464,10 +544,10 @@ describe('FeedManager', () => {
                 visible : true
             }; 
 
-            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId); 
             expect(feedCategoryAdded).toBe(true);
 
-            return expect(feedConfigManager.updateFeedCategory(updatedFeedCategory, newFeedCategory)).rejects.toThrowError(new InvalidFeedCategoryIdError(`The updated feed category has a category id which is already existing in the category tree!`));
+            return expect(feedConfigManager.updateFeedCategory(updatedFeedCategory, newFeedCategory.categoryId)).rejects.toThrowError(new InvalidFeedCategoryIdError(`The updated feed category has a category id which is already existing in the category tree!`));
         });
 
         it('should write the category tree into the category.json file after update is successful', async () => {
@@ -487,10 +567,10 @@ describe('FeedManager', () => {
                 visible : false
             }; 
 
-            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId); 
             expect(feedCategoryAdded).toBe(true);
 
-            const feedCategoryUpdated = await feedConfigManager.updateFeedCategory(updatedFeedCategory, newFeedCategory);
+            const feedCategoryUpdated = await feedConfigManager.updateFeedCategory(updatedFeedCategory, newFeedCategory.categoryId);
             expect(feedCategoryUpdated).toBe(true);
 
             const categoriesFromFile : FeedCategory = JSON.parse(readFileSync(categoryJSONFilePath).toString());
@@ -515,12 +595,12 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId); 
             expect(feedCategoryAdded).toBe(true);
 
-            const feedCategoryUpdated = await feedConfigManager.updateFeedCategory(updatedFeedCategory, newFeedCategory);
+            const feedCategoryUpdated = await feedConfigManager.updateFeedCategory(updatedFeedCategory, newFeedCategory.categoryId);
             expect(feedCategoryUpdated).toBe(true);
-            expect(feedCategoryExist(updatedFeedCategory, feedConfigManager.getRootCategory())).not.toBeNull();
+            expect(feedCategoryExist(updatedFeedCategory.categoryId, feedConfigManager.getRootCategory())).not.toBeNull();
         });
 
     });
@@ -530,7 +610,7 @@ describe('FeedManager', () => {
         it('should not delete the root category', () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             
-            return expect(feedConfigManager.deleteFeedCategory(feedConfigManager.getRootCategory())).rejects.toThrowError(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
+            return expect(feedConfigManager.deleteFeedCategory(feedConfigManager.getRootCategory().categoryId)).rejects.toThrowError(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
         });
 
         it('should not delete a feed category which is not existing', async () => {
@@ -541,7 +621,7 @@ describe('FeedManager', () => {
                 name : 'xx123456',
                 visible : true
             }; 
-            const feedDeleted = await feedConfigManager.deleteFeedCategory(notExistFeedCategory);
+            const feedDeleted = await feedConfigManager.deleteFeedCategory(notExistFeedCategory.categoryId);
 
             expect(feedDeleted).toBe(false);
         });
@@ -556,10 +636,10 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId); 
             expect(feedCategoryAdded).toBe(true);
 
-            const feedDeleted = await feedConfigManager.deleteFeedCategory(newFeedCategory);
+            const feedDeleted = await feedConfigManager.deleteFeedCategory(newFeedCategory.categoryId);
             expect(feedDeleted).toBe(true);
 
             const categoriesFromFile : FeedCategory = JSON.parse(readFileSync(categoryJSONFilePath).toString());
@@ -577,13 +657,13 @@ describe('FeedManager', () => {
                 visible : true
             };
 
-            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory()); 
+            const feedCategoryAdded = await feedConfigManager.addFeedCategory(newFeedCategory, feedConfigManager.getRootCategory().categoryId); 
             expect(feedCategoryAdded).toBe(true);
 
-            const feedDeleted = await feedConfigManager.deleteFeedCategory(newFeedCategory);
+            const feedDeleted = await feedConfigManager.deleteFeedCategory(newFeedCategory.categoryId);
             expect(feedDeleted).toBe(true);
 
-            expect(feedCategoryExist(newFeedCategory, feedConfigManager.getRootCategory())).toBeNull();
+            expect(feedCategoryExist(newFeedCategory.categoryId, feedConfigManager.getRootCategory())).toBeNull();
         });
 
     });

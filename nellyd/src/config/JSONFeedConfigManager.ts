@@ -1,8 +1,8 @@
-import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError } from "./FeedConfigManager";
+import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist, getCategoryById } from "./FeedConfigManager";
 import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, writeFileSync, } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";
-import { isFeedConfig, feedCategoryExist, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
+import { isFeedConfig, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
 import logger from "../utils/Logger";
 
 /**
@@ -160,15 +160,15 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
      * The method makes sure that it does not try to add the new feed category to a non-existing feed category node.
      * The method also makes sure that the new feed category does provide a unique category id.
      * @param feedCategory The feed category that needs to be added into the category tree.
-     * @param parent The feed category object that will be the parent node of the new feed category.
+     * @param parentCategoryId The id of the feed category that will be the parent node of the new feed category.
      * @throws NotExistFeedCategoryError If the parent is not existing in the category tree.
      * @throws InvalidFeedCategoryIdError if the given category id is already existing in the system.
      * @returns a promise with a value of true if adding a new feed category is successful.
      */
-    addFeedCategory(feedCategory: FeedCategory, parent : FeedCategory): Promise<boolean> {
+    addFeedCategory(feedCategory: FeedCategory, parentCategoryId : string): Promise<boolean> {
         const addFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
             
-            if (!feedCategoryExist(parent, this.ROOT_CATEGORY)){
+            if (!feedCategoryExist(parentCategoryId, this.ROOT_CATEGORY)){
                 reject(new NotExistFeedCategoryError(`The feed category provided is not existing the category tree!`));
                 return;
             }
@@ -184,7 +184,8 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
             }
 
             // Add the given new category into the child category list of its parent.
-            parent.childCategories.push(feedCategory);
+            const parentCategory = getCategoryById(parentCategoryId, this.ROOT_CATEGORY);
+            parentCategory.childCategories.push(feedCategory);
             
             writeFile(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(this.ROOT_CATEGORY), err => {
                 if (err) reject(err);
@@ -206,9 +207,9 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
      * @deprecated @throws InvalidFeedCategoryIdError if the new feed category has an id that is already defined in the category tree.
      * @returns a promise with a value of true if the update operation succeeds otherwise it might throw an error.
      */
-    updateFeedCategory(newFeedCategory: FeedCategory, oldFeedCategory : FeedCategory): Promise<boolean> {
+    updateFeedCategory(newFeedCategory: FeedCategory, oldFeedCategoryId : string): Promise<boolean> {
         const updateFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
-        const feedCategoryToUpdate = feedCategoryExist(oldFeedCategory, this.ROOT_CATEGORY); 
+        const feedCategoryToUpdate = feedCategoryExist(oldFeedCategoryId, this.ROOT_CATEGORY); 
             
             if (!feedCategoryToUpdate) {
                 reject(new NotExistFeedCategoryError(`The feed category to be updated is not existing in the category tree!`));
@@ -235,19 +236,20 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
     /**
      * The method that deletes a given feed category from a category tree.
      * It makes sure that the root category is not being deleted.
-     * @param feedCategory The feed category that needs to be deleted.
+     * @param feedCategoryId The feed category that needs to be deleted.
      * @throws InvalidFeedCategoryError if root category is intented to be deleted.
      * @returns a promise with a value of true if the deletion of feed category succeeds otherwise it might throw an error.
      */
-    deleteFeedCategory(feedCategory: FeedCategory): Promise<boolean> {
+    deleteFeedCategory(feedCategoryId: string): Promise<boolean> {
 
         const deleteFeedCategoryPromise = new Promise<boolean>((resolve, reject) => {
+            const feedCategory = getCategoryById(feedCategoryId, this.ROOT_CATEGORY);
             if (feedCategory === this.ROOT_CATEGORY) {
                 reject(new InvalidFeedCategoryError(`The root category cannot be deleted!`));
                 return;
             }
             // If the given feed category is not existing in the category tree at all, then return resolved with false value.
-            if (!feedCategoryExist(feedCategory, this.ROOT_CATEGORY)) {
+            if (!feedCategoryExist(feedCategoryId, this.ROOT_CATEGORY)) {
                 resolve(false);
                 return;
             }
