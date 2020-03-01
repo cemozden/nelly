@@ -9,4 +9,6 @@ dist : xenial
 install : 
   - npm install
 cache: npm
-script: bash run_tests.sh
+script: 
+  - cd nellyd
+  - tsc && npm test
