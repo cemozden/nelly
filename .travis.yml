@@ -7,8 +7,8 @@ os :
   - windows
 dist : xenial
 install : 
+  - cd nellyd
   - npm install
 cache: npm
 script: 
-  - cd nellyd
   - tsc && npm test
