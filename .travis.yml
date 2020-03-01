@@ -8,7 +8,5 @@ os :
 dist : xenial
 install : 
   - npm install
-cache:
-  directories:
-    - node_modules
+cache: npm
 script: bash run_tests.sh
