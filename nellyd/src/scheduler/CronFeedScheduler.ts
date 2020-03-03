@@ -13,6 +13,12 @@ export default class CronFeedScheduler implements FeedScheduler {
     
     private readonly scheduledTaskMap = new Map<string, ScheduledTask>();
 
+    private feedCollector(feedConfig : FeedConfig) {
+        collectFeed(feedConfig).catch(reason => {
+            //TODO: In case of failure during collection then send it message using Socket.IO
+        });
+    }
+
     addFeedToSchedule(feedConfig: FeedConfig): void {
         const feedConfigId = feedConfig.feedConfigId;
 
@@ -24,10 +30,12 @@ export default class CronFeedScheduler implements FeedScheduler {
             
 
         const cronExpression = generateCronPattern(feedConfig.fetchPeriod);
+        console.log(cronExpression);
+        // First fetch all data then schedule.
+        this.feedCollector(feedConfig);
+
         const task = schedule(cronExpression, () => {
-            collectFeed(feedConfig).catch(reason => {
-                //TODO: In case of failure during collection then send it message using Socket.IO
-            });
+            this.feedCollector(feedConfig);
         },{
             scheduled : feedConfig.enabled
         });

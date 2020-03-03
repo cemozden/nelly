@@ -14,7 +14,7 @@ const consoleLogFormat = format.combine(
     format.printf(info => `${info.timestamp} [${info.level}]: ${info.message}`)
   );
 
-const logsDir = process.env.LOGS_DIR;
+const logsDir = process.env.LOGS_DIR
 
 const options : LoggerOptions = {
   level : 'debug', 

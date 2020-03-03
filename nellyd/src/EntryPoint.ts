@@ -1,7 +1,12 @@
+import { sep } from "path";
+
+process.env.CONFIG_DIR = `${process.env.HOME}${sep}.nelly${sep}`;
+process.env.LOGS_DIR = `${process.env.CONFIG_DIR}logs${sep}`;
+process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
+
 import express from "express";
 import { ConfigManager } from "./config/ConfigManager";
 import JSONConfigManager from "./config/JSONConfigManager";
-import { sep } from "path";
 import { SettingsManager } from "./config/SettingsManager";
 import logger from "./utils/Logger";
 import { createServer } from "http";
@@ -9,10 +14,6 @@ import socketIO from "socket.io";
 import initAPIs from "./api/APIs";
 import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
-
-process.env.CONFIG_DIR = `${process.env.HOME}${sep}.nelly${sep}`;
-process.env.LOGS_DIR = `${process.env.CONFIG_DIR}${sep}logs${sep}`;
-process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
 
 logger.info('[nellyd] Application started.');
 
@@ -32,15 +33,17 @@ const settingsManager : SettingsManager = configManager.getSettingsManager();
 function requestLoggerMiddleware(request : express.Request, response : express.Response, next : () => void) {
     
     logger.info(`[APIRequest] ${request.method} Endpoint: ${request.url}`);
-    logger.info(`[APIRequest] Params: ${JSON.stringify(request.query)}`);
+    if (Object.keys(request.query).length > 0) logger.info(`[APIRequest] Params: ${JSON.stringify(request.query)}`);
+    
     next();
 }
 
 exp.use(requestLoggerMiddleware);
-initAPIs(exp, configManager);
+
+const feedScheduler : FeedScheduler = new CronFeedScheduler();
+initAPIs(exp, configManager, feedScheduler);
 
 const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
-const feedScheduler : FeedScheduler = new CronFeedScheduler();
 
 feedConfigs.forEach(fc => feedScheduler.addFeedToSchedule(fc));
 

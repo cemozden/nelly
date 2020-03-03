@@ -18,7 +18,7 @@ describe('CronPatternGenerator', () => {
             const duration : Duration = { unit : TimeUnit.MINUTES, value : 2 };
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* */2 * * * *');
+            expect(pattern).toEqual('*/2 * * * *');
             expect(validate(pattern)).toBe(true);
         });
 
@@ -26,7 +26,7 @@ describe('CronPatternGenerator', () => {
             const duration : Duration = { unit : TimeUnit.HOURS, value : 1 };
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* * */1 * * *');
+            expect(pattern).toEqual('* */1 * * *');
             expect(validate(pattern)).toBe(true);
         });
 
@@ -34,7 +34,7 @@ describe('CronPatternGenerator', () => {
             const duration : Duration = { unit : TimeUnit.DAYS, value : 1 };
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* * * */1 * *');
+            expect(pattern).toEqual('* * */1 * *');
             expect(validate(pattern)).toBe(true);
         });
 
@@ -42,7 +42,7 @@ describe('CronPatternGenerator', () => {
             const duration : Duration = { unit : TimeUnit.MONTHS, value : 1 };
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* * * * */1 *');
+            expect(pattern).toEqual('* * * */1 *');
             expect(validate(pattern)).toBe(true);
         });
 
