@@ -5,6 +5,7 @@
   "main": "public/EntryPoint.js",
   "scripts": {
     "test": "jest --watch",
+    "testci" : "jest --ci",
     "start": "tsc && env-cmd -f .env.dev node ."
   },
   "repository": "https://github.com/cemozden/nelly",

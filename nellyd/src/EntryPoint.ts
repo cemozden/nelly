@@ -10,9 +10,9 @@ import initAPIs from "./api/APIs";
 import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
 
-process.env.CONFIG_DIR = `${process.env.HOME}${sep}`;
-process.env.LOGS_DIR = `${process.env.APPLICATION_DIR}${sep}logs${sep}`;
-process.env.DATABASE_FOLDER = `${process.env.APPLICATION_DIR}${sep}`;
+process.env.CONFIG_DIR = `${process.env.HOME}${sep}.nelly${sep}`;
+process.env.LOGS_DIR = `${process.env.CONFIG_DIR}${sep}logs${sep}`;
+process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
 
 logger.info('[nellyd] Application started.');
 

@@ -40,7 +40,8 @@ export default class SQLiteDatabase {
                 enclosure TEXT,
                 guid TEXT,
                 source TEXT,
-                insertedAt datetime,
+                itemRead char(1) NOT NULL,
+                insertedAt datetime NOT NULL,
                 FOREIGN KEY(feedId) REFERENCES feeds(feedId) ON DELETE CASCADE
             );`);
         }

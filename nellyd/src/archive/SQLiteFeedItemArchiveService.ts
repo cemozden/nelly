@@ -73,6 +73,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             tableValues.push(fi.enclosure !== undefined ? JSON.stringify(fi.enclosure) : null);
             tableValues.push(fi.guid !== undefined ? JSON.stringify(fi.guid) : null);
             tableValues.push(fi.source !== undefined ? JSON.stringify(fi.source) : null );
+            tableValues.push('N');
             tableValues.push(new Date().toISOString());
         });
         
