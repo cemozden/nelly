@@ -127,11 +127,11 @@ describe('FeedItemArchiveService', () => {
 
                 feedArchiveService.addFeed(feed, feedId);
 
-                const qry1Values = ['abc12345', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, twoMonthsAgo.toISOString()];
-                const qry2Values = ['abc12346', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, twoMonthsAgo.toISOString()];
+                const qry1Values = ['abc12345', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'N', twoMonthsAgo.toISOString()];
+                const qry2Values = ['abc12346', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'N', twoMonthsAgo.toISOString()];
                 
-                SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry1Values);
-                SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry2Values);
+                SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry1Values);
+                SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry2Values);
 
                 expect(feedItemArchiveService.cleanFeedItems({unit : TimeUnit.MONTHS, value : 1})).toBe(2);
             });

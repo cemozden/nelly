@@ -19,7 +19,7 @@ describe('FeedArchiveService', () => {
             SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`).run();
         });
 
-        const feed : Feed = {
+        const feed : Feed = { 
             feedMetadata : {
                 title : 'Feed Title 1',
                 description : 'Feed Description 1',
