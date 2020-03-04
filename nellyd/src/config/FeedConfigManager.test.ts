@@ -2,7 +2,7 @@ import { join, sep } from "path";
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from "fs";
 import { sync } from "rimraf";
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
-import { FeedCategory, FeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist} from "./FeedConfigManager";
+import { FeedCategory, FeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist, InvalidFeedConfigError} from "./FeedConfigManager";
 import { TimeUnit } from "../time/TimeUnit";
 
 describe('FeedManager', () => {
@@ -50,7 +50,7 @@ describe('FeedManager', () => {
                     feedConfigId : feedId,
                     fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                     name : 'Test Feed',
-                    url : 'https://example.com'
+                    url : 'https://examplea.com'
                 };
 
                 const feedConfig2 : FeedConfig = {
@@ -59,7 +59,7 @@ describe('FeedManager', () => {
                     feedConfigId : feedId,
                     fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                     name : 'Test Feed',
-                    url : 'https://example.com'
+                    url : 'https://exampleb.com'
                 };
 
                 writeFileSync(`${tmpFeedsFolder}${sep}${feedId}.json`, JSON.stringify(feedConfig1));
@@ -81,7 +81,7 @@ describe('FeedManager', () => {
                 feedConfigId : feedId,
                 fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                 name : 'Test Feed',
-                url : 'https://example.com'
+                url : 'https://examplec.com'
             };
 
             if (!existsSync(tmpFeedsFolder)) 
@@ -107,6 +107,11 @@ describe('FeedManager', () => {
         });
        
         describe('#addFeedConfig(feed : FeedConfig)', () => {
+
+            afterAll(() => {
+                sync(`${tmpFeedsFolder}${sep}p23h69rt.json`);
+                sync(`${tmpFeedsFolder}${sep}p23h69ra.json`);
+            });
             
             it('should create the feed config file in the specific category folder', () => {
                 const feedId = 'eb4d45b5';
@@ -115,10 +120,10 @@ describe('FeedManager', () => {
 
                 const feedConfig : FeedConfig = {
                     feedConfigId : feedId,
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example3.com',
                     enabled : true
                 };
 
@@ -138,10 +143,10 @@ describe('FeedManager', () => {
                 
                 const feedConfig : FeedConfig = {
                     feedConfigId : feedConfigId,
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example1.com',
                     enabled : true
                 };
 
@@ -151,6 +156,55 @@ describe('FeedManager', () => {
                 return expect(feedConfigManager.addFeedConfig(feedConfig)).rejects.toThrowError(new NotUniqueFeedConfigIdError(`The feed config id is not unique. There is already a feed config which has the same feed config id ${feedConfigId}`));
             });
 
+            it('should not allow to add a feed config if the given category id of the feed config does not exist', async () => {
+                const feedConfigId = 'p23h69rt';
+                const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+
+                const feedConfig : FeedConfig = {
+                    categoryId : 'notexist',
+                    enabled : true,
+                    feedConfigId : feedConfigId,
+                    fetchPeriod : {unit : TimeUnit.MINUTES, value : 5},
+                    name : 'Test',
+                    url : 'https://example2.com'
+                };
+
+                return expect(feedConfigManager.addFeedConfig(feedConfig)).rejects.toThrowError(new InvalidFeedCategoryIdError(`The given category id "${feedConfig.categoryId}" does not exist!`));
+            });
+
+            it('should not allow to add a feed config if the given url is already existing', async () => {
+
+                const feedConfigId = 'p23h69ra';
+                const feedConfigId2 = 'p23h69rb';
+
+                const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+
+                const feedConfig : FeedConfig = {
+                    categoryId : 'root',
+                    enabled : true,
+                    feedConfigId : feedConfigId,
+                    fetchPeriod : {unit : TimeUnit.MINUTES, value : 5},
+                    name : 'Test',
+                    url : 'https://axample.com'
+                };
+
+                const feedConfigAdded = await feedConfigManager.addFeedConfig(feedConfig);
+                expect(feedConfigAdded).toBe(true);
+
+                const feedConfig2 : FeedConfig = {
+                    categoryId : 'root',
+                    enabled : true,
+                    feedConfigId : feedConfigId2,
+                    fetchPeriod : {unit : TimeUnit.MINUTES, value : 5},
+                    name : 'Test',
+                    url : 'https://axample.com'
+                };
+
+
+                return expect(feedConfigManager.addFeedConfig(feedConfig2)).rejects.toThrowError(new InvalidFeedConfigError(`The given URL "${feedConfig2.url}" is already existing in the system!`));
+
+            });
+
             it('should add the feed into the feeds config list', () => {
                 const feedId = 'ab4d45b1';
                 const configFilePath = `${tmpFeedsFolder}${sep}${feedId}.json`;  
@@ -158,10 +212,10 @@ describe('FeedManager', () => {
 
                 const feed : FeedConfig = {
                     feedConfigId : feedId,
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example4.com',
                     enabled : true
                 };
 
@@ -190,10 +244,10 @@ describe('FeedManager', () => {
                 const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
                 const feedToBeAdded : FeedConfig = {
                     feedConfigId : 'notexist',
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example5.com',
                     enabled : true
                 };
 
@@ -209,19 +263,19 @@ describe('FeedManager', () => {
 
                 const feedToBeAdded : FeedConfig = {
                     feedConfigId : '4444444444',
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example6.com',
                     enabled : true
                 };
 
                 const feedToBeAddedUpdated : FeedConfig = {
                     feedConfigId : '4444444445',
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example7.com',
                     enabled : true
                 };
 
@@ -237,10 +291,10 @@ describe('FeedManager', () => {
             const feedConfigId = 'xxxxxabx';
             const feedToBeAddedUpdated : FeedConfig = {
                 feedConfigId : feedConfigId,
-                categoryId : '',
+                categoryId : 'root',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
-                url : 'https://example.com',
+                url : 'https://example8.com',
                 enabled : true
             };
             
@@ -262,10 +316,10 @@ describe('FeedManager', () => {
 
             const feedToBeAddedUpdated : FeedConfig = {
                 feedConfigId : feedId,
-                categoryId : '',
+                categoryId : 'root',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
-                url : 'https://example.com',
+                url : 'https://example9.com',
                 enabled : true
             };
             
@@ -295,10 +349,10 @@ describe('FeedManager', () => {
             const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
             const feedToBeAdded : FeedConfig = {
                     feedConfigId : 'xbxxxxxx',
-                    categoryId : '',
+                    categoryId : 'root',
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
-                    url : 'https://example.com',
+                    url : 'https://example10.com',
                     enabled : true
                 };
 
@@ -316,10 +370,10 @@ describe('FeedManager', () => {
 
             const feedToBeAddedDeleted : FeedConfig = {
                 feedConfigId : feedId,
-                categoryId : '',
+                categoryId : 'root',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
-                url : 'https://example.com',
+                url : 'https://example11.com',
                 enabled : true
             };
             
@@ -338,10 +392,10 @@ describe('FeedManager', () => {
  
             const feedToBeAddedDeleted : FeedConfig = {
                 feedConfigId : feedId,
-                categoryId : '',
+                categoryId : 'root',
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
-                url : 'https://example.com',
+                url : 'https://example12.com',
                 enabled : true
             };
             

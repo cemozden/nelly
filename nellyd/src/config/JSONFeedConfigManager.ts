@@ -1,4 +1,4 @@
-import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist, getCategoryById } from "./FeedConfigManager";
+import { FeedConfigManager, FeedConfig, FeedCategory, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist, getCategoryById, InvalidFeedConfigError } from "./FeedConfigManager";
 import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, writeFileSync, } from "fs";
 import { sep } from "path";
 import { sync } from "rimraf";
@@ -84,6 +84,18 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 reject(new NotUniqueFeedConfigIdError(`The feed config id is not unique. There is already a feed config which has the same feed config id ${feedConfig.feedConfigId}`));
                 return;
             }
+
+            // If the category does not exist in the category tree then reject feed addition.
+            if(!categoryIdExist(feedConfig.categoryId, this.ROOT_CATEGORY)) {
+                reject(new InvalidFeedCategoryIdError(`The given category id "${feedConfig.categoryId}" does not exist!`));
+                return;
+            }
+            // If the given URL already exists in the system then reject feed addition.
+            if (this.FEED_CONFIGS.map(fc => fc.url).includes(feedConfig.url)) {
+                reject(new InvalidFeedConfigError(`The given URL "${feedConfig.url}" is already existing in the system!`));
+                return;
+            }
+
             // Write the feed config into the file and add it into FEED_CONFIGS list.
             const feedJSON = JSON.stringify(feedConfig);
             writeFile(`${this.FEEDS_FOLDER}${sep}${feedConfig.feedConfigId}.json`, feedJSON, (err) => {

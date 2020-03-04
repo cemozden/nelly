@@ -104,3 +104,5 @@ export class NotExistFeedCategoryError extends Error {}
 export class InvalidFeedCategoryIdError extends Error {}
 
 export class InvalidFeedCategoryError extends Error {}
+
+export class InvalidFeedConfigError extends Error {}
