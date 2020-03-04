@@ -4,6 +4,7 @@ import { sync } from "rimraf";
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
 import { FeedCategory, FeedConfig, InvalidFeedConfigIdError, NotUniqueFeedConfigIdError, DEFAULT_ROOT_CATEGORY, NotExistFeedCategoryError, InvalidFeedCategoryIdError, InvalidFeedCategoryError, feedCategoryExist, InvalidFeedConfigError} from "./FeedConfigManager";
 import { TimeUnit } from "../time/TimeUnit";
+import Duration from "../time/Duration";
 
 describe('FeedManager', () => {
     const tmpFeedsFolder = join(process.env.CONFIG_DIR as string, 'feeds/');
@@ -203,6 +204,23 @@ describe('FeedManager', () => {
 
                 return expect(feedConfigManager.addFeedConfig(feedConfig2)).rejects.toThrowError(new InvalidFeedConfigError(`The given URL "${feedConfig2.url}" is already existing in the system!`));
 
+            });
+
+            it('should not allow to add a feed config if the given fetch period is not a valid Duration object', () => {
+                const feedConfigId = 'p23h69rC';
+
+                const feedConfigManager = new JSONFeedConfigManager(tmpFeedsFolder);
+
+                const feedConfig : FeedConfig = {
+                    categoryId : 'root',
+                    enabled : true,
+                    feedConfigId : feedConfigId,
+                    fetchPeriod : ({} as Duration),
+                    name : 'Test',
+                    url : 'https://bxample.com'
+                };
+
+                return expect(feedConfigManager.addFeedConfig(feedConfig)).rejects.toThrowError(`The given Fetch Period "${JSON.stringify(feedConfig.fetchPeriod)}" is not a valid fetch period!!`);
             });
 
             it('should add the feed into the feeds config list', () => {

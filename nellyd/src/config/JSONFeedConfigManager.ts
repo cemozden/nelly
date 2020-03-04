@@ -4,6 +4,7 @@ import { sep } from "path";
 import { sync } from "rimraf";
 import { isFeedConfig, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
 import logger from "../utils/Logger";
+import { isDuration } from "../time/Duration";
 
 /**
  * The feed configuration manager class that represents how feed configurations are dealt in Nelly via JSON format. 
@@ -93,6 +94,12 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
             // If the given URL already exists in the system then reject feed addition.
             if (this.FEED_CONFIGS.map(fc => fc.url).includes(feedConfig.url)) {
                 reject(new InvalidFeedConfigError(`The given URL "${feedConfig.url}" is already existing in the system!`));
+                return;
+            }
+
+            // If the given Fetch Period is not a valid Duration object then reject the addition.
+            if(!isDuration(feedConfig.fetchPeriod)) {
+                reject(new InvalidFeedConfigError(`The given Fetch Period "${JSON.stringify(feedConfig.fetchPeriod)}" is not a valid fetch period!!`));
                 return;
             }
 
