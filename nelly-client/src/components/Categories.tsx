@@ -1,10 +1,10 @@
-import React, { useContext, useReducer} from "react";
-import { FeedCategory, FeedConfig } from "../config/FeedConfigManager";
+import React, { useReducer} from "react";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
-import { ApplicationContext } from "../App";
 import Modal from "./Modal";
 import AddNewCategory from "./AddNewCategory";
 import UpdateFeedCategory from "./UpdateFeedCategory";
+import { FeedConfig, FeedCategory, DEFAULT_ROOT_CATEGORY } from "../models/FeedModels";
+import { useEffect } from "react";
 
 export interface CategoriesProps {
   
@@ -51,10 +51,8 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
 };
 
 const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
-    const appContext = useContext(ApplicationContext);
-    const language = appContext.language;
 
-    async function deleteCategory(feedCategory : FeedCategory) {
+    /*async function deleteCategory(feedCategory : FeedCategory) {
 
       const options = {
         type: 'question',
@@ -103,7 +101,7 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
 
       }
       
-    }
+    }*/
 
     return  (
               <React.Fragment>
@@ -112,31 +110,26 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                 </ContextMenuTrigger>
                 <ContextMenu id={props.feedCategory.categoryId + '_contextMenu'}>
                   <MenuItem onClick={(e, data) => console.log(2)}>
-                    {appContext.language.sidebar.feedCategoryTitle.addNewFeedUnder.replace('$<categoryName>', props.feedCategory.name)}
+                    {"Add new feed under " + props.feedCategory.name}
                   </MenuItem>
                   <MenuItem data={{parentCategory : props.feedCategory}} onClick={(e, data) => {
-                    props.categoryDispatch({type : 'setModalTitle', modalTitle : 
-                    appContext.language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)
-                  });
+                    props.categoryDispatch({type : 'setModalTitle', modalTitle : 'Add new category under ' + props.feedCategory.name});
 
                     props.categoryDispatch({type : 'setModalContent', modalContent : <AddNewCategory categoryDispatch={props.categoryDispatch} parentCategory={props.feedCategory} />});
                     props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
                   } }>
-                    {appContext.language.sidebar.feedCategoryTitle.addCategoryUnder.replace('$<categoryName>', props.feedCategory.name)}
+                    {'Add new category under ' + props.feedCategory.name}
                   </MenuItem>
                   { props.feedCategory.categoryId !== 'root' ? <React.Fragment>
                     <MenuItem onClick={(e, data) => {
-                      props.categoryDispatch({type : 'setModalTitle', modalTitle : 
-                      appContext.language.sidebar.feedCategoryTitle.updateCategoryTitle.replace('$<categoryName>', props.feedCategory.name)
-                    });
-  
+                      props.categoryDispatch({type : 'setModalTitle', modalTitle : 'Update category ' + props.feedCategory.name});
                       props.categoryDispatch({type : 'setModalContent', modalContent : <UpdateFeedCategory categoryDispatch={props.categoryDispatch} feedCategory={props.feedCategory} />});
                       props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
                     }}>
-                    {appContext.language.sidebar.feedCategoryTitle.updateCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
+                    {'Update category "' + props.feedCategory.name + '"'}
                     </MenuItem>
-                    <MenuItem onClick={async (e, data) => await deleteCategory(props.feedCategory)}>
-                    {appContext.language.sidebar.feedCategoryTitle.deleteCategoryTitle.replace('$<categoryName>', props.feedCategory.name)}
+                    <MenuItem onClick={async (e, data) => {}}>
+                    {'Delete category ' + props.feedCategory.name}
                     </MenuItem>
                   </React.Fragment> : null}
               </ContextMenu>  
@@ -146,21 +139,19 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
 
 const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
 
-  const appContext = useContext(ApplicationContext);
-
   return  (<React.Fragment>
                 <ContextMenuTrigger id={props.feedConfig.feedConfigId + '_contextMenu'}>
                     <li id={props.feedConfig.feedConfigId}>{props.feedConfig.name}</li>
                   </ContextMenuTrigger>
                   <ContextMenu id={props.feedConfig.feedConfigId + '_contextMenu'}>
                     <MenuItem onClick={(e, data) => console.log(1)}>
-                      {appContext.language.sidebar.feedCategoryMember.addNewFeed}
+                      Add new Feed
                     </MenuItem>
                     <MenuItem onClick={(e, data) => console.log(2)}>
-                     {appContext.language.sidebar.feedCategoryMember.updateFeed.replace('$<feedName>', props.feedConfig.name)}
+                     {'Update ' + props.feedConfig.name}
                     </MenuItem>
                     <MenuItem onClick={(e, data) => console.log(3)}>
-                    {appContext.language.sidebar.feedCategoryMember.deleteFeed.replace('$<feedName>', props.feedConfig.name)}
+                    {'Delete ' + props.feedConfig.name}
                     </MenuItem>
                 </ContextMenu>       
             </React.Fragment>) 
@@ -185,11 +176,21 @@ function categoryReducer(state : CategoriesState, action : any) : CategoriesStat
 }
 
 const Categories : React.FC<CategoriesProps> = props => {
-  const appContext = useContext(ApplicationContext);
+  useEffect(() => {
+    
+    fetch('http://localhost:6150/getrootcategory')
+      .then(res => res.json())
+      .then(result => {
+        const rootCategory : FeedCategory = result;
+        console.log(rootCategory);
+        dispatch({type : 'setRootCategory', rootCategory : rootCategory});
+
+      });
+  }, []);
 
   const initialState : any = {
-      rootCategory : appContext.configManager.getFeedConfigManager().getRootCategory(),
-      feeds : appContext.configManager.getFeedConfigManager().getFeedConfigs(),
+      rootCategory : DEFAULT_ROOT_CATEGORY,
+      feeds : [],
       modalContent : <div></div>,
       modalTitle : 'Modal',
       modalVisible : false

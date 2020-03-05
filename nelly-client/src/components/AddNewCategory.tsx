@@ -1,7 +1,5 @@
-import React, { useState, useContext } from "react";
-import { FeedCategory } from "../config/FeedConfigManager";
-import { crc32 } from "crc";
-import { ApplicationContext } from "../App";
+import React, { useState } from "react";
+import { FeedCategory } from "../models/FeedModels";
 
 
 interface AddNewCategoryProps {
@@ -11,9 +9,6 @@ interface AddNewCategoryProps {
 
 const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
     
-    const appContext = useContext(ApplicationContext);
-    const addNewCategoryLanguage = appContext.language.sidebar.addCategoryUnder;
-
     const [categoryName, setCategoryName] = useState('');
     const [categoryVisible, setCategoryVisible] = useState(true);
 
@@ -21,7 +16,7 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
         setCategoryVisible(event.target.value === 'true');
     }
 
-    async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    /*async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
         event.preventDefault();
         
         if (categoryName.length === 0) {
@@ -64,7 +59,7 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
             (window as any).electron.dialog.showMessageBox(null, options);
         }
         
-    }
+    }*/
 
     function handleCategoryNameChange(event : React.ChangeEvent<HTMLInputElement>) {
         setCategoryName(event.target.value);
@@ -72,12 +67,12 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
 
     return (<form>
                 <table>
-                    <tr><td><label>{addNewCategoryLanguage.categoryName}: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
-                    <tr><td><label><label>{addNewCategoryLanguage.visible}: </label></label></td><td><select onChange={handleVisibilityChange}>
-                    <option value="true" selected>{appContext.language.yes}</option>
-                    <option value="false">{appContext.language.yes}</option>
+                    <tr><td><label>Category Name: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
+                    <tr><td><label><label>Visible: </label></label></td><td><select onChange={handleVisibilityChange}>
+                    <option value="true" selected>Yes</option>
+                    <option value="false">Yes</option>
                     </select></td></tr>
-                    <tr><td colSpan={2}><input type="submit" onClick={handleClick} value={addNewCategoryLanguage.addCategory} /></td></tr>
+                    <tr><td colSpan={2}><input type="submit" /*onClick={handleClick}*/ value="Add Category" /></td></tr>
                 </table>
         </form>)
 };

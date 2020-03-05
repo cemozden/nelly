@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import { FeedCategory } from "../config/FeedConfigManager";
-import { ApplicationContext } from "../App";
+import React, { useState, useEffect, useRef} from "react";
+import { FeedCategory } from "../models/FeedModels";
 
 interface UpdateFeedCategoryProps {
     feedCategory : FeedCategory,
@@ -8,9 +7,6 @@ interface UpdateFeedCategoryProps {
 }
 
 const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
-
-    const appContext = useContext(ApplicationContext);
-    const updateFeedCategoryLanguage = appContext.language.sidebar.updateCategory;
 
     const [categoryName, setCategoryName] = useState(props.feedCategory.name);
     const [categoryVisible, setCategoryVisible] = useState(props.feedCategory.visible !== undefined && props.feedCategory.visible);
@@ -29,7 +25,7 @@ const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
         setCategoryName(event.target.value);
     }
 
-    async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    /*async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
         event.preventDefault();
         
         if (categoryName.length === 0) {
@@ -72,16 +68,16 @@ const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
             (window as any).electron.dialog.showMessageBox(null, options);
         }
 
-    }
+    }*/
 
     return (<form>
         <table>
-            <tr><td><label>{updateFeedCategoryLanguage.categoryName}: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
-            <tr><td><label><label>{updateFeedCategoryLanguage.visible}: </label></label></td><td><select ref={visibilitySelectBox} onChange={handleVisibilityChange}>
-            <option value="true">{appContext.language.yes}</option>
-            <option value="false">{appContext.language.no}</option>
+            <tr><td><label>Category Name: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
+            <tr><td><label><label>Visible: </label></label></td><td><select ref={visibilitySelectBox} onChange={handleVisibilityChange}>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
             </select></td></tr>
-            <tr><td colSpan={2}><input type="submit" onClick={handleClick} value={updateFeedCategoryLanguage.updateCategory} /></td></tr>
+            <tr><td colSpan={2}><input type="submit" /*onClick={handleClick}*/ value="Update Category" /></td></tr>
         </table>
 </form>);
 };

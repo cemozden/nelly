@@ -14,6 +14,7 @@ import socketIO from "socket.io";
 import initAPIs from "./api/APIs";
 import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
+import cors from "cors";
 
 logger.info('[nellyd] Application started.');
 
@@ -38,7 +39,26 @@ function requestLoggerMiddleware(request : express.Request, response : express.R
     next();
 }
 
+const serverPort = settingsManager.getSettings().serverPort;
+
+const whileList = [`http://localhost:3000`];
+
 exp.use(requestLoggerMiddleware);
+exp.use(cors({
+    origin : (origin, callback) => {
+        
+        if (!origin) return callback(null, true);
+
+        if (whileList.indexOf(origin) === -1) {
+            const message = 'The CORS policy for this origin doesn`t ' +
+                'allow access from the particular origin.';
+            
+            return callback(new Error(message), false);
+        }
+
+        return callback(null, true);
+    }
+}));
 
 const feedScheduler : FeedScheduler = new CronFeedScheduler();
 initAPIs(exp, configManager, feedScheduler);
@@ -46,8 +66,6 @@ initAPIs(exp, configManager, feedScheduler);
 const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
 
 feedConfigs.forEach(fc => feedScheduler.addFeedToSchedule(fc));
-
-const serverPort = settingsManager.getSettings().serverPort;
 
 httpServerInstance.listen(serverPort, () => {
     logger.info(`[nellyd] HTTP Server has started listening on localhost:${serverPort}.`);
