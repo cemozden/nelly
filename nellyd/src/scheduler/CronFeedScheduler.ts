@@ -30,9 +30,10 @@ export default class CronFeedScheduler implements FeedScheduler {
             
 
         const cronExpression = generateCronPattern(feedConfig.fetchPeriod);
-        console.log(cronExpression);
+        
         // First fetch all data then schedule.
-        this.feedCollector(feedConfig);
+        if (feedConfig.enabled)
+            this.feedCollector(feedConfig);
 
         const task = schedule(cronExpression, () => {
             this.feedCollector(feedConfig);

@@ -102,4 +102,8 @@ export default function FeedAPI(express : Express.Application, configManager : C
 
     });
 
+    express.get('/updatefeed', (req, res) => {
+        
+    });
+
 }
