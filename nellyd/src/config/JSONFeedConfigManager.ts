@@ -133,6 +133,10 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                 reject(new InvalidFeedConfigIdError(`Update failed. There is no feed config with the id "${feedConfigId}".`));
             else if (feedConfigId !== feedConfig.feedConfigId)
                 reject(new InvalidFeedConfigIdError(`The feed configuration id of a specific feed configuration cannot be updated`));
+            else if(!categoryIdExist(feedConfig.categoryId, this.ROOT_CATEGORY)) 
+                reject(new InvalidFeedCategoryIdError(`The given category id "${feedConfig.categoryId}" does not exist!`));
+            else if(!isDuration(feedConfig.fetchPeriod))
+                reject(new InvalidFeedConfigError(`The given Fetch Period "${JSON.stringify(feedConfig.fetchPeriod)}" is not a valid fetch period!!`));
             else {
                 this.FEED_CONFIGS[feedIdIndex] = feedConfig;
                 

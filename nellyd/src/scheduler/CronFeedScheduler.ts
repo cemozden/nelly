@@ -43,7 +43,9 @@ export default class CronFeedScheduler implements FeedScheduler {
 
         this.scheduledTaskMap.set(feedConfigId, task);
         logger.debug(`[CronFeedScheduler->addFeedToSchedule] The feed that is added ${JSON.stringify(feedConfig)}`);
-        logger.info(`[CronFeedScheduler->addFeedToSchedule] ${feedConfig.name} is scheduled for receiving feeds.`);
+        
+        if(feedConfig.enabled)
+            logger.info(`[CronFeedScheduler->addFeedToSchedule] ${feedConfig.name} is scheduled for receiving feeds.`);
     }
 
     getScheduledTaskCount(): number {
