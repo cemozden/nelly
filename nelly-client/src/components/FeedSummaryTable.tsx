@@ -24,7 +24,7 @@ const FeedSummaryTable : React.FC<FeedSummaryTableProps> = props => {
     return (
         <div className="feeds">
                 <table>
-                    <FeedTableRow />
+                    
                 </table>
             </div>
     );

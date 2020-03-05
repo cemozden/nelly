@@ -40,7 +40,7 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
         return (<React.Fragment>
                 <FeedCategoryTitle categoryDispatch={props.feedCategoryDispatch} feedCategory={props.feedCategory} />
                 <ol>
-                    {childCategories.map(cc => <FeedDirectory feedCategoryDispatch={props.feedCategoryDispatch} feedList={props.feedList} feedCategory={cc} />)}
+                    {childCategories.map(cc => <FeedDirectory key={cc.categoryId} feedCategoryDispatch={props.feedCategoryDispatch} feedList={props.feedList} feedCategory={cc} />)}
                 </ol>
                 {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember feedConfig={fc} />)}
             </React.Fragment>);
@@ -182,7 +182,7 @@ const Categories : React.FC<CategoriesProps> = props => {
       .then(res => res.json())
       .then(result => {
         const rootCategory : FeedCategory = result;
-        console.log(rootCategory);
+     
         dispatch({type : 'setRootCategory', rootCategory : rootCategory});
 
       });
@@ -200,7 +200,7 @@ const Categories : React.FC<CategoriesProps> = props => {
 
     return <div className="categoryList">
                 <ul>
-                    <FeedDirectory feedList={state.feeds} feedCategory={state.rootCategory} feedCategoryDispatch={dispatch} />
+                    <FeedDirectory key={state.rootCategory.categoryId} feedList={state.feeds} feedCategory={state.rootCategory} feedCategoryDispatch={dispatch} />
                 </ul>
                 <Modal title={state.modalTitle} visible={state.modalVisible}>
                   {state.modalContent}
