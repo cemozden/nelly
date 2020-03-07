@@ -186,6 +186,16 @@ const Categories : React.FC<CategoriesProps> = props => {
         dispatch({type : 'setRootCategory', rootCategory : rootCategory});
 
       });
+      
+    fetch('http://localhost:6150/getfeeds')
+      .then(res => res.json())
+      .then(result => {
+        const feeds : FeedConfig[] = result;
+     
+        dispatch({type : 'setFeeds', feeds : feeds});
+
+    });
+    
   }, []);
 
   const initialState : any = {

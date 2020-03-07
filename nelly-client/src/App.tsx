@@ -14,8 +14,7 @@ const className = 'wrapper';
 const App : React.FC<AppProps> = props => {
 
   document.title = 'Nelly RSS Feeder';
-
-    
+  
   return (
       <div className={className}>
         <Sidebar />
