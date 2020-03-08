@@ -37,7 +37,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Category id is not a valid id! Please provide a valid id to add a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ added : false, message : errorMessage });
             logger.error(`[AddFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -46,7 +46,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (name === undefined || name.length === 0) {
             const errorMessage =  'Feed name is not valid! Please provide a valid name to add a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ added : false, message : errorMessage });
             logger.error(`[AddFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -55,7 +55,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (url === undefined || url.length === 0) {
             const errorMessage =  'Feed URL is not valid! Please provide a valid URL to add a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ added : false, message : errorMessage });
             logger.error(`[AddFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -64,7 +64,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (fetchPeriod === undefined || fetchPeriod.unit === undefined || fetchPeriod.value === undefined) {
             const errorMessage =  'Fetch period is not valid! Please provide a valid fetch period to add a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ added : false, message : errorMessage });
             logger.error(`[AddFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -92,13 +92,13 @@ export default function FeedAPI(express : Express.Application, configManager : C
             }
             else {
                 logger.error(`[AddFeed] An error occured while adding the feed! Request Params: ${JSON.stringify(params)}`);
-                res.json({ added : false, errorMessage : 'An error occured while adding feed!'});
+                res.json({ added : false, message : 'An error occured while adding feed!'});
             }
 
         }
         catch(err) {
             logger.error(`[AddFeed] ${err.message}, Request Params: ${JSON.stringify(params)}`);
-            res.status(500).json({message : err.message});
+            res.status(500).json({ added : false, message : err.message});
         }
 
 
@@ -130,7 +130,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'Feed id is not a valid id! Please provide a valid id to update a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ updated : false, message : errorMessage });
             logger.error(`[UpdateFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -139,7 +139,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Category id is not a valid id! Please provide a valid id to update a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ updated : false, message : errorMessage });
             logger.error(`[UpdateFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -148,7 +148,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (name === undefined || name.length === 0) {
             const errorMessage =  'Feed name is not valid! Please provide a valid name to update a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ updated : false, message : errorMessage });
             logger.error(`[UpdateFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -157,7 +157,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (url === undefined || url.length === 0) {
             const errorMessage =  'Feed URL is not valid! Please provide a valid URL to update a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ updated : false, message : errorMessage });
             logger.error(`[UpdateFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -166,7 +166,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (fetchPeriod === undefined || fetchPeriod.unit === undefined || fetchPeriod.value === undefined) {
             const errorMessage =  'Fetch period is not valid! Please provide a valid fetch period to update a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ updated : false, message : errorMessage });
             logger.error(`[UpdateFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -196,13 +196,13 @@ export default function FeedAPI(express : Express.Application, configManager : C
             }
             else {
                 logger.error(`[UpdateFeed] An error occured while updating the feed! Request Params: ${JSON.stringify(params)}`);
-                res.json({ updated : false, errorMessage : 'An error occured while updating the feed!'});
+                res.json({ updated : false, message : 'An error occured while updating the feed!'});
             }
 
         }
         catch (err) {
             logger.error(`[UpdateFeed] ${err.message}, Request Params: ${JSON.stringify(params)}`);
-            res.status(500).json({message : err.message});
+            res.status(500).json({ updated : false, message : err.message});
         }
         
     });
@@ -221,7 +221,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'Feed id is not a valid id! Please provide a valid id to update a new feed.';
             
-            res.status(400).json({ message : errorMessage });
+            res.status(400).json({ deleted : false, message : errorMessage });
             logger.error(`[DeleteFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -247,13 +247,13 @@ export default function FeedAPI(express : Express.Application, configManager : C
             }
             else {
                 logger.error(`[DeleteFeed] An error occured while deleting the feed! Request Params: ${JSON.stringify(params)}`);
-                res.json({ deleted : false, errorMessage : 'An error occured while deleting the feed!'});
+                res.json({ deleted : false, message : 'An error occured while deleting the feed!'});
             }
 
         }
         catch (err) {
             logger.error(`[DeleteFeed] ${err.message}, Request Params: ${JSON.stringify(params)}`);
-            res.status(500).json({ message : err.message });
+            res.status(500).json({ deleted : false, message : err.message });
         }
         
     });

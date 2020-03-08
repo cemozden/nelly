@@ -9,7 +9,13 @@ const isDev = require('electron-is-dev');
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({width: 1024, height: 680});
+  mainWindow = new BrowserWindow({
+    width: 1024,
+    height: 680,
+    webPreferences: { 
+      nodeIntegration: true, 
+      preload : `${__dirname}${path.sep}preload.js` 
+  }});
   process.env.NODE_ENV = isDev ? 'development' : 'production';
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);

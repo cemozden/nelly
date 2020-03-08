@@ -3,8 +3,10 @@ import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import Modal from "./Modal";
 import AddNewCategory from "./AddNewCategory";
 import UpdateFeedCategory from "./UpdateFeedCategory";
-import { FeedConfig, FeedCategory, DEFAULT_ROOT_CATEGORY } from "../models/FeedModels";
+import { FeedConfig } from "../models/FeedModels";
 import { useEffect } from "react";
+import {MessageBoxReturnValue} from "electron";
+import { FeedCategory, DEFAULT_ROOT_CATEGORY, isFeedCategoryDeleteSucceedMessage, isFeedCategoryDeleteFailedMessage } from "../models/FeedCategoryModels";
 
 export interface CategoriesProps {
   
@@ -42,7 +44,7 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
                 <ol>
                     {childCategories.map(cc => <FeedDirectory key={cc.categoryId} feedCategoryDispatch={props.feedCategoryDispatch} feedList={props.feedList} feedCategory={cc} />)}
                 </ol>
-                {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember feedConfig={fc} />)}
+                {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedConfig={fc} />)}
             </React.Fragment>);
     }
     else 
@@ -52,56 +54,55 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
 
 const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
 
-    /*async function deleteCategory(feedCategory : FeedCategory) {
+    async function deleteCategory(feedCategory : FeedCategory) {
 
       const options = {
         type: 'question',
-        buttons: [language.yes, language.no],
-        title: language.sidebar.deleteCategory.deleteCategoryMessageTitle.replace('$<categoryName>', feedCategory.name),
-        message : language.sidebar.deleteCategory.deleteConfirmMessage.replace('$<categoryName>', feedCategory.name),
-        detail  : language.sidebar.deleteCategory.deleteConfirmMessageDetails
+        buttons: ['Yes', 'No'],
+        title: `Delete category "${feedCategory.name}"`,
+        message : `Are you sure you want to delete the category "${feedCategory.name}"?`,
+        detail  : 'Feeds under this category will also be deleted!'
       };
       
-      const messageBoxReturnValuePromise : Promise<Electron.MessageBoxReturnValue> = (window as any).electron.dialog.showMessageBox(null, options);
+      const messageBoxReturnValuePromise : Promise<MessageBoxReturnValue> = (window as any).electron.dialog.showMessageBox(null, options);
       const messageBoxReturnValue = await messageBoxReturnValuePromise;
 
       if (messageBoxReturnValue.response === 0) {
-        const feedConfigManager = appContext.configManager.getFeedConfigManager();
+        //TODO: Remove feeds that belongs to the deleted categories. (CATEGORIES that is, all of them)
         
-        try {
-          const categoryDeleted = await feedConfigManager.deleteFeedCategory(feedCategory);
+        fetch(`http://localhost:6150/deletefeedcategory?categoryId=${feedCategory.categoryId}`)
+          .then(res => res.json())
+          .then(returnedObject => {
 
-          if (categoryDeleted) {
-            const rootCategory = feedConfigManager.getRootCategory();
-            
-            //TODO: Remove feeds that belongs to the deleted categories. (CATEGORIES that is, all of them)
+            if (isFeedCategoryDeleteSucceedMessage(returnedObject)) {
+              
+              props.categoryDispatch({type : 'setRootCategory', rootCategory : returnedObject.rootCategory});
+              props.categoryDispatch({type : 'setModalVisible', modalVisible : false});              
+            }
+            else if(isFeedCategoryDeleteFailedMessage(returnedObject)){
+              const options = {
+                type: 'error',
+                buttons: ['Ok'],
+                title: 'Nelly | Error',
+                message : returnedObject.message
+              };
 
-            props.categoryDispatch({type : 'setRootCategory', rootCategory : rootCategory});
-            props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
-          }
-          else {
-            const options = {
-              type: 'error',
-              buttons: ['Ok'],
-              title: 'Nelly | ' + language.error,
-              message: language.sidebar.deleteCategory.deleteCategoryError
-          };
-          (window as any).electron.dialog.showMessageBox(null, options);
-          }
-        }
-        catch (err) {
-          const options = {
-            type: 'error',
-            buttons: ['Ok'],
-            title: 'Nelly | ' + language.error,
-            message: err.message
-        };
-        (window as any).electron.dialog.showMessageBox(null, options);
-        }
+             (window as any).electron.dialog.showMessageBox(null, options);
+            }
+            else {
+              const options = {
+                type: 'error',
+                buttons: ['Ok'],
+                title: 'Nelly | Error',
+                message : 'An unknown error occured!'
+              };
+              
+             (window as any).electron.dialog.showMessageBox(null, options);
+            }
 
-      }
-      
-    }*/
+          });
+    }
+  }
 
     return  (
               <React.Fragment>
@@ -128,7 +129,7 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                     }}>
                     {'Update category "' + props.feedCategory.name + '"'}
                     </MenuItem>
-                    <MenuItem onClick={async (e, data) => {}}>
+                    <MenuItem onClick={async (e, data) => deleteCategory(props.feedCategory)}>
                     {'Delete category ' + props.feedCategory.name}
                     </MenuItem>
                   </React.Fragment> : null}

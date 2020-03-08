@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from "react";
-import { FeedCategory } from "../models/FeedModels";
+import { FeedCategory, isFeedCategoryUpdateSucceedMessage, isFeedCategoryUpdateFailedMessage } from "../models/FeedCategoryModels";
 
 interface UpdateFeedCategoryProps {
     feedCategory : FeedCategory,
@@ -25,50 +25,53 @@ const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
         setCategoryName(event.target.value);
     }
 
-    /*async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
         event.preventDefault();
         
         if (categoryName.length === 0) {
             const options = {
                 type: 'error',
                 buttons: ['Ok'],
-                title: 'Nelly | ' + appContext.language.error,
-                message: appContext.language.validations.updateCategoryValidation.categoryNameCannotBeEmpty
+                title: 'Nelly | Error',
+                message: 'Category name cannot be empty! Please provide a valid category name'
             };
+
             (window as any).electron.dialog.showMessageBox(null, options);
             return;
         }
 
-        const updatedFeedCategory : FeedCategory = {
-            ...props.feedCategory
-        }
+        fetch(`http://localhost:6150/updatefeedcategory?categoryId=${props.feedCategory.categoryId}&categoryName=${categoryName}&visible=${categoryVisible}`)
+            .then(res => res.json())
+            .then(returnedObject => {
+                
+                if (isFeedCategoryUpdateSucceedMessage(returnedObject)) {
+                    props.categoryDispatch({type : 'setRootCategory', rootCategory : returnedObject.rootCategory});
+                    props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
+                }
+                else if (isFeedCategoryUpdateFailedMessage(returnedObject)) {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message: returnedObject.message
+                    };
+                    
+                    (window as any).electron.dialog.showMessageBox(null, options);
+                }
+                else {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message : 'An unknown error occured!'
+                      };
+                      
+                     (window as any).electron.dialog.showMessageBox(null, options);
+                }
 
-        updatedFeedCategory.name = categoryName;
-        updatedFeedCategory.visible = categoryVisible;
+        });
 
-        const feedConfigManager = appContext.configManager.getFeedConfigManager();
-
-        try {
-            const feedCategoryUpdated = await feedConfigManager.updateFeedCategory(updatedFeedCategory, props.feedCategory);
-
-            if (feedCategoryUpdated) {
-                const rootCategory = feedConfigManager.getRootCategory();
-                props.categoryDispatch({type : 'setRootCategory', rootCategory : rootCategory});
-                props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
-            }
-
-        }
-        catch (err) {
-            const options = {
-                type: 'error',
-                buttons: ['Ok'],
-                title: 'Nelly | ' + appContext.language.error,
-                message: err.message
-            };
-            (window as any).electron.dialog.showMessageBox(null, options);
-        }
-
-    }*/
+    }
 
     return (<form>
         <table>
@@ -77,7 +80,7 @@ const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
             <option value="true">Yes</option>
             <option value="false">No</option>
             </select></td></tr>
-            <tr><td colSpan={2}><input type="submit" /*onClick={handleClick}*/ value="Update Category" /></td></tr>
+            <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Update Category" /></td></tr>
         </table>
 </form>);
 };

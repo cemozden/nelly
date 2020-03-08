@@ -8,17 +8,6 @@ export interface FeedTableRowProps {
  
 }
 
-const FeedTableRow : React.FC<FeedTableRowProps> = props => {
-
-
-    return (<tr>
-                <td></td>
-                <td>Title</td>
-                <td>Author</td>
-                <td>Time</td>
-                <td>Category</td>
-            </tr>);
-    };
 
 const FeedSummaryTable : React.FC<FeedSummaryTableProps> = props => {
     return (

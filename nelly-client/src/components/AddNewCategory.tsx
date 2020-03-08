@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FeedCategory } from "../models/FeedModels";
+import { FeedCategory, isFeedCategoryAddSucceedMessage, isFeedCategoryAddFailedMessage } from "../models/FeedCategoryModels";
 
 
 interface AddNewCategoryProps {
@@ -16,50 +16,51 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
         setCategoryVisible(event.target.value === 'true');
     }
 
-    /*async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
         event.preventDefault();
         
         if (categoryName.length === 0) {
             const options = {
                 type: 'error',
                 buttons: ['Ok'],
-                title: 'Nelly | ' + appContext.language.error,
-                message: appContext.language.validations.addNewCategoryValidation.categoryNameCannotBeEmpty
+                title: 'Nelly | Error',
+                message: 'Category name cannot be empty! Please provide a valid category name'
             };
             (window as any).electron.dialog.showMessageBox(null, options);
             return;
         }
 
-        const feedConfigManager = appContext.configManager.getFeedConfigManager();
+        fetch(`http://localhost:6150/addfeedcategory?categoryName=${categoryName}&visible=${categoryVisible}&parentCategoryId=${props.parentCategory.categoryId}`)
+            .then(res => res.json())
+            .then(returnedObject => {
+                
+                if (isFeedCategoryAddSucceedMessage(returnedObject)) {
+                    props.categoryDispatch({type : 'setRootCategory', rootCategory : returnedObject.rootCategory});
+                    props.categoryDispatch({type : 'setModalVisible', modalVisible : false});        
+                }
+                else if(isFeedCategoryAddFailedMessage(returnedObject)) {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message: returnedObject.message
+                    };
+                    (window as any).electron.dialog.showMessageBox(null, options);
+                }
+                else {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message : 'An unknown error occured!'
+                      };
+                      
+                     (window as any).electron.dialog.showMessageBox(null, options);
+                }
 
-        const feedCategory : FeedCategory = {
-            categoryId : crc32(Math.random().toString(36).substring(2, 9)).toString(16),
-            childCategories : [],
-            name : categoryName,
-            visible : categoryVisible
-        };
-
-        try {
-            const addFeedCategoryResult = await feedConfigManager.addFeedCategory(feedCategory, props.parentCategory);
-
-            if (addFeedCategoryResult) {
-                const rootCategory = feedConfigManager.getRootCategory();
-                props.categoryDispatch({type : 'setRootCategory', rootCategory : rootCategory});
-                props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
-            }
-
-        }
-        catch (err) {
-            const options = {
-                type: 'error',
-                buttons: ['Ok'],
-                title: 'Nelly | ' + appContext.language.error,
-                message: err.message
-            };
-            (window as any).electron.dialog.showMessageBox(null, options);
-        }
+        });
         
-    }*/
+    }
 
     function handleCategoryNameChange(event : React.ChangeEvent<HTMLInputElement>) {
         setCategoryName(event.target.value);
@@ -73,7 +74,7 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
                         <option value="true">Yes</option>
                         <option value="false">Yes</option>
                         </select></td></tr>
-                        <tr><td colSpan={2}><input type="submit" /*onClick={handleClick}*/ value="Add Category" /></td></tr>
+                        <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Add Category" /></td></tr>
                     </tbody>
                     
                 </table>

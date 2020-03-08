@@ -27,7 +27,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
         if (categoryName === undefined || categoryName.length === 0) {
             const errorMessage =  'Category name is not a valid name! Please provide a valid name to add a new feed category.';
             
-            res.status(400).json({ message : errorMessage});
+            res.status(400).json({ added : false, message : errorMessage});
             logger.error(`[AddFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -36,7 +36,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
         if(parentCategoryId === undefined || parentCategoryId.length === 0) {
             const errorMessage =  'Parent category id is not a valid id!';
             
-            res.status(400).json({ message : errorMessage});
+            res.status(400).json({ added : false, message : errorMessage});
             logger.error(`[AddFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -60,12 +60,12 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             }
             else {
                 logger.error(`[AddFeedCategory] An error occured while adding the category! Request Params: ${JSON.stringify(params)}`);
-                res.json({added : false, errorMessage : 'An error occured while adding the category!'});
+                res.json({added : false, message : 'An error occured while adding the category!'});
             }
         }
         catch(err) {
             logger.error(`[AddFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
-            res.status(500).json({message : err.message});
+            res.status(500).json({added : false, message : err.message});
         }
         
         
@@ -89,7 +89,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
         if (categoryName === undefined || categoryName.length === 0) {
             const errorMessage =  'Category name is not a valid name! Please provide a valid name to add a new feed category.';
             
-            res.status(400).json({ message : errorMessage});
+            res.status(400).json({ updated : false, message : errorMessage});
             logger.error(`[UpdateFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -98,7 +98,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
         if(categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Parent category id is not a valid id!';
             
-            res.status(400).json({ message : errorMessage});
+            res.status(400).json({ updated : false, message : errorMessage});
             logger.error(`[UpdateFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -124,13 +124,13 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             }
             else {
                 logger.error(`[UpdateFeedCategory] An error occured while updating the category!, Request Params: ${JSON.stringify(params)}`);
-                res.json({updated : false, errorMessage : 'An error occured while updating the category!'});
+                res.json({updated : false, message : 'An error occured while updating the category!'});
             }
                 
         }
         catch(err) {
             logger.error(`[UpdateFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
-            res.status(500).json({message : err.message});
+            res.status(500).json({updated : false, message : err.message});
         }
 
     });
@@ -147,7 +147,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
         if(categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Parent category id is not a valid id!';
             
-            res.status(400).json({ message : errorMessage});
+            res.status(400).json({ deleted : false, message : errorMessage});
             logger.error(`[DeleteFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
@@ -165,13 +165,13 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             }
             else {
                 logger.error(`[DeleteFeedCategory] An error occured while deleting the category with the id "${categoryId}"! `);
-                res.json({deleted : false, errorMessage : 'An error occured while deleting the category!'});
+                res.json({deleted : false, message : 'An error occured while deleting the category!'});
             }
 
         }
         catch (err) {
             logger.error(`[DeleteFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
-            res.status(500).json({message : err.message});
+            res.status(500).json({deleted : false, message : err.message});
         }
         
 

@@ -7,12 +7,12 @@ os :
   - windows
 dist : xenial
 install : 
-  - cd nellyd
-  - npm install
-  - cd ../nelly-client
-  - npm install
-  - cd ..
+    cd ..
 cache: npm
 script: 
-  - cd nellyd && tsc && npm run-script testci && cd ..
-  - cd nelly-client && npm test
+  - cd nellyd
+  - npm install
+  - tsc && npm run-script testci && cd ..
+  - cd ../nelly-client
+  - npm install
+  - npm test

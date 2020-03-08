@@ -12,21 +12,7 @@ export interface FeedConfig {
 
 }
 
-export interface FeedCategory {
-    categoryId : string,
-    name : string,
-    childCategories : FeedCategory[],
-    visible? : boolean
-}
-
-
 export interface FeedItem {
 
 }
 
-export const DEFAULT_ROOT_CATEGORY : FeedCategory = {
-    categoryId : 'root',
-    childCategories : [],
-    name : 'Root',
-    visible : true
-};
