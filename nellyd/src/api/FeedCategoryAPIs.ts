@@ -161,7 +161,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
 
             if (categoryDeleted) {
                 logger.info(`[DeleteFeedCategory] A feed category with the id "${categoryId}" deleted!, Data: ${JSON.stringify(categoryDeleted)}`);
-                res.json({deleted : true, rootCategory : feedConfigManager.getRootCategory()});
+                res.json({deleted : true, deletedCategory : feedCategoryToDelete, rootCategory : feedConfigManager.getRootCategory()});
             }
             else {
                 logger.error(`[DeleteFeedCategory] An error occured while deleting the category with the id "${categoryId}"! `);

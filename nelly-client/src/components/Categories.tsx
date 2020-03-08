@@ -6,7 +6,10 @@ import UpdateFeedCategory from "./UpdateFeedCategory";
 import { FeedConfig } from "../models/FeedModels";
 import { useEffect } from "react";
 import {MessageBoxReturnValue} from "electron";
-import { FeedCategory, DEFAULT_ROOT_CATEGORY, isFeedCategoryDeleteSucceedMessage, isFeedCategoryDeleteFailedMessage } from "../models/FeedCategoryModels";
+import { FeedCategory, DEFAULT_ROOT_CATEGORY } from "../models/FeedCategoryModels";
+import AddFeed from "./AddFeed";
+import { isFeedCategoryDeleteSucceedMessage, isFeedCategoryDeleteFailedMessage } from "../models/apimessages/FeedCategoryMessages";
+import { isDeleteFeedSucceedMessage, isDeleteFeedFailedMessage } from "../models/apimessages/FeedMessages";
 
 export interface CategoriesProps {
   
@@ -24,7 +27,8 @@ interface FeedCategoryTitleProps {
 }
 
 interface FeedCategoryMemberProps {
-    feedConfig : FeedConfig
+    feedConfig : FeedConfig,
+    categoryDispatch : React.Dispatch<any>
 }
 
 interface CategoriesState {
@@ -44,11 +48,20 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
                 <ol>
                     {childCategories.map(cc => <FeedDirectory key={cc.categoryId} feedCategoryDispatch={props.feedCategoryDispatch} feedList={props.feedList} feedCategory={cc} />)}
                 </ol>
-                {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedConfig={fc} />)}
+                <ol>
+                  {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedConfig={fc} categoryDispatch={props.feedCategoryDispatch} />)}
+                </ol>
             </React.Fragment>);
     }
     else 
-      return <FeedCategoryTitle feedCategory={props.feedCategory} categoryDispatch={props.feedCategoryDispatch} />  
+      return (
+        <React.Fragment>
+            <FeedCategoryTitle feedCategory={props.feedCategory} categoryDispatch={props.feedCategoryDispatch} />
+            <ol>
+              {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedConfig={fc} categoryDispatch={props.feedCategoryDispatch} />)}
+            </ol>
+        </React.Fragment>
+        );
     
 };
 
@@ -77,7 +90,17 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
             if (isFeedCategoryDeleteSucceedMessage(returnedObject)) {
               
               props.categoryDispatch({type : 'setRootCategory', rootCategory : returnedObject.rootCategory});
-              props.categoryDispatch({type : 'setModalVisible', modalVisible : false});              
+              props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
+              
+              const options = {
+                type: 'info',
+                buttons: ['Ok'],
+                title: 'Nelly | Information',
+                message : `${returnedObject.deletedCategory.name} has been deleted successfully.`
+              };
+
+             (window as any).electron.dialog.showMessageBox(null, options);
+              
             }
             else if(isFeedCategoryDeleteFailedMessage(returnedObject)){
               const options = {
@@ -110,7 +133,11 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                   <li id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>
                 </ContextMenuTrigger>
                 <ContextMenu id={props.feedCategory.categoryId + '_contextMenu'}>
-                  <MenuItem onClick={(e, data) => console.log(2)}>
+                  <MenuItem onClick={(e, data) => {
+                    props.categoryDispatch({type : 'setModalTitle', modalTitle : 'Add new feed under  ' + props.feedCategory.name});
+                    props.categoryDispatch({type : 'setModalContent', modalContent : <AddFeed categoryDispatch={props.categoryDispatch} feedCategory={props.feedCategory} />});
+                    props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
+                  }}>
                     {"Add new feed under " + props.feedCategory.name}
                   </MenuItem>
                   <MenuItem data={{parentCategory : props.feedCategory}} onClick={(e, data) => {
@@ -127,7 +154,7 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
                       props.categoryDispatch({type : 'setModalContent', modalContent : <UpdateFeedCategory categoryDispatch={props.categoryDispatch} feedCategory={props.feedCategory} />});
                       props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
                     }}>
-                    {'Update category "' + props.feedCategory.name + '"'}
+                    {'Update category ' + props.feedCategory.name}
                     </MenuItem>
                     <MenuItem onClick={async (e, data) => deleteCategory(props.feedCategory)}>
                     {'Delete category ' + props.feedCategory.name}
@@ -140,6 +167,65 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
 
 const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
 
+  async function deleteFeed(feedConfig : FeedConfig) {
+    const options = {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: `Delete feed "${feedConfig.name}"`,
+      message : `Are you sure you want to delete the feed "${feedConfig.name}"?`,
+      detail  : 'All news feed and archive will be cleaned up!'
+    };
+    
+    const messageBoxReturnValuePromise : Promise<MessageBoxReturnValue> = (window as any).electron.dialog.showMessageBox(null, options);
+    const messageBoxReturnValue = await messageBoxReturnValuePromise;
+  
+    if (messageBoxReturnValue.response !== 0) return;
+    
+    //localhost:6150/deletefeed?feedId=f611f2a5
+  
+    fetch(`http://localhost:6150/deletefeed?feedId=${feedConfig.feedConfigId}`)
+      .then(res => res.json())
+      .then(returnedObject => {
+          if (isDeleteFeedSucceedMessage(returnedObject)) {
+            props.categoryDispatch({type : 'setFeeds', feeds : returnedObject.feeds});
+            props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
+  
+            const options = {
+              type: 'info',
+              buttons: ['Ok'],
+              title: 'Nelly | Information',
+              message : `${returnedObject.deletedObject.name} has been deleted successfully.`
+            };
+  
+           (window as any).electron.dialog.showMessageBox(null, options);
+  
+          }
+          else if (isDeleteFeedFailedMessage(returnedObject)) {
+            const options = {
+              type: 'error',
+              buttons: ['Ok'],
+              title: 'Nelly | Error',
+              message : returnedObject.message
+            };
+  
+           (window as any).electron.dialog.showMessageBox(null, options);
+          }
+          else {
+            const options = {
+              type: 'error',
+              buttons: ['Ok'],
+              title: 'Nelly | Error',
+              message : 'An unknown error occured!'
+            };
+            
+           (window as any).electron.dialog.showMessageBox(null, options);
+          }
+      });
+    
+  
+  }
+  
+
   return  (<React.Fragment>
                 <ContextMenuTrigger id={props.feedConfig.feedConfigId + '_contextMenu'}>
                     <li id={props.feedConfig.feedConfigId}>{props.feedConfig.name}</li>
@@ -151,12 +237,15 @@ const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
                     <MenuItem onClick={(e, data) => console.log(2)}>
                      {'Update ' + props.feedConfig.name}
                     </MenuItem>
-                    <MenuItem onClick={(e, data) => console.log(3)}>
+                    <MenuItem onClick={(e, data) => deleteFeed(props.feedConfig)}>
                     {'Delete ' + props.feedConfig.name}
                     </MenuItem>
                 </ContextMenu>       
             </React.Fragment>) 
 };
+
+
+
 
 function categoryReducer(state : CategoriesState, action : any) : CategoriesState {
     

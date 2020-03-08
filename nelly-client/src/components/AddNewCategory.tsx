@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FeedCategory, isFeedCategoryAddSucceedMessage, isFeedCategoryAddFailedMessage } from "../models/FeedCategoryModels";
+import { FeedCategory } from "../models/FeedCategoryModels";
+import { isFeedCategoryAddFailedMessage, isFeedCategoryAddSucceedMessage } from "../models/apimessages/FeedCategoryMessages";
 
 
 interface AddNewCategoryProps {
@@ -72,7 +73,7 @@ const AddNewCategory : React.FC<AddNewCategoryProps> = props => {
                         <tr><td><label>Category Name: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
                         <tr><td><label><label>Visible: </label></label></td><td><select onChange={handleVisibilityChange} value="true">
                         <option value="true">Yes</option>
-                        <option value="false">Yes</option>
+                        <option value="false">No</option>
                         </select></td></tr>
                         <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Add Category" /></td></tr>
                     </tbody>

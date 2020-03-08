@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef} from "react";
-import { FeedCategory, isFeedCategoryUpdateSucceedMessage, isFeedCategoryUpdateFailedMessage } from "../models/FeedCategoryModels";
+import { FeedCategory } from "../models/FeedCategoryModels";
+import { isFeedCategoryUpdateFailedMessage, isFeedCategoryUpdateSucceedMessage } from "../models/apimessages/FeedCategoryMessages";
 
 interface UpdateFeedCategoryProps {
     feedCategory : FeedCategory,

@@ -6,8 +6,6 @@ os :
   - osx
   - windows
 dist : xenial
-install : 
-    cd ..
 cache: npm
 script: 
   - cd nellyd
