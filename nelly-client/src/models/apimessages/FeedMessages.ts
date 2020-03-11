@@ -22,6 +22,32 @@ export interface DeleteFeedFailedMessage {
     message : string
 }
 
+/**
+ * 
+ *   if (feedConfigUpdated) {
+                logger.info(`[UpdateFeed] A feed is successfully updated! Old Feed: ${JSON.stringify(oldFeed)},  Updated Feed : ${JSON.stringify(updatedFeed)}`);
+                feedScheduler.addFeedToSchedule(updatedFeed);
+                res.json({ updated : true, updatedFeedObject : updatedFeed, feeds : feedConfigManager.getFeedConfigs() });
+            }
+            else {
+                logger.error(`[UpdateFeed] An error occured while updating the feed! Request Params: ${JSON.stringify(params)}`);
+                res.json({ updated : false, message : 'An error occured while updating the feed!'});
+            }
+
+ * 
+ */
+
+export interface UpdateFeedSucceedMessage {
+    updated : boolean,
+    updatedFeedObject : FeedConfig,
+    feeds : FeedConfig[]
+}
+
+export interface UpdateFeedFailedMessage {
+    updated : boolean,
+    message : string
+}
+
 export function isAddFeedSucceedMessage(obj : any) : obj is AddFeedSucceedMessage {
 
     if (obj.added === undefined) return false;
@@ -54,4 +80,21 @@ export function isDeleteFeedFailedMessage(obj : any) : obj is DeleteFeedFailedMe
     if (obj.message === undefined) return false;
 
     return !obj.added;
+}
+
+export function isUpdateFeedSucceedMessage(obj : any) : obj is UpdateFeedSucceedMessage {
+
+    if (obj.updated === undefined) return false;
+    if (obj.updatedFeedObject === undefined) return false;
+    if (obj.feeds === undefined) return false;
+
+    return obj.updated;
+}
+
+export function isUpdateFeedFailedMessage(obj : any) : obj is UpdateFeedFailedMessage {
+
+    if (obj.updated === undefined) return false;
+    if (obj.message === undefined) return false;
+
+    return !obj.updated;
 }

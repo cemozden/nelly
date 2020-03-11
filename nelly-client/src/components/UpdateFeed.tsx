@@ -2,20 +2,22 @@ import React, { useRef, useState, useEffect } from "react";
 import Duration from "../time/Duration";
 import { TimeUnit } from "../time/TimeUnit";
 import { FeedConfig } from "../models/FeedModels";
+import { isUpdateFeedSucceedMessage, isUpdateFeedFailedMessage } from "../models/apimessages/FeedMessages";
+import { FeedCategory } from "../models/FeedCategoryModels";
 
 interface UpdateFeedProps {
     feedConfig : FeedConfig,
+    feedCategory : FeedCategory,
     categoryDispatch : React.Dispatch<any>
 }
 
 const UpdateFeed : React.FC<UpdateFeedProps> = props => {
 
-    const [name, setName] = useState('');
-    const [url, setURL] = useState('');
-    const [fetchPeriod, setFetchPeriod] = useState({ unit : TimeUnit.MINUTES, value : 5 } as Duration);
-    const [enabled, setEnabled] = useState(true);
+    const [name, setName] = useState(props.feedConfig.name);
+    const [url, setURL] = useState(props.feedConfig.url);
+    const [fetchPeriod, setFetchPeriod] = useState(props.feedConfig.fetchPeriod);
+    const [enabled, setEnabled] = useState(props.feedConfig.enabled);
 
-    const enableSelectBox = useRef<HTMLSelectElement>(null);
     const timeUnitSelectBox = useRef<HTMLSelectElement>(null);
 
     function handleFeedNameChange(event : React.ChangeEvent<HTMLInputElement>) {
@@ -33,7 +35,6 @@ const UpdateFeed : React.FC<UpdateFeedProps> = props => {
         };
 
         setFetchPeriod(updatedFetchPeriod);
-
     }
 
     function handleTimeValueChange(event : React.ChangeEvent<HTMLInputElement>) {
@@ -46,16 +47,69 @@ const UpdateFeed : React.FC<UpdateFeedProps> = props => {
         setFetchPeriod(updatedFetchPeriod);
     }
 
-    function handleEnabledChange(event : React.ChangeEvent<HTMLSelectElement>) {
-        setEnabled(event.target.value === 'true');
+    function handleEnabledChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setEnabled(!enabled);
     }
 
     async function handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
         event.preventDefault();
+
+        if (name.length === 0) {
+            const options = {
+                type: 'error',
+                buttons: ['Ok'],
+                title: 'Nelly | Error',
+                message: 'Feed name cannot be empty! Please provide a valid feed name.'
+            };
+            (window as any).electron.dialog.showMessageBox(null, options);
+            return;
+        }
+
+        if (url.length === 0) {
+            const options = {
+                type: 'error',
+                buttons: ['Ok'],
+                title: 'Nelly | Error',
+                message: 'Feed URL cannot be empty! Please provide a valid URL.'
+            };
+            (window as any).electron.dialog.showMessageBox(null, options);
+            return;
+        }
+
+        fetch(`http://localhost:6150/updatefeed?categoryId=${props.feedCategory.categoryId}&name=${name}&url=${url}&fetchPeriod=${JSON.stringify(fetchPeriod)}&enabled=${enabled}&feedId=${props.feedConfig.feedConfigId}`)
+            .then(res => res.json())
+            .then(returnedObject => {
+                
+                if (isUpdateFeedSucceedMessage(returnedObject)) {
+                    props.categoryDispatch({type : 'setFeeds', feeds : returnedObject.feeds});
+                    props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
+                }
+                else if (isUpdateFeedFailedMessage(returnedObject)) {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message: returnedObject.message
+                    };
+                    
+                    (window as any).electron.dialog.showMessageBox(null, options);
+                }
+                else {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message : 'An unknown error occured!'
+                      };
+                      
+                     (window as any).electron.dialog.showMessageBox(null, options);
+                }
+
+        });
+
     }
 
     useEffect(() => {
-        (enableSelectBox.current as HTMLSelectElement).selectedIndex = enabled ? 0 : 1;
         (timeUnitSelectBox.current as HTMLSelectElement).selectedIndex = fetchPeriod.unit.valueOf()
     });
 
@@ -74,10 +128,7 @@ const UpdateFeed : React.FC<UpdateFeedProps> = props => {
                         <option value="4">Months</option>
                     </select>
                 </td></tr>
-                <tr><td><label><label>Enabled: </label></label></td><td><select ref={enableSelectBox} onChange={handleEnabledChange} value="true">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-                </select></td></tr>
+                <tr><td><label><label>Enabled: </label></label></td><td><input type="checkbox" checked={enabled} onChange={handleEnabledChange} /></td></tr>
                 <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Update feed" /></td></tr>
             </tbody>
             

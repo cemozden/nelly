@@ -48,8 +48,8 @@ const AddFeed : React.FC<AddFeedProps> = props => {
         setFetchPeriod(updatedFetchPeriod);
     }
 
-    function handleEnabledChange(event : React.ChangeEvent<HTMLSelectElement>) {
-        setEnabled(event.target.value === 'true');
+    function handleEnabledChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setEnabled(!enabled);
     }
 
     /**
@@ -149,10 +149,7 @@ const AddFeed : React.FC<AddFeedProps> = props => {
                         <option value="4">Months</option>
                     </select>
                 </td></tr>
-                <tr><td><label><label>Enabled: </label></label></td><td><select ref={enableSelectBox} onChange={handleEnabledChange} value="true">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-                </select></td></tr>
+                <tr><td><label><label>Enabled: </label></label></td><td><input type="checkbox" checked={enabled} onChange={handleEnabledChange} /></td></tr>
                 <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Add Feed" /></td></tr>
             </tbody>
             

@@ -9,7 +9,11 @@ import {MessageBoxReturnValue} from "electron";
 import { FeedCategory, DEFAULT_ROOT_CATEGORY } from "../models/FeedCategoryModels";
 import AddFeed from "./AddFeed";
 import { isFeedCategoryDeleteSucceedMessage, isFeedCategoryDeleteFailedMessage } from "../models/apimessages/FeedCategoryMessages";
-import { isDeleteFeedSucceedMessage, isDeleteFeedFailedMessage } from "../models/apimessages/FeedMessages";
+import { isDeleteFeedSucceedMessage, isDeleteFeedFailedMessage, isUpdateFeedSucceedMessage, isUpdateFeedFailedMessage } from "../models/apimessages/FeedMessages";
+import { useDrag, useDrop } from "react-dnd";
+import FEED_DND_TYPES from "../models/dnd/FeedType";
+import FeedDragItem from "../models/dnd/FeedDragItem";
+import UpdateFeed from "./UpdateFeed";
 
 export interface CategoriesProps {
   
@@ -28,6 +32,7 @@ interface FeedCategoryTitleProps {
 
 interface FeedCategoryMemberProps {
     feedConfig : FeedConfig,
+    feedCategory : FeedCategory
     categoryDispatch : React.Dispatch<any>
 }
 
@@ -49,7 +54,7 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
                     {childCategories.map(cc => <FeedDirectory key={cc.categoryId} feedCategoryDispatch={props.feedCategoryDispatch} feedList={props.feedList} feedCategory={cc} />)}
                 </ol>
                 <ol>
-                  {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedConfig={fc} categoryDispatch={props.feedCategoryDispatch} />)}
+                  {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedCategory={props.feedCategory} feedConfig={fc} categoryDispatch={props.feedCategoryDispatch} />)}
                 </ol>
             </React.Fragment>);
     }
@@ -58,7 +63,7 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
         <React.Fragment>
             <FeedCategoryTitle feedCategory={props.feedCategory} categoryDispatch={props.feedCategoryDispatch} />
             <ol>
-              {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedConfig={fc} categoryDispatch={props.feedCategoryDispatch} />)}
+              {props.feedList.filter(fc => fc.categoryId === props.feedCategory.categoryId).map(fc => <FeedCategoryMember key={fc.feedConfigId} feedCategory={props.feedCategory} feedConfig={fc} categoryDispatch={props.feedCategoryDispatch} />)}
             </ol>
         </React.Fragment>
         );
@@ -66,6 +71,51 @@ const FeedDirectory : React.FC<FeedDirectoryProps> = props => {
 };
 
 const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
+
+    const [{ droppedItem, isOver }, drop] = useDrop({
+      accept : FEED_DND_TYPES.feed,
+      drop : () => {
+        const droppedFeedConfig = droppedItem.feedConfig;
+
+        fetch(`http://localhost:6150/updatefeed?categoryId=${props.feedCategory.categoryId}&name=${droppedFeedConfig.name}&url=${droppedFeedConfig.url}&fetchPeriod=${JSON.stringify(droppedFeedConfig.fetchPeriod)}&enabled=${droppedFeedConfig.enabled}&feedId=${droppedFeedConfig.feedConfigId}`)
+            .then(res => res.json())
+            .then(returnedObject => {
+                
+                if (isUpdateFeedSucceedMessage(returnedObject)) {
+                    props.categoryDispatch({type : 'setFeeds', feeds : returnedObject.feeds});
+                    props.categoryDispatch({type : 'setModalVisible', modalVisible : false});
+                }
+                else if (isUpdateFeedFailedMessage(returnedObject)) {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message: returnedObject.message
+                    };
+                    
+                    (window as any).electron.dialog.showMessageBox(null, options);
+                }
+                else {
+                    const options = {
+                        type: 'error',
+                        buttons: ['Ok'],
+                        title: 'Nelly | Error',
+                        message : 'An unknown error occured!'
+                      };
+                      
+                     (window as any).electron.dialog.showMessageBox(null, options);
+                }
+
+        });
+        
+
+      },
+      collect : mon => ({
+        isOver : mon.isOver(),
+        droppedItem : mon.getItem() as FeedDragItem
+      })
+      
+    });
 
     async function deleteCategory(feedCategory : FeedCategory) {
 
@@ -130,7 +180,7 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
     return  (
               <React.Fragment>
                 <ContextMenuTrigger id={props.feedCategory.categoryId + '_contextMenu'}>
-                  <li id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>
+                  <li ref={drop} style={isOver ? {border : '1px solid #FF0000'} : {}} id={props.feedCategory.categoryId}>{props.feedCategory.name}</li>
                 </ContextMenuTrigger>
                 <ContextMenu id={props.feedCategory.categoryId + '_contextMenu'}>
                   <MenuItem onClick={(e, data) => {
@@ -167,6 +217,13 @@ const FeedCategoryTitle : React.FC<FeedCategoryTitleProps> = props => {
 
 const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
 
+  const [, drag] = useDrag({
+    item : {
+      type : FEED_DND_TYPES.feed,
+      feedConfig : props.feedConfig
+    }
+  })
+
   async function deleteFeed(feedConfig : FeedConfig) {
     const options = {
       type: 'question',
@@ -180,8 +237,6 @@ const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
     const messageBoxReturnValue = await messageBoxReturnValuePromise;
   
     if (messageBoxReturnValue.response !== 0) return;
-    
-    //localhost:6150/deletefeed?feedId=f611f2a5
   
     fetch(`http://localhost:6150/deletefeed?feedId=${feedConfig.feedConfigId}`)
       .then(res => res.json())
@@ -228,13 +283,21 @@ const FeedCategoryMember : React.FC<FeedCategoryMemberProps> = props => {
 
   return  (<React.Fragment>
                 <ContextMenuTrigger id={props.feedConfig.feedConfigId + '_contextMenu'}>
-                    <li id={props.feedConfig.feedConfigId}>{props.feedConfig.name}</li>
+                    <li ref={drag} id={props.feedConfig.feedConfigId}>{props.feedConfig.name}</li>
                   </ContextMenuTrigger>
                   <ContextMenu id={props.feedConfig.feedConfigId + '_contextMenu'}>
-                    <MenuItem onClick={(e, data) => console.log(1)}>
+                    <MenuItem onClick={(e, data) => {
+                    props.categoryDispatch({type : 'setModalTitle', modalTitle : 'Add new feed under  ' + props.feedCategory.name});
+                    props.categoryDispatch({type : 'setModalContent', modalContent : <AddFeed categoryDispatch={props.categoryDispatch} feedCategory={props.feedCategory} />});
+                    props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
+                  }}>
                       Add new Feed
                     </MenuItem>
-                    <MenuItem onClick={(e, data) => console.log(2)}>
+                    <MenuItem onClick={(e, data) => {
+                      props.categoryDispatch({type : 'setModalTitle', modalTitle : 'Update feed ' + props.feedConfig.name});
+                      props.categoryDispatch({type : 'setModalContent', modalContent : <UpdateFeed categoryDispatch={props.categoryDispatch} feedCategory={props.feedCategory} feedConfig={props.feedConfig} />});
+                      props.categoryDispatch({type : 'setModalVisible', modalVisible : true});
+                    }}>
                      {'Update ' + props.feedConfig.name}
                     </MenuItem>
                     <MenuItem onClick={(e, data) => deleteFeed(props.feedConfig)}>

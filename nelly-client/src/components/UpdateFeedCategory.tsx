@@ -18,8 +18,8 @@ const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
         (visibilitySelectBox.current as HTMLSelectElement).selectedIndex = categoryVisible ? 0 : 1;
     });
 
-    function handleVisibilityChange(event : React.ChangeEvent<HTMLSelectElement>) {
-        setCategoryVisible(event.target.value === 'true');
+    function handleVisibilityChange(event : React.ChangeEvent<HTMLInputElement>) {
+        setCategoryVisible(!categoryVisible);
     }
 
     function handleCategoryNameChange(event : React.ChangeEvent<HTMLInputElement>) {
@@ -77,10 +77,7 @@ const UpdateFeedCategory : React.FC<UpdateFeedCategoryProps> = props => {
     return (<form>
         <table>
             <tr><td><label>Category Name: </label></td><td><input onChange={handleCategoryNameChange} type="text" value={categoryName} /></td></tr>
-            <tr><td><label><label>Visible: </label></label></td><td><select ref={visibilitySelectBox} onChange={handleVisibilityChange}>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-            </select></td></tr>
+            <tr><td><label><label>Visible: </label></label></td><td><input type="checkbox" checked={categoryVisible} onChange={handleVisibilityChange} /></td></tr>
             <tr><td colSpan={2}><input type="submit" onClick={handleClick} value="Update Category" /></td></tr>
         </table>
 </form>);
