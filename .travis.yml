@@ -14,5 +14,8 @@ install:
   - npm install
 script: 
   - tsc && npm run-script testci && cd ..
-  - cd ../nelly-client
+  - cd ..
+  - pwd
+  - cd nelly-client
+  - npm run-script build
   - npm test
