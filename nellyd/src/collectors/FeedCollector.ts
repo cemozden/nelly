@@ -113,7 +113,7 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
                     else 
                         updateExistingFeed(feed, feedConfig.feedConfigId);
 
-                    logger.info(`Collecting feeds from the feed "${feedConfig.name}" has completed.`);
+                    logger.info(`Finished collecting feeds from the feed "${feedConfig.name}" successfully.`);
                     resolve(feed);
                 }
                 catch (err) {

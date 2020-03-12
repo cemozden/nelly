@@ -7,6 +7,8 @@ import { FeedConfig } from "../config/FeedConfigManager";
 import { crc32 } from "crc";
 import { FeedArchiveService } from "../archive/FeedArchiveService";
 import SQLiteFeedArchiveService from "../archive/SQLiteFeedArchiveService";
+import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
+import SQLiteFeedItemArchiveService from "../archive/SQLiteFeedItemArchiveService";
 
 export default function FeedAPI(express : Express.Application, configManager : ConfigManager, feedScheduler : FeedScheduler) {
 
@@ -254,6 +256,54 @@ export default function FeedAPI(express : Express.Application, configManager : C
         catch (err) {
             logger.error(`[DeleteFeed] ${err.message}, Request Params: ${JSON.stringify(params)}`);
             res.status(500).json({ deleted : false, message : err.message });
+        }
+        
+    });
+
+    express.get('/getarchiveitems', (req, res) => {
+        const params = req.query;
+
+        const feedId : string = params.feedId;
+        const startDateISOStr : string = params.startDate;
+        const endDateISOStr : string = params.endDate;
+        const allItems = params.allItems === 'true';
+
+        if (feedId === undefined || feedId.length === 0) {
+            const errorMessage =  'Feed id is not a valid id! Please provide a valid id to update a new feed.';
+            
+            res.status(400).json({ retrieved : false, message : errorMessage });
+            logger.error(`[GetArchiveItems] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        if (startDateISOStr === undefined || startDateISOStr.length === 0) {
+            const errorMessage =  'Start date is not a valid date string! Please provide a valid start date string to retrieve the feeds.';
+            
+            res.status(400).json({ retrieved : false, message : errorMessage });
+            logger.error(`[GetArchiveItems] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        if (endDateISOStr === undefined || endDateISOStr.length === 0) {
+            const errorMessage =  'End date is not a valid date string! Please provide a valid end date string to retrieve the feeds.';
+            
+            res.status(400).json({ retrieved : false, message : errorMessage });
+            logger.error(`[GetArchiveItems] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        const feedItemArchive: FeedItemArchiveService = new SQLiteFeedItemArchiveService();
+
+        try {
+            const feedItems = feedItemArchive.getFeedItems(feedId, new Date(startDateISOStr), new Date(endDateISOStr), allItems);
+            res.json({ retrieved : true, itemCount : feedItems.length, items : feedItems });
+        }
+        catch (err) {
+            logger.error(`[GetArchiveItems] ${err.message}, Request Params: ${JSON.stringify(params)}`);
+            res.status(500).json({ retrieved : false, message : err.message });
         }
         
     });

@@ -35,6 +35,43 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
     }  
 
     /**
+     * The method that retrieves feed items belong to a specific feed.
+     * startDate and endDate variables filter the items for a specific time period.
+     * If allItems variable is set to true then all feed items in the specific time period will be yielded. by default it's false
+     */
+    getFeedItems(feedId: string, startDate: Date, endDate: Date, allItems : boolean = false): FeedItem[] {
+        const feedItemQry = `SELECT * FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC`;
+        try {
+
+            const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
+            const feedItems : FeedItem[] = rows.map((row : any) => {
+                const feedItem : FeedItem = {
+                    description : row.description,
+                    itemId : row.itemId,
+                    title : row.title,
+                    author : row.author == null ? undefined : row.author,
+                    category : row.category != null ? JSON.parse(row.category) : undefined,
+                    comments : row.comments == null ? undefined : row.comments,
+                    enclosure : row.category != null ? JSON.parse(row.enclosure) : undefined,
+                    guid : row.guid != null ? JSON.parse(row.guid) : undefined,
+                    link : row.link == null ? undefined : row.link,
+                    pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
+                    source : row.source != null ? JSON.parse(row.source) : undefined
+                }
+
+                return feedItem;
+            });
+
+            return feedItems;
+        }
+        catch(err) {
+            logger.error(`[SQLiteArchiveService->getFeedItems] ${err.message}`);
+        }
+
+        return [];
+    }
+
+    /**
      * The method that adds the given feed items to the archive.
      * The second parameter "feedId" represents the id of the feed that will own the given feed items. 
      * @param feedItems The feed items that needs to be added.

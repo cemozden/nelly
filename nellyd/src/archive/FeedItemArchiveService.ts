@@ -11,7 +11,8 @@ import Duration from "../time/Duration";
 export interface FeedItemArchiveService {
 
     getFeedItemIds(feedId : string) : string[],
-    addFeedItems(feedItems : FeedItem[], feedId : string) : boolean;
+    getFeedItems(feedId : string, startDate : Date, endDate : Date, allItems : boolean) : FeedItem[],
+    addFeedItems(feedItems : FeedItem[], feedId : string) : boolean,
     deleteFeedItems(itemIds : string[])  : number,
     /**
      * The method that cleans the feed items according to the given duration

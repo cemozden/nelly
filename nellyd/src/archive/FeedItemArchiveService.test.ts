@@ -41,7 +41,13 @@ describe('FeedItemArchiveService', () => {
                 description : 'Feed Description 1',
                 link : 'https://example.com'
             },
-            items : [],
+            items : [
+                {
+                    title:'Test Title',
+                    description : 'Test Description',
+                    itemId : '01234567'
+                }
+            ],
             version : RSSVersion.RSS_20
         }
 
@@ -67,6 +73,35 @@ describe('FeedItemArchiveService', () => {
                 expect(feedItemArchiveService.getFeedItemIds(exampleFeedId)).toEqual(feedItems.map(fi => fi.itemId));
             });
 
+        });
+
+        describe('#getFeedItems(feedId: string, startDate: Date, endDate: Date, allItems : boolean = false)', () => {
+            it('should return an array of feed items', () => {
+                const feedItemArchiveService = new SQLiteFeedItemArchiveService();
+                const feedArchiveService = new SQLiteFeedArchiveService();
+
+                const feedAdded = feedArchiveService.addFeed(feed, exampleFeedId);
+                expect(feedAdded).toBe(true);
+
+                const feedItemsAdded = feedItemArchiveService.addFeedItems(feedItems, exampleFeedId);
+                
+                expect(feedItemsAdded).toBe(true);
+
+                const startDate = new Date();
+                const endDate = new Date();
+
+                endDate.setMinutes(59);
+                endDate.setHours(23);
+                endDate.setSeconds(59);
+
+                startDate.setMinutes(0);
+                startDate.setHours(0);
+                startDate.setSeconds(0);
+
+                const items = feedItemArchiveService.getFeedItems('14725836', startDate, endDate);
+                
+                expect(items.length).toBeGreaterThan(0);
+            });
         });
 
         describe('#addFeedItems(feedItems : FeedItem[])', () => {
