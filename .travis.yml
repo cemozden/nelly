@@ -8,12 +8,6 @@ os :
 dist : xenial
 cache: npm
 install:
-  - cd nelly-client
-  - npm install
-  - cd ../nellyd
   - npm install
 script: 
-  - tsc && npm run-script testci && cd ..
-  - cd nelly-client
-  - npm run-script build
-  - npm test
+  - tsc && npm run-script testci
