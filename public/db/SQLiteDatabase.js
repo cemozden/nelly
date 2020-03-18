@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var better_sqlite3_1 = __importDefault(require("better-sqlite3"));
 var path_1 = require("path");
 var fs_1 = require("fs");
-var electron_1 = require("electron");
 var Logger_1 = __importDefault(require("../utils/Logger"));
 /**
  * The class that generates the SQLite database instance of the application.
@@ -23,15 +22,6 @@ var SQLiteDatabase = /** @class */ (function () {
         }
         catch (err) {
             Logger_1.default.error("[initializeDb] " + err.message);
-            if (process.env.CI === undefined) {
-                var options = {
-                    type: 'error',
-                    buttons: ['Ok'],
-                    title: 'Nelly',
-                    message: err.message
-                };
-                electron_1.dialog.showMessageBox(null, options);
-            }
             process.exit(-1);
         }
     };
@@ -49,15 +39,6 @@ var SQLiteDatabase = /** @class */ (function () {
             }
             catch (err) {
                 Logger_1.default.error("[SQLiteDatabase->getDatabaseInstance()] " + err.message);
-                if (process.env.CI === undefined) {
-                    var options = {
-                        type: 'error',
-                        buttons: ['Ok'],
-                        title: 'Nelly',
-                        message: err.message
-                    };
-                    electron_1.dialog.showMessageBox(null, options);
-                }
                 process.exit(-1);
             }
             return this.dbInstance;
