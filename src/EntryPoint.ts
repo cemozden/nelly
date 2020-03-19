@@ -1,10 +1,10 @@
-import { sep } from "path";
+import { sep, join } from "path";
 
 process.env.CONFIG_DIR = `${process.env.HOME}${sep}.nelly${sep}`;
 process.env.LOGS_DIR = `${process.env.CONFIG_DIR}logs${sep}`;
 process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
 
-import express from "express";
+import express, { static as expStatic } from "express";
 import { ConfigManager } from "./config/ConfigManager";
 import JSONConfigManager from "./config/JSONConfigManager";
 import { SettingsManager } from "./config/SettingsManager";
@@ -17,6 +17,7 @@ import CronFeedScheduler from "./scheduler/CronFeedScheduler";
 
 logger.info('[Nelly] Application started.');
 
+const ASSETS_PATH = join(__dirname, 'assets/');
 const exp = express();
 const httpServerInstance = createServer(exp);
 const io = socketIO(httpServerInstance);
@@ -32,8 +33,8 @@ const settingsManager : SettingsManager = configManager.getSettingsManager();
  */
 function requestLoggerMiddleware(request : express.Request, response : express.Response, next : () => void) {
     
-    logger.info(`[APIRequest] ${request.method} Endpoint: ${request.url}`);
-    if (Object.keys(request.query).length > 0) logger.info(`[APIRequest] Params: ${JSON.stringify(request.query)}`);
+    logger.info(`[HTTPRequest] ${request.method} Endpoint: ${request.url}`);
+    if (Object.keys(request.query).length > 0) logger.info(`[HTTPRequest] Params: ${JSON.stringify(request.query)}`);
     
     next();
 }
@@ -41,6 +42,13 @@ function requestLoggerMiddleware(request : express.Request, response : express.R
 const serverPort = settingsManager.getSettings().serverPort;
 
 exp.use(requestLoggerMiddleware);
+exp.use(expStatic(ASSETS_PATH));
+exp.set('view engine', 'ejs');
+exp.set('views', ASSETS_PATH);
+
+exp.get('/', (req, res) => {
+    res.render('main');
+});
 
 const feedScheduler : FeedScheduler = new CronFeedScheduler();
 initAPIs(exp, configManager, feedScheduler);

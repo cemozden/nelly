@@ -6,13 +6,14 @@
   "scripts": {
     "test": "jest --watch",
     "testci": "jest --ci",
-    "start": "tsc && env-cmd -f .env.dev node ."
+    "start": "tsc && node copy-assets.js && env-cmd -f .env.dev node ."
   },
   "repository": "https://github.com/cemozden/nelly",
   "author": "cemozden",
   "license": "MIT",
   "dependencies": {
     "@types/crc": "^3.4.0",
+    "@types/ejs": "^3.0.1",
     "@types/express": "^4.17.2",
     "@types/jest": "^25.1.3",
     "@types/node": "^12.0.0",
@@ -25,6 +26,7 @@
     "@types/xml2js": "^0.4.5",
     "better-sqlite3": "^6.0.1",
     "crc": "^3.8.0",
+    "ejs": "^3.0.1",
     "env-cmd": "^10.1.0",
     "express": "^4.17.1",
     "jest": "^25.1.0",
@@ -32,6 +34,7 @@
     "nodemon": "^2.0.2",
     "request": "^2.88.2",
     "rimraf": "^3.0.2",
+    "shelljs": "^0.8.3",
     "socket.io": "^2.3.0",
     "typescript": "^3.8.2",
     "winston": "^3.2.1",
