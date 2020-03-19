@@ -5,6 +5,4 @@ dist/
 build/
 yarn-error.log
 testresources/
-nellyd/node_modules/
-nellyd/dist/
-nellyd/public/
+public/

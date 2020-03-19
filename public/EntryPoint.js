@@ -14,8 +14,7 @@ var http_1 = require("http");
 var socket_io_1 = __importDefault(require("socket.io"));
 var APIs_1 = __importDefault(require("./api/APIs"));
 var CronFeedScheduler_1 = __importDefault(require("./scheduler/CronFeedScheduler"));
-var cors_1 = __importDefault(require("cors"));
-Logger_1.default.info('[nellyd] Application started.');
+Logger_1.default.info('[Nelly] Application started.');
 var exp = express_1.default();
 var httpServerInstance = http_1.createServer(exp);
 var io = socket_io_1.default(httpServerInstance);
@@ -34,26 +33,13 @@ function requestLoggerMiddleware(request, response, next) {
     next();
 }
 var serverPort = settingsManager.getSettings().serverPort;
-var whileList = ["http://localhost:3000"];
 exp.use(requestLoggerMiddleware);
-exp.use(cors_1.default({
-    origin: function (origin, callback) {
-        if (!origin)
-            return callback(null, true);
-        if (whileList.indexOf(origin) === -1) {
-            var message = 'The CORS policy for this origin doesn`t ' +
-                'allow access from the particular origin.';
-            return callback(new Error(message), false);
-        }
-        return callback(null, true);
-    }
-}));
 var feedScheduler = new CronFeedScheduler_1.default();
 APIs_1.default(exp, configManager, feedScheduler);
 var feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
 feedConfigs.forEach(function (fc) { return feedScheduler.addFeedToSchedule(fc); });
 httpServerInstance.listen(serverPort, function () {
-    Logger_1.default.info("[nellyd] HTTP Server has started listening on localhost:" + serverPort + ".");
+    Logger_1.default.info("[Nelly] HTTP Server has started listening on localhost:" + serverPort + ".");
 });
 io.on('connection', function (socket) {
     Logger_1.default.info("[Socket.IO] Socket.IO connected!");
