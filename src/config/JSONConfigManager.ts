@@ -7,7 +7,7 @@ import { SettingsManager } from "./SettingsManager";
 import JSONSettingsManager from "./JSONSettingsManager";
 import JSONLanguageManager from "./JSONLanguageManager";
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 
 /**
  * A config manager class that is providing Nelly config functionality in JSON format.
@@ -44,9 +44,9 @@ export default class JSONConfigManager implements ConfigManager {
 
         // Check for existance of config folder.
         if (!existsSync(configPath)){
-            logger.info(`Configuration folder does not exist! Creating the configuration folder...`);
+            general_logger.info(`Configuration folder does not exist! Creating the configuration folder...`);
             mkdirSync(configPath);
-            logger.info(`Configuration Folder created. Folder Path: ${configPath}`);
+            general_logger.info(`Configuration Folder created. Folder Path: ${configPath}`);
         }
 
         const configPathStr = configPath as string;
@@ -56,7 +56,7 @@ export default class JSONConfigManager implements ConfigManager {
             this.FEED_CONFIG_MANAGER = new JSONFeedConfigManager(`${configPathStr}${sep}${this.FEED_CONFIG_FOLDER_NAME}`);
         }
         catch (err) {
-            logger.error(`[JSONConfigManager] ${err.message}`);
+            general_logger.error(`[JSONConfigManager] ${err.message}`);
             process.exit(-1);
         }
     }

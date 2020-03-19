@@ -1,6 +1,5 @@
 import { format } from "logform";
 import { LoggerOptions, transports, createLogger } from "winston";
-import { isString } from "util";
 import { sep } from "path";
 
 const logFormat = format.combine(
@@ -16,7 +15,7 @@ const consoleLogFormat = format.combine(
 
 const logsDir = process.env.LOGS_DIR
 
-const options : LoggerOptions = {
+const generalLoggerOptions : LoggerOptions = {
   level : 'debug', 
   format : logFormat,
   transports : [
@@ -28,9 +27,25 @@ const options : LoggerOptions = {
   ]
 };
 
-const logger = createLogger(options);
+const httpLoggerOptions : LoggerOptions = {
+  level : 'debug', 
+  format : logFormat,
+  transports : [
+      new transports.File({
+          filename : `${logsDir}${sep}http.log`, 
+          level : 'info',
+          maxsize : 20971520,
+      })
+  ]
+};
 
-if (process.env.NODE_ENV !== 'production') 
-    logger.add(new transports.Console({ format : consoleLogFormat}));
+const general_logger = createLogger(generalLoggerOptions);
 
-export default logger;
+export const http_logger = createLogger(httpLoggerOptions);
+
+if (process.env.NODE_ENV !== 'production') {
+  general_logger.add(new transports.Console({ format : consoleLogFormat}));
+  http_logger.add(new transports.Console({ format : consoleLogFormat}));
+}
+
+export default general_logger;

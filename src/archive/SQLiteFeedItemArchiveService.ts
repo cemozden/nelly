@@ -1,5 +1,5 @@
 import { FeedItemArchiveService, InvalidFeedItemIdError } from "./FeedItemArchiveService";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 import { FeedItem } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
 import Duration from "../time/Duration";
@@ -29,7 +29,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             return itemIds;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService->getFeedItemIds] ${err.message}`);
+            general_logger.error(`[SQLiteArchiveService->getFeedItemIds] ${err.message}`);
         }
         return [];
     }  
@@ -65,7 +65,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             return feedItems;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService->getFeedItems] ${err.message}`);
+            general_logger.error(`[SQLiteArchiveService->getFeedItems] ${err.message}`);
         }
 
         return [];
@@ -122,7 +122,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             return true;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService->addFeedItems] ${err.message}`);
+            general_logger.error(`[SQLiteArchiveService->addFeedItems] ${err.message}`);
         }
         return false;
     }

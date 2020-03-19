@@ -1,7 +1,7 @@
 import { SettingsManager, SystemSettings, DEFAULT_SYSTEM_SETTINGS } from "./SettingsManager";
 import { existsSync, writeFile, readFileSync, writeFileSync } from "fs";
 import { sep } from "path";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 
 /**
  * The settings manager class that manages the general settings of the application.
@@ -25,9 +25,9 @@ export default class JSONSettingsManager implements SettingsManager {
         if (!existsSync(this.SETTINGS_FILE_PATH)) {
             
 
-            logger.info(`[${this.LOG_LABEL}] Settings file does not exist! Creating one.`);
+            general_logger.info(`[${this.LOG_LABEL}] Settings file does not exist! Creating one.`);
             writeFileSync(this.SETTINGS_FILE_PATH, JSON.stringify(DEFAULT_SYSTEM_SETTINGS));
-            logger.info(`[${this.LOG_LABEL}] Settings file created. Path: ${this.SETTINGS_FILE_PATH}`);
+            general_logger.info(`[${this.LOG_LABEL}] Settings file created. Path: ${this.SETTINGS_FILE_PATH}`);
 
             this.SYSTEM_SETTINGS = DEFAULT_SYSTEM_SETTINGS;
         }
@@ -45,7 +45,7 @@ export default class JSONSettingsManager implements SettingsManager {
                 if (err) reject(err);
                 else {
                     resolve(true);
-                    logger.info(`[${this.LOG_LABEL}] Settings saved. New Settings ${JSON.stringify(newSettings)}`);
+                    general_logger.info(`[${this.LOG_LABEL}] Settings saved. New Settings ${JSON.stringify(newSettings)}`);
                 }
             });
         });

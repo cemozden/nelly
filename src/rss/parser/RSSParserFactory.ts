@@ -3,7 +3,7 @@ import { RSSValidator } from "./validators/Validator";
 import RSS20Validator from "./validators/RSS20Validator";
 import { RSSVersion } from "../specifications/RSSVersion";
 import RSS20Parser from "./RSS20Parser";
-import logger from "../../utils/Logger";
+import general_logger from "../../utils/Logger";
 import { Feed } from "../specifications/RSS20";
 
 export default class RSSParserFactory {
@@ -33,7 +33,7 @@ export default class RSSParserFactory {
                     return rssParser;
             }
             catch (err) {
-                logger.error(`[${this.LOG_LABEL}] ${err.message}`);
+                general_logger.error(`[${this.LOG_LABEL}] ${err.message}`);
             }
             
         }

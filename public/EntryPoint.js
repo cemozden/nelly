@@ -16,13 +16,13 @@ process.env.LOGS_DIR = process.env.CONFIG_DIR + "logs" + path_1.sep;
 process.env.DATABASE_FOLDER = "" + process.env.CONFIG_DIR + path_1.sep;
 var express_1 = __importStar(require("express"));
 var JSONConfigManager_1 = __importDefault(require("./config/JSONConfigManager"));
-var Logger_1 = __importDefault(require("./utils/Logger"));
+var Logger_1 = __importStar(require("./utils/Logger"));
 var http_1 = require("http");
 var socket_io_1 = __importDefault(require("socket.io"));
 var APIs_1 = __importDefault(require("./api/APIs"));
 var CronFeedScheduler_1 = __importDefault(require("./scheduler/CronFeedScheduler"));
 Logger_1.default.info('[Nelly] Application started.');
-var ASSETS_PATH = path_1.join(__dirname, 'assets/');
+var ASSETS_PATH = path_1.join(__dirname, 'assets');
 var exp = express_1.default();
 var httpServerInstance = http_1.createServer(exp);
 var io = socket_io_1.default(httpServerInstance);
@@ -35,9 +35,9 @@ var settingsManager = configManager.getSettingsManager();
  * @param next Next function
  */
 function requestLoggerMiddleware(request, response, next) {
-    Logger_1.default.info("[HTTPRequest] " + request.method + " Endpoint: " + request.url);
+    Logger_1.http_logger.info("[HTTPRequest] " + request.method + " Endpoint: " + request.url);
     if (Object.keys(request.query).length > 0)
-        Logger_1.default.info("[HTTPRequest] Params: " + JSON.stringify(request.query));
+        Logger_1.http_logger.info("[HTTPRequest] Params: " + JSON.stringify(request.query));
     next();
 }
 var serverPort = settingsManager.getSettings().serverPort;

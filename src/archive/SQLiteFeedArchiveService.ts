@@ -1,7 +1,7 @@
 import { FeedArchiveService, InvalidFeedIdError } from "./FeedArchiveService";
 import { Feed, FeedItem } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 
 /**
  * The archive service implemention that manages archive using SQLite database for feeds.
@@ -48,7 +48,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             return true;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService->addFeed] ${err.message}`);
+            general_logger.error(`[SQLiteArchiveService->addFeed] ${err.message}`);
         }
         return false;
     }
@@ -104,7 +104,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             return feed;
         }
         catch(err) {
-            logger.error(`[SQLiteArchiveService->getFeed] ${err.message}`);
+            general_logger.error(`[SQLiteArchiveService->getFeed] ${err.message}`);
             return undefined;
         }
         
@@ -153,7 +153,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             return qryResult.changes > 0;
         }
         catch (err) {
-            logger.error(`[SQLiteArchiveService->deleteFeed] ${err.message}`);   
+            general_logger.error(`[SQLiteArchiveService->deleteFeed] ${err.message}`);   
         }
 
         return false;

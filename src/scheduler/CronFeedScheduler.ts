@@ -3,7 +3,7 @@ import { FeedConfig, InvalidFeedConfigIdError } from "../config/FeedConfigManage
 import { schedule, ScheduledTask } from "node-cron";
 import { generateCronPattern } from "./CronPatternGenerator";
 import { collectFeed } from "../collectors/FeedCollector";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 
 /**
  * The feed scheduler that schedules using cron style job system.
@@ -24,7 +24,7 @@ export default class CronFeedScheduler implements FeedScheduler {
 
         if (this.getScheduledTask(feedConfigId) !== undefined) {
             const message = `Invalid Feed Configuration! There already exist a task which has the same id as "${feedConfigId}"`;
-            logger.error('[CronFeedScheduler->addFeedToSchedule] ' + message);
+            general_logger.error('[CronFeedScheduler->addFeedToSchedule] ' + message);
             throw new InvalidFeedConfigIdError(message);
         }
             
@@ -42,10 +42,10 @@ export default class CronFeedScheduler implements FeedScheduler {
         });
 
         this.scheduledTaskMap.set(feedConfigId, task);
-        logger.debug(`[CronFeedScheduler->addFeedToSchedule] The feed that is added ${JSON.stringify(feedConfig)}`);
+        general_logger.debug(`[CronFeedScheduler->addFeedToSchedule] The feed that is added ${JSON.stringify(feedConfig)}`);
         
         if(feedConfig.enabled)
-            logger.info(`[CronFeedScheduler->addFeedToSchedule] ${feedConfig.name} is scheduled for receiving feeds.`);
+            general_logger.info(`[CronFeedScheduler->addFeedToSchedule] ${feedConfig.name} is scheduled for receiving feeds.`);
     }
 
     getScheduledTaskCount(): number {
@@ -61,24 +61,24 @@ export default class CronFeedScheduler implements FeedScheduler {
         
         if (task === undefined) {
             const message = `The given feed config id "${feedConfigId}" does not exist in the scheduler!`;
-            logger.error('[CronFeedScheduler->stopTask]' + message);
+            general_logger.error('[CronFeedScheduler->stopTask]' + message);
             throw new InvalidFeedConfigIdError(message);
         }
 
         task.stop();
-        logger.info(`[CronFeedScheduler->stopTask] A task with the id "${feedConfigId}" is stopped.`);
+        general_logger.info(`[CronFeedScheduler->stopTask] A task with the id "${feedConfigId}" is stopped.`);
     }
 
     startTask(feedConfigId: string): void {
         const task = this.getScheduledTask(feedConfigId);
         if (task === undefined) {
             const message = `The given feed config id "${feedConfigId}" does not exist in the scheduler!`;
-            logger.error('[CronFeedScheduler->startTask]' + message);
+            general_logger.error('[CronFeedScheduler->startTask]' + message);
             throw new InvalidFeedConfigIdError(message);
         }
 
         task.start();
-        logger.info(`[CronFeedScheduler->stopTask] A task with the id "${feedConfigId}" is started.`);
+        general_logger.info(`[CronFeedScheduler->stopTask] A task with the id "${feedConfigId}" is started.`);
     }
 
     deleteScheduledTask(feedConfigId: string): void {
@@ -86,13 +86,13 @@ export default class CronFeedScheduler implements FeedScheduler {
         
         if (task === undefined) {
             const message = `The given feed config id "${feedConfigId}" does not exist in the scheduler!`;
-            logger.error('[CronFeedScheduler->deleteScheduledTask]' + message);
+            general_logger.error('[CronFeedScheduler->deleteScheduledTask]' + message);
             throw new InvalidFeedConfigIdError(message);
         }
 
         task.destroy();
         this.scheduledTaskMap.delete(feedConfigId);
-        logger.info(`[CronFeedScheduler->deleteScheduledTask] A task with the id "${feedConfigId}" is destroyed and removed.`);
+        general_logger.info(`[CronFeedScheduler->deleteScheduledTask] A task with the id "${feedConfigId}" is destroyed and removed.`);
     }
 
 }

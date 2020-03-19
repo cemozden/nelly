@@ -1,7 +1,7 @@
 import BetterSQLite3 from "better-sqlite3";
 import { sep } from "path";
 import { existsSync, mkdirSync } from "fs";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 
 /**
  * The class that generates the SQLite database instance of the application.
@@ -46,7 +46,7 @@ export default class SQLiteDatabase {
             );`);
         }
         catch(err) {
-            logger.error(`[initializeDb] ${err.message}`);
+            general_logger.error(`[initializeDb] ${err.message}`);
             process.exit(-1);
         }
                
@@ -61,14 +61,14 @@ export default class SQLiteDatabase {
 
             try {
                 const dbOptions = {
-                    verbose : logger.verbose
+                    verbose : general_logger.verbose
                 };
                 // Activate verbose if the environment is not production.
                 this.dbInstance = new BetterSQLite3(`${this.databaseFolderPath}nelly.db`, process.env.NODE_ENV === 'production' ? undefined : dbOptions);
                 this.initializeDb();
             }
             catch (err) {
-                logger.error(`[SQLiteDatabase->getDatabaseInstance()] ${err.message}`);
+                general_logger.error(`[SQLiteDatabase->getDatabaseInstance()] ${err.message}`);
                 process.exit(-1);
             }
             

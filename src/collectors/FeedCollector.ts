@@ -3,7 +3,7 @@ import request from "request";
 import RSSParserFactory from "../rss/parser/RSSParserFactory";
 import { parseString, OptionsV2 } from "xml2js";
 import { Feed } from "../rss/specifications/RSS20";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 import { FeedArchiveService } from "../archive/FeedArchiveService";
 import SQLiteFeedArchiveService from "../archive/SQLiteFeedArchiveService";
 import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
@@ -28,7 +28,7 @@ function prepareNewFeed(feed : Feed, feedId : string) {
         
         if (!feedAdded) {
             const message = `Unable to add the feed into the archive. Feed Info: ${JSON.stringify(feed)}`;
-            logger.error(`[CollectFeed->prepareNewFeed] ${message}`);
+            general_logger.error(`[CollectFeed->prepareNewFeed] ${message}`);
             throw new FeedFetchError(message);
         }
 
@@ -36,13 +36,13 @@ function prepareNewFeed(feed : Feed, feedId : string) {
 
         if (!feedItemsAdded) {
             const message = ``;
-            logger.error(`[CollectFeed->prepareNewFeed] Unable to add feed items into the archive.`);
+            general_logger.error(`[CollectFeed->prepareNewFeed] Unable to add feed items into the archive.`);
             throw new FeedFetchError(message);
         }
         //TODO: Send new feed items and feed info to the UI using Socket.IO
     }
     catch (err) {
-        logger.error(`[CollectFeed->prepareNewFeed] ${err.message}`);
+        general_logger.error(`[CollectFeed->prepareNewFeed] ${err.message}`);
         throw err;
     }
 }
@@ -64,7 +64,7 @@ function updateExistingFeed(feed : Feed, feedId : string) {
             
             if (!feedItemsAdded) {
                 const message = `Unable to add feed items.`;
-                logger.error(`[CollectFeed->updateExistingFeed] ${message}`);
+                general_logger.error(`[CollectFeed->updateExistingFeed] ${message}`);
                 throw new FeedFetchError(message);
             }
             /*else {
@@ -81,16 +81,16 @@ function updateExistingFeed(feed : Feed, feedId : string) {
  */
 export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
     const feedCollectorPromise = new Promise<Feed>((resolve, reject) => {
-        logger.info(`Started Collecting feeds from the feed "${feedConfig.name}"`);
+        general_logger.info(`Started Collecting feeds from the feed "${feedConfig.name}"`);
         request(feedConfig.url, function(error, response, body) {
 
             if (error) {
                 if (error.code === 'ENOTFOUND') {
-                    logger.error(`[CollectFeed] Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`);
+                    general_logger.error(`[CollectFeed] Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`);
                     reject(new FeedFetchError(`Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`));
                 }
                 else {
-                    logger.error(`[CollectFeed] ${error.message} :: Feed URL: ${feedConfig.url}`);
+                    general_logger.error(`[CollectFeed] ${error.message} :: Feed URL: ${feedConfig.url}`);
                     reject(error);
                 }
 
@@ -99,7 +99,7 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
             //Parse XML to JavaScript object.
             parseString(body, xmlParseOptions, (err, rssObject) => {
                 if (err) {
-                    logger.error(`[CollectFeed->ParsingXML] ${err.message}`);
+                    general_logger.error(`[CollectFeed->ParsingXML] ${err.message}`);
                     reject(err);
                     return;
                 }
@@ -113,11 +113,11 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
                     else 
                         updateExistingFeed(feed, feedConfig.feedConfigId);
 
-                    logger.info(`Finished collecting feeds from the feed "${feedConfig.name}" successfully.`);
+                    general_logger.info(`Finished collecting feeds from the feed "${feedConfig.name}" successfully.`);
                     resolve(feed);
                 }
                 catch (err) {
-                    logger.error(`[CollectFeed] ${err.message}`);
+                    general_logger.error(`[CollectFeed] ${err.message}`);
                     reject(err);
                 }
             });

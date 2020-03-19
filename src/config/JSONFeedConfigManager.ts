@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, writeFile, readdirSync, readFileSync, writeFileS
 import { sep } from "path";
 import { sync } from "rimraf";
 import { isFeedConfig, categoryIdExist, deleteFeedCategoryFromCategoryTree} from "./ConfigUtil";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 import { isDuration } from "../time/Duration";
 
 /**
@@ -32,9 +32,9 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         this.CATEGORY_LIST_FILE_PATH = `${this.FEEDS_FOLDER}${sep}${this.CATEGORY_LIST_FILE_NAME}`;
         
         if (!existsSync(feedsFolderPath)){
-            logger.info(`[${this.LOG_LABEL}] Feeds folder does not exist.`);
+            general_logger.info(`[${this.LOG_LABEL}] Feeds folder does not exist.`);
             mkdirSync(feedsFolderPath);
-            logger.info(`[${this.LOG_LABEL}] Feeds folder created. Path: ${feedsFolderPath}`);
+            general_logger.info(`[${this.LOG_LABEL}] Feeds folder created. Path: ${feedsFolderPath}`);
         }
         /* Read existing feed configurations and place them into FEED_CONFIGS array.
            The file format is a string which is 8 length. with .json extension
@@ -56,7 +56,7 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
                     throw new NotUniqueFeedConfigIdError('Unable to load feed configurations. All feed configurations must have unique ids!');
 
                 this.FEED_CONFIGS.push(fcObject);
-                logger.verbose(`[${this.LOG_LABEL}] ${feedConfigFile} is loaded.`);
+                general_logger.verbose(`[${this.LOG_LABEL}] ${feedConfigFile} is loaded.`);
             }
         });
         
@@ -65,7 +65,7 @@ export default class JSONFeedConfigManager implements FeedConfigManager {
         if (!existsSync(this.CATEGORY_LIST_FILE_PATH)) {
             writeFileSync(this.CATEGORY_LIST_FILE_PATH, JSON.stringify(DEFAULT_ROOT_CATEGORY));
             this.ROOT_CATEGORY = DEFAULT_ROOT_CATEGORY;
-            logger.info(`[${this.LOG_LABEL}] category.json is created. Path: ${this.CATEGORY_LIST_FILE_PATH}`);
+            general_logger.info(`[${this.LOG_LABEL}] category.json is created. Path: ${this.CATEGORY_LIST_FILE_PATH}`);
         }
         else this.ROOT_CATEGORY = JSON.parse(readFileSync(this.CATEGORY_LIST_FILE_PATH).toString());
 

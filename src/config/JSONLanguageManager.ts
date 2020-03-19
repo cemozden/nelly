@@ -2,7 +2,7 @@ import { LanguageManager, InvalidLanguageFileError } from "./LanguageManager";
 import { Language, DEFAULT_ENGLISH_LANGUAGE } from "./Language";
 import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "fs";
 import { sep } from "path";
-import logger from "../utils/Logger";
+import general_logger from "../utils/Logger";
 
 /**
  * The language manager class that manages Nelly UI language by using loadLanguage method.
@@ -27,9 +27,9 @@ export default class JSONLanguageManager implements LanguageManager {
         // If there is no "lang_*.json" file in the language folder then create default english language file.
         if(readdirSync(languageFolderPath)
             .filter(fileName => fileName.match(this.LANGUAGE_FILE_PATTERN) !== null).length === 0){
-                logger.info(`[${this.LOG_LABEL}] No language file exist! Creating the english language file.`);
+                general_logger.info(`[${this.LOG_LABEL}] No language file exist! Creating the english language file.`);
                 writeFileSync(englishLanguageFilePath, JSON.stringify(DEFAULT_ENGLISH_LANGUAGE));
-                logger.info(`[${this.LOG_LABEL}] English language file created. Path: ${englishLanguageFilePath}`);
+                general_logger.info(`[${this.LOG_LABEL}] English language file created. Path: ${englishLanguageFilePath}`);
             }
             
         
