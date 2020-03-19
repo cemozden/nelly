@@ -92,7 +92,12 @@ describe('FeedArchiveService', () => {
                     feedMetadata : {
                         title : 'Example Title',
                         description : 'Example Description',
-                        link : 'https://example.com'
+                        link : 'https://example.com',
+                        image : {
+                            link : '',
+                            title: '',
+                            url :''
+                        }
                     },
                     items : [
                         {
@@ -227,7 +232,12 @@ describe('FeedArchiveService', () => {
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
-                        link : 'https://example.com'
+                        link : 'https://example.com',
+                        image : {
+                            link : '',
+                            title : '',
+                            url : ''
+                        }                     
                     },
                     items : [],
                     version : RSSVersion.RSS_20

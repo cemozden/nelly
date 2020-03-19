@@ -17,7 +17,7 @@ var SQLiteDatabase = /** @class */ (function () {
     }
     SQLiteDatabase.initializeDb = function () {
         try {
-            this.getDatabaseInstance().exec("CREATE TABLE IF NOT EXISTS " + this.FEEDS_TABLE_NAME + "(\n                feedId char(8) PRIMARY KEY NOT NULL,\n                version char(1) NOT NULL,\n                title varchar(255) NOT NULL,\n                link varchar(255) NOT NULL,\n                description varchar(255) NOT NULL,\n                insertedAt datetime\n            );");
+            this.getDatabaseInstance().exec("CREATE TABLE IF NOT EXISTS " + this.FEEDS_TABLE_NAME + "(\n                feedId char(8) PRIMARY KEY NOT NULL,\n                version char(1) NOT NULL,\n                title varchar(255) NOT NULL,\n                link varchar(255) NOT NULL,\n                description varchar(255) NOT NULL,\n                imageURL varchar(255) NULL,\n                insertedAt datetime\n            );");
             this.getDatabaseInstance().exec("CREATE TABLE IF NOT EXISTS " + this.FEED_ITEMS_TABLE_NAME + " (\n                itemId char(8) NOT NULL,\n                feedId char(8) NOT NULL,\n                title TEXT,\n                description TEXT,\n                link varchar(255),\n                author varchar(150),\n                category TEXT,\n                comments varchar(250),\n                pubDate datetime,\n                enclosure TEXT,\n                guid TEXT,\n                source TEXT,\n                itemRead char(1) NOT NULL,\n                insertedAt datetime NOT NULL,\n                FOREIGN KEY(feedId) REFERENCES feeds(feedId) ON DELETE CASCADE\n            );");
         }
         catch (err) {

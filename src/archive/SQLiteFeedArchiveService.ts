@@ -35,6 +35,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             feed.feedMetadata.title,
             feed.feedMetadata.link,
             feed.feedMetadata.description,
+            feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             new Date().toISOString()
         ];
         
@@ -60,7 +61,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
     getFeed(feedId: string): Feed | undefined {
         
         try {
-            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
+            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT feedId, version, title, link, description, imageURL, insertedAt FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
             
             if (sqlFeed === undefined) return undefined;
             
@@ -70,13 +71,19 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
                 feedMetadata : {
                     title : sqlFeed.title,
                     description : sqlFeed.description,
-                    link : sqlFeed.link
+                    link : sqlFeed.link,
+                    image: {
+                        link : '',
+                        title : '',
+                        url : sqlFeed.imageURL,
+                    }
                 },
                 items : [],
                 version : sqlFeed.version
             };
 
-            const sqlFeedItems = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT * FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).all(feedId);
+            const sqlFeedItems = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`)
+                .all(feedId);
             // convert data read from db to feed item. parse json data to real objects...
             for (const sfi of sqlFeedItems) {
                 const feedItem : FeedItem = {
@@ -118,6 +125,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             version : feed.version,
             title : feed.feedMetadata.title,
             link : feed.feedMetadata.link,
+            imageURL : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             description : feed.feedMetadata.description
         };
 

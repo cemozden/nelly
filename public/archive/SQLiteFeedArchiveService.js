@@ -35,6 +35,7 @@ var SQLiteFeedArchiveService = /** @class */ (function () {
             feed.feedMetadata.title,
             feed.feedMetadata.link,
             feed.feedMetadata.description,
+            feed.feedMetadata.image !== undefined && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             new Date().toISOString()
         ];
         // Create placeholders according to the size of tableData
@@ -56,7 +57,7 @@ var SQLiteFeedArchiveService = /** @class */ (function () {
      */
     SQLiteFeedArchiveService.prototype.getFeed = function (feedId) {
         try {
-            var sqlFeed = SQLiteDatabase_1.default.getDatabaseInstance().prepare("SELECT * FROM " + SQLiteDatabase_1.default.FEEDS_TABLE_NAME + " WHERE " + this.feedIdColumn + " LIKE ?").get(feedId);
+            var sqlFeed = SQLiteDatabase_1.default.getDatabaseInstance().prepare("SELECT feedId, version, title, link, description, imageURL, insertedAt FROM " + SQLiteDatabase_1.default.FEEDS_TABLE_NAME + " WHERE " + this.feedIdColumn + " LIKE ?").get(feedId);
             if (sqlFeed === undefined)
                 return undefined;
             sqlFeed.version = parseInt(sqlFeed.version);
@@ -64,12 +65,18 @@ var SQLiteFeedArchiveService = /** @class */ (function () {
                 feedMetadata: {
                     title: sqlFeed.title,
                     description: sqlFeed.description,
-                    link: sqlFeed.link
+                    link: sqlFeed.link,
+                    image: {
+                        link: '',
+                        title: '',
+                        url: sqlFeed.imageURL,
+                    }
                 },
                 items: [],
                 version: sqlFeed.version
             };
-            var sqlFeedItems = SQLiteDatabase_1.default.getDatabaseInstance().prepare("SELECT * FROM " + SQLiteDatabase_1.default.FEED_ITEMS_TABLE_NAME + " WHERE " + this.feedIdColumn + " LIKE ?").all(feedId);
+            var sqlFeedItems = SQLiteDatabase_1.default.getDatabaseInstance().prepare("SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM " + SQLiteDatabase_1.default.FEED_ITEMS_TABLE_NAME + " WHERE " + this.feedIdColumn + " LIKE ?")
+                .all(feedId);
             // convert data read from db to feed item. parse json data to real objects...
             for (var _i = 0, sqlFeedItems_1 = sqlFeedItems; _i < sqlFeedItems_1.length; _i++) {
                 var sfi = sqlFeedItems_1[_i];
@@ -109,6 +116,7 @@ var SQLiteFeedArchiveService = /** @class */ (function () {
             version: feed.version,
             title: feed.feedMetadata.title,
             link: feed.feedMetadata.link,
+            imageURL: feed.feedMetadata.image !== undefined && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             description: feed.feedMetadata.description
         };
         var sqlNewValuesStr = Object.keys(feedTableValues)
