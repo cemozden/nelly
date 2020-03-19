@@ -209,10 +209,8 @@ h1, h2, h3, h4, h5, h6 {
     color: #FFFFFF;    
 }
 
-
-
 .feed-summary-table td, th {
-    border-bottom: 1px dashed #202020;
+    border-bottom: 1px solid #202020;
     font-size: 12px;
 }
 
@@ -273,8 +271,6 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-menu .menu-item:hover {
     height: 30px;
     padding: 5px;
-    border-top: 1px solid #202020;
-    border-bottom: 1px solid #202020;
     background-color: #311a7c;
 }
 
