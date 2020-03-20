@@ -35,8 +35,11 @@ var settingsManager = configManager.getSettingsManager();
  * @param next Next function
  */
 function requestLoggerMiddleware(request, response, next) {
-    if (request.url.startsWith('/css') || request.url.startsWith('/js') || request.url.startsWith('/img'))
+    var skipPathList = ['/css', '/js', '/img', '/fonts', '/favicon.ico'];
+    if (skipPathList.filter(function (sp) { return request.url.startsWith(sp); }).length > 0) {
+        next();
         return;
+    }
     Logger_1.http_logger.info("[HTTPRequest] " + request.method + " Endpoint: " + request.url);
     if (Object.keys(request.query).length > 0)
         Logger_1.http_logger.info("[HTTPRequest] Params: " + JSON.stringify(request.query));

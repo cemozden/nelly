@@ -34,7 +34,12 @@ const settingsManager : SettingsManager = configManager.getSettingsManager();
  */
 function requestLoggerMiddleware(request : express.Request, response : express.Response, next : () => void) {
     
-    if (request.url.startsWith('/css') || request.url.startsWith('/js') || request.url.startsWith('/img')) return;
+    const skipPathList = ['/css', '/js', '/img', '/fonts', '/favicon.ico'];
+
+    if (skipPathList.filter(sp => request.url.startsWith(sp)).length > 0) {
+        next();
+        return;
+    }
 
     http_logger.info(`[HTTPRequest] ${request.method} Endpoint: ${request.url}`);
     if (Object.keys(request.query).length > 0) http_logger.info(`[HTTPRequest] Params: ${JSON.stringify(request.query)}`);

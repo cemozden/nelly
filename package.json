@@ -2,7 +2,7 @@
   "name": "nellyd",
   "version": "1.0.0",
   "description": "nelly daemon",
-  "main": "public/EntryPoint.js",
+  "main": "build/EntryPoint.js",
   "scripts": {
     "test": "jest --watch",
     "testci": "jest --ci",

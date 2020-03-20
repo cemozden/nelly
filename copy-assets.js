@@ -1,3 +1,3 @@
 const shell = require('shelljs');
 
-shell.cp('-R', 'assets', 'public/');
+shell.cp('-R', 'assets', 'build/');
