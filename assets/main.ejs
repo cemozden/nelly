@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Nelly RSS Feader</title>
+        <link rel="shortcut icon" type="image/png" href="/favicon.ico"/>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap-grid.min.css">
         <link rel="stylesheet" type="text/css" href="css/main.css">
@@ -17,7 +18,7 @@
           function addFeedToMenuItem(feed) {
             const feedId = feed.feedConfigId;
 
-            $('#feed-menu').append(`<div id="${feedId}" class="menu-item"><a href="#">${feed.name}</a></div>`);
+            $('#feed-menu').append(`<div id="${feedId}" class="menu-item"><a href="#${feedId}">${feed.name}</a></div>`);
             $(`#${feedId}`).click(() => {
               
               $.ajax({
