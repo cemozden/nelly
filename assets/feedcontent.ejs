@@ -21,7 +21,7 @@
             <td><img src="<%= !fi.read ? './img/green-icon.png' : './img/white-icon.png'  %>" /></td>
             <td><a href="#" title="<%= fi.title %>" ><%= fi.title %></a></td>
             <td><%= fi.author !== undefined ? fi.author : '' %></td>
-            <td><%= fi.pubDate !== undefined && fi.pubDate !== null ? fi.pubDate.toLocaleString() : '' %></td>
+            <td><%= fi.pubDate !== undefined && fi.pubDate !== null ? moment(fi.pubDate).format('L') + ' ' + moment(fi.pubDate).format('LTS') : '' %></td>
         </tr>
       <% }); %>  
     </tbody>

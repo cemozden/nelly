@@ -4,7 +4,7 @@ import SQLiteFeedArchiveService from "../archive/SQLiteFeedArchiveService";
 import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
 import SQLiteFeedItemArchiveService from "../archive/SQLiteFeedItemArchiveService";
 import { http_logger } from "../utils/Logger";
-
+import moment from "moment";
 const feedArchiveService : FeedArchiveService = new SQLiteFeedArchiveService();
 const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
 
@@ -37,11 +37,15 @@ export default function FeedContent(exp : Express.Application, expressURL : stri
         
         const feedItems = feedItemArchiveService.getFeedItems(feedId, startDate, endDate, true);
         
+        // Set locale for date time formatting.
+        moment.locale(systemLocale);
+
         res.render('feedcontent', {
             feedInfo : feed.feedMetadata,
             feedItems,
             rssVersion : 'RSS 2.0',
-            systemLocale
+            systemLocale,
+            moment
         });
     });
 }
