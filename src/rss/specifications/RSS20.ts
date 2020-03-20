@@ -81,7 +81,8 @@ export interface FeedItem {
     pubDate? : Date,
     enclosure? : FeedItemEnclosure,
     guid? : FeedItemGuid,
-    source? : FeedItemSource
+    source? : FeedItemSource,
+    read : boolean
 }
 
 /**

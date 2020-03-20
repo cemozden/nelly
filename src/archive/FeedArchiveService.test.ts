@@ -99,89 +99,16 @@ describe('FeedArchiveService', () => {
                             url :''
                         }
                     },
-                    items : [
-                        {
-                            description : 'Feed Item description',
-                            itemId : '36925814',
-                            title : 'Feed Item Title',
-                            pubDate : new Date(),
-                            category : ['testCategory1', 'testCategory2'],
-                            enclosure : {
-                                length: 5,
-                                type : 'enclosure_type',
-                                url : 'https://example.com'
-                            },
-                            guid : {
-                                value : 'xyz',
-                                permaLink : false
-                            },
-                            source : {
-                                url : 'https://example.com',
-                                value : 'dsad'
-                            }
-                        }
-                    ]
+                    items : []
                 };
 
                 const feedAdded = feedArchiveService.addFeed(feed, exampleFeedId);
                 expect(feedAdded).toBe(true);
-
-                const feedItemsAdded = feedItemArchiveService.addFeedItems(feed.items, exampleFeedId);
-                expect(feedItemsAdded).toBe(true);
 
                 const getFeed = feedArchiveService.getFeed(exampleFeedId);
 
                 expect(getFeed).not.toBeNull();
                 expect(getFeed).toEqual(feed);
-            });
-
-            it('should return feed with items', () => {
-                const feedArchiveService = new SQLiteFeedArchiveService();
-                const feedItemArchiveService = new SQLiteFeedItemArchiveService();
-                
-                const exampleFeedId = '01472583';
-
-                const feed : Feed = {
-                    version : RSSVersion.RSS_20,
-                    feedMetadata : {
-                        title : 'Example Title',
-                        description : 'Example Description',
-                        link : 'https://example.com'
-                    },
-                    items : [
-                        {
-                            description : 'Feed Item description',
-                            itemId : '36925814',
-                            title : 'Feed Item Title',
-                            pubDate : new Date(),
-                            category : ['testCategory1', 'testCategory2'],
-                            enclosure : {
-                                length: 5,
-                                type : 'enclosure_type',
-                                url : 'https://example.com'
-                            },
-                            guid : {
-                                value : 'xyz',
-                                permaLink : false
-                            },
-                            source : {
-                                url : 'https://example.com',
-                                value : 'dsad'
-                            }
-                        }
-                    ]
-                };
-
-                const feedAdded = feedArchiveService.addFeed(feed, exampleFeedId);
-                expect(feedAdded).toBe(true);
-
-                const feedItemsAdded = feedItemArchiveService.addFeedItems(feed.items, exampleFeedId);
-                expect(feedItemsAdded).toBe(true);
-
-                const getFeed = feedArchiveService.getFeed(exampleFeedId);
-
-                expect(getFeed).not.toBeNull();
-                expect(getFeed?.items).toEqual(feed.items);
             });
 
         });
@@ -310,7 +237,8 @@ describe('FeedArchiveService', () => {
                             source : {
                                 url : 'https://example.com',
                                 value : 'dsad'
-                            }
+                            },
+                            read : false
                         }
                     ]
                 };

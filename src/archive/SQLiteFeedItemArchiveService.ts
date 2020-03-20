@@ -40,7 +40,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
      * If allItems variable is set to true then all feed items in the specific time period will be yielded. by default it's false
      */
     getFeedItems(feedId: string, startDate: Date, endDate: Date, allItems : boolean = false): FeedItem[] {
-        const feedItemQry = `SELECT * FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC`;
+        const feedItemQry = `SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC`;
         try {
 
             const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
@@ -56,7 +56,8 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
                     guid : row.guid != null ? JSON.parse(row.guid) : undefined,
                     link : row.link == null ? undefined : row.link,
                     pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
-                    source : row.source != null ? JSON.parse(row.source) : undefined
+                    source : row.source != null ? JSON.parse(row.source) : undefined,
+                    read : row.itemRead != null && row.itemRead === 'Y'
                 }
 
                 return feedItem;

@@ -1,0 +1,32 @@
+<div class="content-header">
+    <% if (feedInfo.image !== undefined && feedInfo.image.url !== null && feedInfo.image.url !== undefined){ %>
+        <img src="<%=feedInfo.image.url%>" />
+    <% }%><span class="title"><%= feedInfo.title %></span><br />
+    <span class="attribute"><%= feedInfo.description %></span><br />
+    <span class="attribute"><a href="<%= feedInfo.link %>"><%= feedInfo.link %></a></span><br />
+    <span class="attribute">RSS Version: <%= rssVersion %></span><br />
+</div>
+<table class="feed-summary-table">
+    <thead>
+      <tr>
+        <th style="width: 2%;"></th>
+        <th style="width: 78%;">TITLE</th>
+        <th style="width: 10%;">AUTHOR</th>
+        <th style="width: 10%;">DATE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% feedItems.forEach(fi => { %>
+        <tr <%= !fi.read ? 'class=unreadEntry' : ''  %>>
+            <td><img src="<%= !fi.read ? './img/green-icon.png' : './img/white-icon.png'  %>" /></td>
+            <td><a href="#" title="<%= fi.title %>" ><%= fi.title %></a></td>
+            <td><%= fi.author !== undefined ? fi.author : '' %></td>
+            <td><%= fi.pubDate !== undefined && fi.pubDate !== null ? fi.pubDate.toLocaleString() : '' %></td>
+        </tr>
+      <% }); %>  
+    </tbody>
+  </table>
+  <div class="tableInfo">
+      <%= feedItems.length %> entries fetched in total.<br />
+      Presenting feed items between <span id="timePeriod">18.03.2020 - 19.03.2020</span>
+  </div>

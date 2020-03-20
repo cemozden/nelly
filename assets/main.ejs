@@ -5,9 +5,39 @@
         <link rel="stylesheet" type="text/css" href="css/bootstrap-grid.min.css">
         <link rel="stylesheet" type="text/css" href="css/main.css">
         <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-dateformat.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-          const socket = io('http://localhost:6150');
+          const socket = io('<%= expressURL %>');
+          const app = {
+            feeds : [],
+            activeFeed : null
+          };
+
+          function addFeedToMenuItem(feed) {
+            const feedId = feed.feedConfigId;
+
+            $('#feed-menu').append(`<div id="${feedId}" class="menu-item"><a href="#">${feed.name}</a></div>`);
+            $(`#${feedId}`).click(() => {
+              
+              $.ajax({
+                  url: `<%= expressURL %>/feedcontent?feedId=${feedId}`,
+                  method: 'POST'    
+                }).done(feedContent => {
+                  $('#feedContent').html(feedContent);
+              });
+
+            });
+          }
+
+          $.ajax({
+              url: '<%= expressURL %>/getfeeds',
+              method: 'GET'
+            }).done(feeds => {
+              app.feeds = feeds.sort((a, b) => a.name.localeCompare(b.name));
+              app.feeds.forEach(feed => addFeedToMenuItem(feed));
+          });
+
         </script>
     </head>
     <body>
@@ -15,7 +45,7 @@
             <div class="pagetop">
                 <div class="top-left">
                     <h1>Nelly RSS Feeder</h1>
-                    <h4>Version: 1.0.0</h4>
+                    <h4>Version: <%= nellyVersion %></h4>
                 </div>
                 <div class="top-right">
                   <p>Last Time Updated: 19.03.2020 16:23</p>
@@ -27,56 +57,9 @@
               <div class="feedsHeader">
                   <h3>RSS Feeds</h3>
               </div>
-              <div class="sidebar-menu">
-                <div class="menu-item"><a href="#"><b>Ubuntu Incident (5)</b></a></div>
-                <div class="menu-item"><a href="#">Cem Ozden</a></div>
-                <div class="menu-item"><a href="#">BBC News World</a></div>
-                <div class="menu-item"><a href="#">BBC News Sport</a></div>
-                <div class="menu-item"><a href="#">BBC News Technology</a></div>
-              </div>
+              <div id="feed-menu" class="sidebar-menu"></div>
             </div>
-            <div class="content">
-                <div class="content-header">
-                    <span class="title">T24 - Haberler</span><br />
-                    <span class="attribute">Bağımsız İnternet Gazetesi</span><br />
-                    <span class="attribute"><a href="https://t24.com.tr">https://t24.com.tr</a></span><br />
-                    <span class="attribute">RSS Version: RSS 2.0</span><br />
-                </div>
-                <table class="feed-summary-table">
-                    <thead>
-                      <tr>
-                        <th style="width: 2%;"></th>
-                        <th style="width: 78%;">TITLE</th>
-                        <th style="width: 10%;">AUTHOR</th>
-                        <th style="width: 10%;">DATE</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="unreadEntry">
-                        <td><img src="./img/green-icon.png" /></td>
-                        <td><a href="#" title="Türkiye ile AB arasındaki 'göçmen anlaşması' neleri kapsıyordu?" >Türkiye ile AB arasındaki 'göçmen anlaşması' neleri kapsıyordu?</a></td>
-                        <td></td>
-                        <td>18.03.2020 00:05</td>
-                      </tr>
-                      <tr>
-                        <td><img src="./img/white-icon.png" /></td>
-                        <td><a href="#" title="Avusturya: Türkiye'nin sınırlarını açması AB'ye ve Yunanistan'a bir saldırıdır">Avusturya: Türkiye'nin sınırlarını açması AB'ye ve Yunanistan'a bir saldırıdır</a></td>
-                        <td></td>
-                        <td>18.03.2020 00:05</td>
-                      </tr>
-                      <tr>
-                        <td><img src="./img/white-icon.png" /></td>
-                        <td><a href="#" title="TGS: Cumhuriyet yönetimi tutarlı olmalı; Ozan Çepni'yi işe geri almalı">TGS: Cumhuriyet yönetimi tutarlı olmalı; Ozan Çepni'yi işe geri almalı</a></td>
-                        <td></td>
-                        <td>18.03.2020 00:05</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="tableInfo">
-                      3 entries fetched in total.<br />
-                      Presenting feed items between 18.03.2020 - 19.03.2020 
-                  </div>
-                  
+            <div id="feedContent" class="content">
             </div>
         </div>
     </body>

@@ -2,7 +2,7 @@ import Express from "express";
 import { ConfigManager } from "../config/ConfigManager";
 import { FeedCategory, FeedConfigManager, getCategoryById } from "../config/FeedConfigManager";
 import { crc32 } from "crc";
-import general_logger from "../utils/Logger";
+import {http_logger} from "../utils/Logger";
 
 export default function FeedCategoryAPI(express : Express.Application, configManager : ConfigManager) {
 
@@ -28,7 +28,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const errorMessage =  'Category name is not a valid name! Please provide a valid name to add a new feed category.';
             
             res.status(400).json({ added : false, message : errorMessage});
-            general_logger.error(`[AddFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            http_logger.error(`[AddFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
         }
@@ -37,7 +37,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const errorMessage =  'Parent category id is not a valid id!';
             
             res.status(400).json({ added : false, message : errorMessage});
-            general_logger.error(`[AddFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            http_logger.error(`[AddFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
         }
@@ -55,16 +55,16 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const categoryAdded = await feedConfigManager.addFeedCategory(feedCategory, parentCategoryId);
 
             if (categoryAdded) {
-                general_logger.info(`[AddFeedCategory] A new feed category added! New Category : ${JSON.stringify(feedCategory)}`);
+                http_logger.info(`[AddFeedCategory] A new feed category added! New Category : ${JSON.stringify(feedCategory)}`);
                 res.json({added : true, categoryObject : feedCategory, rootCategory : feedConfigManager.getRootCategory()});
             }
             else {
-                general_logger.error(`[AddFeedCategory] An error occured while adding the category! Request Params: ${JSON.stringify(params)}`);
+                http_logger.error(`[AddFeedCategory] An error occured while adding the category! Request Params: ${JSON.stringify(params)}`);
                 res.json({added : false, message : 'An error occured while adding the category!'});
             }
         }
         catch(err) {
-            general_logger.error(`[AddFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
+            http_logger.error(`[AddFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
             res.status(500).json({added : false, message : err.message});
         }
         
@@ -90,7 +90,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const errorMessage =  'Category name is not a valid name! Please provide a valid name to add a new feed category.';
             
             res.status(400).json({ updated : false, message : errorMessage});
-            general_logger.error(`[UpdateFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            http_logger.error(`[UpdateFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
         }
@@ -99,7 +99,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const errorMessage =  'Parent category id is not a valid id!';
             
             res.status(400).json({ updated : false, message : errorMessage});
-            general_logger.error(`[UpdateFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            http_logger.error(`[UpdateFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
         }
@@ -119,17 +119,17 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const categoryUpdated = await feedConfigManager.updateFeedCategory(updatedFeedCategory, categoryId);
 
             if (categoryUpdated) {
-                general_logger.info(`[UpdateFeedCategory] A category is updated successful. Old version: ${JSON.stringify(oldFeedCategory)} New Version: ${JSON.stringify(updatedFeedCategory)}`);
+                http_logger.info(`[UpdateFeedCategory] A category is updated successful. Old version: ${JSON.stringify(oldFeedCategory)} New Version: ${JSON.stringify(updatedFeedCategory)}`);
                 res.json({updated : true, categoryObject : updatedFeedCategory, rootCategory : feedConfigManager.getRootCategory()});
             }
             else {
-                general_logger.error(`[UpdateFeedCategory] An error occured while updating the category!, Request Params: ${JSON.stringify(params)}`);
+                http_logger.error(`[UpdateFeedCategory] An error occured while updating the category!, Request Params: ${JSON.stringify(params)}`);
                 res.json({updated : false, message : 'An error occured while updating the category!'});
             }
                 
         }
         catch(err) {
-            general_logger.error(`[UpdateFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
+            http_logger.error(`[UpdateFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
             res.status(500).json({updated : false, message : err.message});
         }
 
@@ -141,14 +141,13 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
      */
     express.get('/deletefeedcategory', async (req, res) => {
         const params = req.query;
-        
         const categoryId = params.categoryId;
 
         if(categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Parent category id is not a valid id!';
             
             res.status(400).json({ deleted : false, message : errorMessage});
-            general_logger.error(`[DeleteFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            http_logger.error(`[DeleteFeedCategory] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
             
             return;
         }
@@ -160,17 +159,17 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
             const categoryDeleted = await feedConfigManager.deleteFeedCategory(categoryId);
 
             if (categoryDeleted) {
-                general_logger.info(`[DeleteFeedCategory] A feed category with the id "${categoryId}" deleted!, Data: ${JSON.stringify(categoryDeleted)}`);
+                http_logger.info(`[DeleteFeedCategory] A feed category with the id "${categoryId}" deleted!, Data: ${JSON.stringify(categoryDeleted)}`);
                 res.json({deleted : true, deletedCategory : feedCategoryToDelete, rootCategory : feedConfigManager.getRootCategory()});
             }
             else {
-                general_logger.error(`[DeleteFeedCategory] An error occured while deleting the category with the id "${categoryId}"! `);
+                http_logger.error(`[DeleteFeedCategory] An error occured while deleting the category with the id "${categoryId}"! `);
                 res.json({deleted : false, message : 'An error occured while deleting the category!'});
             }
 
         }
         catch (err) {
-            general_logger.error(`[DeleteFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
+            http_logger.error(`[DeleteFeedCategory] ${err.message}, Request Params: ${JSON.stringify(params)}`);
             res.status(500).json({deleted : false, message : err.message});
         }
         

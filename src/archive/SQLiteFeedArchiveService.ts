@@ -82,25 +82,6 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
                 version : sqlFeed.version
             };
 
-            const sqlFeedItems = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`)
-                .all(feedId);
-            // convert data read from db to feed item. parse json data to real objects...
-            for (const sfi of sqlFeedItems) {
-                const feedItem : FeedItem = {
-                    description : sfi.description,
-                    itemId : sfi.itemId,
-                    title : sfi.title,
-                    author : sfi.author == null ? undefined : sfi.author,
-                    category : sfi.category != null ? JSON.parse(sfi.category) : undefined,
-                    comments : sfi.comments == null ? undefined : sfi.comments,
-                    enclosure : sfi.category != null ? JSON.parse(sfi.enclosure) : undefined,
-                    guid : sfi.guid != null ? JSON.parse(sfi.guid) : undefined,
-                    link : sfi.link == null ? undefined : sfi.link,
-                    pubDate : sfi.pubDate != null ? new Date(sfi.pubDate) : undefined,
-                    source : sfi.source != null ? JSON.parse(sfi.source) : undefined
-                }
-                feed.items.push(feedItem);
-            }
             return feed;
         }
         catch(err) {

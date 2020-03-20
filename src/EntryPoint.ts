@@ -14,6 +14,7 @@ import socketIO from "socket.io";
 import initAPIs from "./api/APIs";
 import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
+import initRoutes from "./routes/Routes";
 
 general_logger.info('[Nelly] Application started.');
 
@@ -46,20 +47,21 @@ function requestLoggerMiddleware(request : express.Request, response : express.R
     
     next();
 }
+const systemSettings = settingsManager.getSettings();
+const serverPort = systemSettings.serverPort;
+const systemLocale = systemSettings.systemLocale;
 
-const serverPort = settingsManager.getSettings().serverPort;
+const expressURL = `http://localhost:${serverPort}`;
 
 exp.use(requestLoggerMiddleware);
 exp.use(expStatic(ASSETS_PATH));
 exp.set('view engine', 'ejs');
 exp.set('views', ASSETS_PATH);
 
-exp.get('/', (req, res) => {
-    res.render('main');
-});
-
 const feedScheduler : FeedScheduler = new CronFeedScheduler();
+
 initAPIs(exp, configManager, feedScheduler);
+initRoutes(exp, expressURL, systemLocale);
 
 const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
 

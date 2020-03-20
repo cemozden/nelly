@@ -98,7 +98,8 @@ export default class RSS20Parser implements RSSParser<Feed> {
                 source : item.source !== undefined ? {
                     url : item.source.$.url,
                     value : item.source._
-                } : undefined
+                } : undefined,
+                read : false
             };
 
             return feedItem;
