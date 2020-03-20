@@ -1,0 +1,8 @@
+{
+    "verbose": true,
+    "events": {
+        "restart": "node copy-assets.js"
+      },
+    "watch": ["assets/"],
+    "ext": "js,json,css,ejs"
+  }

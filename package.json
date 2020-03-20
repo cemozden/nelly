@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --watch",
     "testci": "jest --ci",
-    "start": "tsc && node copy-assets.js && env-cmd -f .env.dev node ."
+    "start": "tsc && node copy-assets.js && env-cmd -f .env.prod node .",
+    "start-dev": "tsc && node copy-assets.js && env-cmd -f .env.dev nodemon node ."
   },
   "repository": "https://github.com/cemozden/nelly",
   "author": "cemozden",
