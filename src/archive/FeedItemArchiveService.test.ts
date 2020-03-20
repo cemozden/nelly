@@ -26,12 +26,14 @@ describe('FeedItemArchiveService', () => {
                 title : 'Feed Item 1',
                 description : 'Description 1',
                 itemId : '12345678',
+                read : false
             },
             {
                 description : 'Description 2',
                 title : 'Title 2',
                 itemId : '12345679',
-                pubDate : new Date()
+                pubDate : new Date(),
+                read : false
             }
         ];
 
@@ -45,7 +47,8 @@ describe('FeedItemArchiveService', () => {
                 {
                     title:'Test Title',
                     description : 'Test Description',
-                    itemId : '01234567'
+                    itemId : '01234567',
+                    read : false
                 }
             ],
             version : RSSVersion.RSS_20
