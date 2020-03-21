@@ -6,37 +6,104 @@
         <link rel="stylesheet" type="text/css" href="css/bootstrap-grid.min.css">
         <link rel="stylesheet" type="text/css" href="css/main.css">
         <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery-dateformat.min.js"></script>
+        <script type="text/javascript" src="js/moment-with-locales.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-          const socket = io('<%= expressURL %>');
-          const app = {
-            feeds : [],
-            activeFeed : null
-          };
 
-          function addFeedToMenuItem(feed) {
-            const feedId = feed.feedConfigId;
+          $(document).ready(() => {
+            const socket = io('<%= expressURL %>');
+            moment.locale('<%= systemLocale %>');
+            const app = {
+              feeds : [],
+              activeFeed : {
+                feedId : null,
+                numOfEntries : 0,
+                feedQryStartDate : new Date(),
+                feedQryEndDate : new Date()
+              }
+            };
 
-            $('#feed-menu').append(`<div id="${feedId}" class="menu-item"><a href="#${feedId}">${feed.name}</a></div>`);
-            $(`#${feedId}`).click(() => {
+            function addFeedToMenuItem(feed) {
+              const feedId = feed.feedConfigId;
+
+              $('#feed-menu').append(`<div id="${feedId}" class="menu-item"><a href="#${feedId}">${feed.name}</a></div>`);
               
-              $.ajax({
-                  url: `<%= expressURL %>/feedcontent?feedId=${feedId}`,
-                  method: 'POST'    
-                }).done(feedContent => {
-                  $('#feedContent').html(feedContent);
+              // Feed clicked event on sidebar.
+              $(`#${feedId}`).click(() => {
+                
+                $.ajax({
+                    url: `<%= expressURL %>/feedcontent?feedId=${feedId}`,
+                    method: 'POST'    
+                  }).done(feedContentResult => {
+                    $('#feedContent').html(feedContentResult.html);
+                    app.activeFeed = {
+                      feedId,
+                      numOfEntries : feedContentResult.numberOfEntries,
+                      feedQryStartDate : new Date(feedContentResult.queryStartDate),
+                      feedQryEndDate : new Date(feedContentResult.queryEndDate),
+                    }
+                });
+
               });
 
-            });
-          }
+            }
 
-          $.ajax({
-              url: '<%= expressURL %>/getfeeds',
-              method: 'GET'
-            }).done(feeds => {
-              app.feeds = feeds.sort((a, b) => a.name.localeCompare(b.name));
-              app.feeds.forEach(feed => addFeedToMenuItem(feed));
+            $("#feedContent").scroll(() => {
+              
+              const scrollTop = $('#feedContent').prop('scrollTop');
+              const scrollTopMax = $('#feedContent').prop('scrollTopMax');
+
+              if (scrollTop === scrollTopMax && app.activeFeed.feedId !== null) {
+                
+                const startDate = new Date(app.activeFeed.feedQryStartDate);
+                
+                startDate.setDate(startDate.getDate() - 1);
+                startDate.setHours(0);
+                startDate.setMinutes(0);
+                startDate.setSeconds(0);
+
+                const endDate = new Date(startDate);
+
+                endDate.setHours(23);
+                endDate.setMinutes(59);
+                endDate.setSeconds(59);
+
+                $.ajax({
+                    url: `<%= expressURL %>/getarchiveitems?feedId=${app.activeFeed.feedId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+                    method: 'GET'    
+                  }).done(archiveMessage => {
+                    console.log(archiveMessage);
+                    //TODO: Send notification regarding message is not retrieved!
+                    //if(!archiveMessage.retrieved) {}
+
+                    const newRows = archiveMessage.items.map(fi => 
+                    `<tr ${!fi.read ? 'class="unreadEntry"' : ''}>
+                      <td><img src="${!fi.read ? './img/green-icon.png' : './img/white-icon.png' }" /></td>
+                      <td><a href="#" title="${fi.title}" >${fi.title}</a></td>
+                      <td>${ fi.author !== undefined ? fi.author : '' }</td>
+                      <td>${ fi.pubDate !== undefined && fi.pubDate !== null ? moment(fi.pubDate).format('L') + ' ' + moment(fi.pubDate).format('LTS') : '' }</td>
+                    </tr>`).join('');
+
+                    $('#feedSummaryTable').append(newRows);
+
+                    app.activeFeed.numOfEntries += archiveMessage.itemCount;
+                    app.activeFeed.feedQryStartDate = startDate;
+
+                    $('#feedStartTime').text(moment(startDate).format('L'))
+                    $('#feedEndTime').text(moment(app.activeFeed.feedQryEndDate).format('L'))
+
+                });
+              }
+
+            });
+
+            $.ajax({
+                url: '<%= expressURL %>/getfeeds',
+                method: 'GET'
+              }).done(feeds => {
+                app.feeds = feeds.sort((a, b) => a.name.localeCompare(b.name));
+                app.feeds.forEach(feed => addFeedToMenuItem(feed));
+            });
           });
 
         </script>

@@ -12,6 +12,7 @@ export interface FeedItemArchiveService {
 
     getFeedItemIds(feedId : string) : string[],
     getFeedItems(feedId : string, startDate : Date, endDate : Date, allItems : boolean) : FeedItem[],
+    getLimitedFeedItems(feedId : string, itemLimit : number) : FeedItem[],
     addFeedItems(feedItems : FeedItem[], feedId : string) : boolean,
     deleteFeedItems(itemIds : string[])  : number,
     /**

@@ -5,11 +5,21 @@ import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
 import SQLiteFeedItemArchiveService from "../archive/SQLiteFeedItemArchiveService";
 import { http_logger } from "../utils/Logger";
 import moment from "moment";
+import { renderFile } from "ejs";
+import { join } from "path";
+
 const feedArchiveService : FeedArchiveService = new SQLiteFeedArchiveService();
 const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
 
+interface FeedContentResult {
+    html : string,
+    numberOfEntries : number,
+    queryStartDate : Date,
+    queryEndDate : Date,
+}
+
 export default function FeedContent(exp : Express.Application, expressURL : string, systemLocale : string) {
-    exp.post('/feedcontent', (req, res) => {
+    exp.post('/feedcontent', async (req, res) => {
         const params = req.query;
         const feedId : string = params.feedId;
 
@@ -39,13 +49,23 @@ export default function FeedContent(exp : Express.Application, expressURL : stri
         
         // Set locale for date time formatting.
         moment.locale(systemLocale);
-
-        res.render('feedcontent', {
+        const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
             feedInfo : feed.feedMetadata,
             feedItems,
             rssVersion : 'RSS 2.0',
             systemLocale,
-            moment
+            moment,
+            queryStartDate : startDate,
+            queryEndDate : endDate
         });
+
+        const result : FeedContentResult = {
+            html : renderedHTML,
+            numberOfEntries : feedItems.length,
+            queryStartDate : startDate,
+            queryEndDate : endDate
+        } ;
+
+        res.json(result);
     });
 }

@@ -3,6 +3,6 @@ import Index from "./Index";
 import FeedContent from "./FeedContent";
 
 export default function initRoutes(exp : Express.Application, expressURL : string, systemLocale : string) {
-        Index(exp, expressURL);
+        Index(exp, expressURL, systemLocale);
         FeedContent(exp, expressURL, systemLocale);
 }

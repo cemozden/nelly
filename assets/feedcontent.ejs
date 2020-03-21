@@ -3,10 +3,13 @@
         <img src="<%=feedInfo.image.url%>" />
     <% }%><span class="title"><%= feedInfo.title %></span><br />
     <span class="attribute"><%= feedInfo.description %></span><br />
-    <span class="attribute"><a href="<%= feedInfo.link %>"><%= feedInfo.link %></a></span><br />
+    <span class="attribute"><a href="<%= feedInfo.link %>" target="_blank"><%= feedInfo.link %></a></span><br />
     <span class="attribute">RSS Version: <%= rssVersion %></span><br />
+    <div class="tableInfo">
+      Presenting feed items between <span id="feedStartTime"><%= moment(queryStartDate).format('L') %></span> - <span id="feedEndTime"><%= moment(queryEndDate).format('L') %></span>
+    </div>
 </div>
-<table class="feed-summary-table">
+<table id="feedSummaryTable" class="feed-summary-table">
     <thead>
       <tr>
         <th style="width: 2%;"></th>
@@ -26,7 +29,3 @@
       <% }); %>  
     </tbody>
   </table>
-  <div class="tableInfo">
-      <%= feedItems.length !== 1 ? feedItems.length + ' entries' : feedItems.length + ' entry'  %> fetched in total.<br />
-      Presenting feed items between <span id="timePeriod">18.03.2020 - 19.03.2020</span>
-  </div>

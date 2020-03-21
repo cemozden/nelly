@@ -73,6 +73,44 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
     }
 
     /**
+     * The method that retrieves feed items belong to a specific feed with a spefici entry limit.
+     * @param feedId The id of the specific feed that feed items belong to
+     * @param itemCount The maximum number of items that will be retrieved.
+     */
+    getLimitedFeedItems(feedId : string, itemLimit : number) : FeedItem[] {
+        const feedItemQry = `SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? ORDER BY pubDate DESC, insertedAt DESC LIMIT ${itemLimit}`;
+        try {
+
+            const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId]);
+            const feedItems : FeedItem[] = rows.map((row : any) => {
+                const feedItem : FeedItem = {
+                    description : row.description,
+                    itemId : row.itemId,
+                    title : row.title,
+                    author : row.author == null ? undefined : row.author,
+                    category : row.category != null ? JSON.parse(row.category) : undefined,
+                    comments : row.comments == null ? undefined : row.comments,
+                    enclosure : row.category != null ? JSON.parse(row.enclosure) : undefined,
+                    guid : row.guid != null ? JSON.parse(row.guid) : undefined,
+                    link : row.link == null ? undefined : row.link,
+                    pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
+                    source : row.source != null ? JSON.parse(row.source) : undefined,
+                    read : row.itemRead != null && row.itemRead === 'Y'
+                }
+
+                return feedItem;
+            });
+
+            return feedItems;
+        }
+        catch(err) {
+            general_logger.error(`[SQLiteArchiveService->getLimitedFeedItems] ${err.message}`);
+        }
+
+        return [];
+    }
+
+    /**
      * The method that adds the given feed items to the archive.
      * The second parameter "feedId" represents the id of the feed that will own the given feed items. 
      * @param feedItems The feed items that needs to be added.

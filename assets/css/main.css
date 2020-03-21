@@ -15,6 +15,11 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     margin: 0px;
+
+}
+
+a {
+    color: #465faf;
 }
 
 ::-webkit-scrollbar {
@@ -195,7 +200,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feed-summary-table {
-    margin: 5px auto 0 auto;
+    margin: 5px auto 250px auto;
     background-color: #EEEEEE;
     color: #000000;
     font-size: 12px;
@@ -210,7 +215,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feed-summary-table td, th {
-    border-bottom: 1px solid #202020;
     font-size: 12px;
 }
 
@@ -228,8 +232,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feed-summary-table tr {
+    border-bottom: 1px solid #202020;
     background-color: #101010;
     color: #FFFFFF;
+}
+
+.feed-summary-table tr:last-child {
+    border-bottom: 1px solid #000000;
 }
 
 .feed-summary-table tr:hover {
