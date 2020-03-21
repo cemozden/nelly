@@ -78,7 +78,7 @@ export interface FeedItem {
     author? : string,
     category? : string[],
     comments? : string,
-    pubDate? : Date,
+    pubDate : Date,
     enclosure? : FeedItemEnclosure,
     guid? : FeedItemGuid,
     source? : FeedItemSource,

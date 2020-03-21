@@ -10,6 +10,7 @@ import { join } from "path";
 
 const feedArchiveService : FeedArchiveService = new SQLiteFeedArchiveService();
 const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
+const minimumEntryLimit = 30;
 
 interface FeedContentResult {
     html : string,
@@ -45,27 +46,58 @@ export default function FeedContent(exp : Express.Application, expressURL : stri
         endDate.setHours(23);
         endDate.setMinutes(59);
         
-        const feedItems = feedItemArchiveService.getFeedItems(feedId, startDate, endDate, true);
-        
         // Set locale for date time formatting.
         moment.locale(systemLocale);
-        const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
-            feedInfo : feed.feedMetadata,
-            feedItems,
-            rssVersion : 'RSS 2.0',
-            systemLocale,
-            moment,
-            queryStartDate : startDate,
-            queryEndDate : endDate
-        });
 
-        const result : FeedContentResult = {
-            html : renderedHTML,
-            numberOfEntries : feedItems.length,
-            queryStartDate : startDate,
-            queryEndDate : endDate
-        } ;
+        const feedItems = feedItemArchiveService.getFeedItems(feedId, startDate, endDate, true);
 
-        res.json(result);
+        if (feedItems.length > 0) {
+            const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
+                feedInfo : feed.feedMetadata,
+                feedItems,
+                rssVersion : 'RSS 2.0',
+                systemLocale,
+                moment,
+                queryStartDate : startDate,
+                queryEndDate : endDate
+            });
+    
+            const result : FeedContentResult = {
+                html : renderedHTML,
+                numberOfEntries : feedItems.length,
+                queryStartDate : startDate,
+                queryEndDate : endDate
+            } ;
+    
+            res.json(result);
+        }
+        //If there is no item for the specific date yet, Pull 30 entries from past and send it to the UI.
+        else {
+            const feedItems = feedItemArchiveService.getLimitedFeedItems(feedId, minimumEntryLimit);
+            const feedItemCount = feedItems.length;
+            const updatedStartDate = feedItemCount !== 0 ? feedItems[feedItemCount - 1].pubDate : new Date();
+       
+            const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
+                feedInfo : feed.feedMetadata,
+                feedItems,
+                rssVersion : 'RSS 2.0',
+                systemLocale,
+                moment,
+                queryStartDate : updatedStartDate,
+                queryEndDate : endDate
+            });
+    
+            const result : FeedContentResult = {
+                html : renderedHTML,
+                numberOfEntries : feedItems.length,
+                queryStartDate : updatedStartDate,
+                queryEndDate : endDate
+            } ;
+    
+            res.json(result);
+
+        }
+        
+        
     });
 }

@@ -84,7 +84,7 @@ export default class RSS20Parser implements RSSParser<Feed> {
                 link : item.link,
                 author : item.author,
                 comments : item.comments,
-                pubDate : typeof item.pubDate === 'string' ? new Date(item.pubDate) : undefined,
+                pubDate : typeof item.pubDate === 'string' ? new Date(item.pubDate) : new Date(),
                 category : getFeedCategories(item.category),
                 enclosure : item.enclosure !== undefined  && item.enclosure.$ !== undefined ? {
                     url : item.enclosure.$.url,

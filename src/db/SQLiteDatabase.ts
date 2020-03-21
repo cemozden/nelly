@@ -36,7 +36,7 @@ export default class SQLiteDatabase {
                 author varchar(150),
                 category TEXT,
                 comments varchar(250),
-                pubDate datetime,
+                pubDate datetime NOT NULL,
                 enclosure TEXT,
                 guid TEXT,
                 source TEXT,

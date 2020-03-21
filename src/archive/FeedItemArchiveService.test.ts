@@ -26,7 +26,8 @@ describe('FeedItemArchiveService', () => {
                 title : 'Feed Item 1',
                 description : 'Description 1',
                 itemId : '12345678',
-                read : false
+                read : false,
+                pubDate : new Date()
             },
             {
                 description : 'Description 2',
@@ -48,7 +49,8 @@ describe('FeedItemArchiveService', () => {
                     title:'Test Title',
                     description : 'Test Description',
                     itemId : '01234567',
-                    read : false
+                    read : false,
+                    pubDate : new Date()
                 }
             ],
             version : RSSVersion.RSS_20
@@ -194,8 +196,8 @@ describe('FeedItemArchiveService', () => {
 
                 feedArchiveService.addFeed(feed, feedId);
 
-                const qry1Values = ['abc12345', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'N', twoMonthsAgo.toISOString()];
-                const qry2Values = ['abc12346', feedId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'N', twoMonthsAgo.toISOString()];
+                const qry1Values = ['abc12345', feedId, undefined, undefined, undefined, undefined, undefined, undefined, new Date().toISOString(), undefined, undefined, undefined, 'N', twoMonthsAgo.toISOString()];
+                const qry2Values = ['abc12346', feedId, undefined, undefined, undefined, undefined, undefined, undefined, new Date().toISOString(), undefined, undefined, undefined, 'N', twoMonthsAgo.toISOString()];
                 
                 SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry1Values);
                 SQLiteDatabase.getDatabaseInstance().prepare(`INSERT INTO feedItems VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(qry2Values);
