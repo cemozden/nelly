@@ -275,19 +275,17 @@ a {
     padding: 5px;
     border-bottom: 1px solid #303030;
     background-color: #080808;
-}
-
-.sidebar-menu .menu-item:hover {
-    height: 30px;
-    padding: 5px;
-    background-color: #311a7c;
-}
-
-.sidebar .menu-item a {
     color: #FFFFFF;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.sidebar .menu-item a:hover {
-    text-decoration: none;    
+.sidebar-menu .menu-item-selected{
+    height: 30px;
+    padding: 5px;
+    font-weight: bolder;
+    background-color: #311a7c;
+}
+
+.sidebar-menu .menu-item:hover {
+    background-color: #311a7c;
 }

@@ -26,7 +26,7 @@
             function addFeedToMenuItem(feed) {
               const feedId = feed.feedConfigId;
 
-              $('#feed-menu').append(`<div id="${feedId}" class="menu-item"><a href="#${feedId}">${feed.name}</a></div>`);
+              $('#feed-menu').append(`<div id="${feedId}" class="menu-item">${feed.name}</div>`);
               
               // Feed clicked event on sidebar.
               $(`#${feedId}`).click(() => {
@@ -36,12 +36,17 @@
                     method: 'POST'    
                   }).done(feedContentResult => {
                     $('#feedContent').html(feedContentResult.html);
+                    
+                    $(`#${app.activeFeed.feedId}`).removeClass('menu-item-selected').addClass('menu-item');
+
                     app.activeFeed = {
                       feedId,
                       numOfEntries : feedContentResult.numberOfEntries,
                       feedQryStartDate : new Date(feedContentResult.queryStartDate),
                       feedQryEndDate : new Date(feedContentResult.queryEndDate),
                     }
+
+                    $(`#${feedId}`).removeClass('menu-item').addClass('menu-item-selected');
                 });
 
               });
