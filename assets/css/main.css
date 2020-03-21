@@ -22,6 +22,10 @@ a {
     color: #465faf;
 }
 
+a:hover {
+    text-decoration: none;
+}
+
 ::-webkit-scrollbar {
     width: 10px;
   }
@@ -200,7 +204,7 @@ a {
 }
 
 .feed-summary-table {
-    margin: 5px auto 250px auto;
+    margin: 5px auto 10px auto;
     background-color: #EEEEEE;
     color: #000000;
     font-size: 12px;
@@ -279,7 +283,7 @@ a {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.sidebar-menu .menu-item-selected{
+.sidebar-menu .menu-item-selected {
     height: 30px;
     padding: 5px;
     font-weight: bolder;
@@ -288,4 +292,11 @@ a {
 
 .sidebar-menu .menu-item:hover {
     background-color: #311a7c;
+}
+
+.feed-summary-table-footer {
+    text-align: center;
+    font-size: 18px;
+    width: 90%;
+    margin: 0 auto 250 auto;
 }

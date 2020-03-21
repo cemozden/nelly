@@ -53,13 +53,7 @@
 
             }
 
-            $("#feedContent").scroll(() => {
-              
-              const scrollTop = $('#feedContent').prop('scrollTop');
-              const scrollTopMax = $('#feedContent').prop('scrollTopMax');
-
-              if (scrollTop === scrollTopMax && app.activeFeed.feedId !== null) {
-                
+            function loadMoreItems() {
                 const startDate = new Date(app.activeFeed.feedQryStartDate);
                 
                 startDate.setDate(startDate.getDate() - 1);
@@ -77,7 +71,6 @@
                     url: `<%= expressURL %>/getarchiveitems?feedId=${app.activeFeed.feedId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
                     method: 'GET'    
                   }).done(archiveMessage => {
-                    console.log(archiveMessage);
                     //TODO: Send notification regarding message is not retrieved!
                     //if(!archiveMessage.retrieved) {}
 
@@ -98,8 +91,17 @@
                     $('#feedEndTime').text(moment(app.activeFeed.feedQryEndDate).format('L'))
 
                 });
-              }
+            }
 
+            $('body').on('click', '#loadMore', () => loadMoreItems());
+
+            $("#feedContent").scroll(() => {
+              
+              const scrollTop = $('#feedContent').prop('scrollTop');
+              const scrollTopMax = $('#feedContent').prop('scrollTopMax');
+
+              if (scrollTop === scrollTopMax && app.activeFeed.feedId !== null) loadMoreItems();
+              
             });
 
             $.ajax({
