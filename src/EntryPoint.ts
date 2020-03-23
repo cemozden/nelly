@@ -16,6 +16,7 @@ import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
 import initRoutes from "./routes/Routes";
 
+console.log(`Nelly RSS Feeder, Version: ${process.env.npm_package_version}`);
 general_logger.info('[Nelly] Application started.');
 
 const ASSETS_PATH = join(__dirname, 'assets');
@@ -60,8 +61,13 @@ exp.set('views', ASSETS_PATH);
 
 const feedScheduler : FeedScheduler = new CronFeedScheduler();
 
+console.log('Initializing APIs..');
 initAPIs(exp, configManager, feedScheduler);
+console.log('Initialization completed.');
+
+console.log('Initializing ExpressJS Routes..');
 initRoutes(exp, expressURL, systemLocale);
+console.log('Initialization completed.');
 
 const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
 
@@ -72,5 +78,12 @@ httpServerInstance.listen(serverPort, () => {
 });
 
 io.on('connection', socket => {
-    general_logger.info(`[Socket.IO] Socket.IO connected!`);
+    console.log('Socket.IO connection successful. Client: ' + socket.client.id);
+
+    feedScheduler.addSocket(io);
+});
+
+io.on('disconnect', () => {
+    //feedScheduler.removeSocket(io);
+    console.log('blablabal');
 });

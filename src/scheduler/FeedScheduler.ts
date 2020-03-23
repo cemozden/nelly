@@ -1,5 +1,6 @@
 import { FeedConfig } from "../config/FeedConfigManager";
 import { ScheduledTask } from "node-cron";
+import { Server } from "socket.io";
 
 /**
  * The interface that describes scheduling of feeds according to their setup.
@@ -44,5 +45,11 @@ export interface FeedScheduler {
      * @param feedConfigId The id of the scheduled task. Same as the id of the feed.
      * @throws InvalidFeedConfigIdError if feed config id does not exist.
      */
-    startTask(feedConfigId : string) : void
+    startTask(feedConfigId : string) : void,
+
+    /**
+     * The method that adds the given Socket.IO Server into feed scheduling in order to inform UI clients real-time via Socket.IO.
+     * @param socket The Socket.IO Server instance that namespaces will be created for feed schedules.
+     */
+    addSocket(socket : Server) : void
 }

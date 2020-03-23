@@ -300,3 +300,8 @@ a:hover {
     width: 90%;
     margin: 0 auto 250 auto;
 }
+
+.system-notification {
+    margin: 5px auto 0 auto;
+    width: 98%;
+}

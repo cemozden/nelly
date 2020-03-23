@@ -2,12 +2,19 @@ import { FeedConfig } from "../config/FeedConfigManager";
 import request from "request";
 import RSSParserFactory from "../rss/parser/RSSParserFactory";
 import { parseString, OptionsV2 } from "xml2js";
-import { Feed } from "../rss/specifications/RSS20";
+import { Feed, FeedItem } from "../rss/specifications/RSS20";
 import general_logger from "../utils/Logger";
 import { FeedArchiveService } from "../archive/FeedArchiveService";
 import SQLiteFeedArchiveService from "../archive/SQLiteFeedArchiveService";
 import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
 import SQLiteFeedItemArchiveService from "../archive/SQLiteFeedItemArchiveService";
+import { Namespace } from "socket.io";
+
+interface FeedUpdateMessage {
+    feedId : string,
+    feedName : string,
+    items : FeedItem[]
+}
 
 const xmlParseOptions : OptionsV2 = {
     cdata : true,
@@ -22,7 +29,7 @@ const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiv
  * @param feed The feed that needs to be added to the archive.
  * @param feedId The id of the feed.
  */
-function prepareNewFeed(feed : Feed, feedId : string) {
+function prepareNewFeed(feed : Feed, feedId : string, socketList : Namespace[]) {
     try {
         const feedAdded = feedArchiveService.addFeed(feed, feedId);
         
@@ -35,11 +42,19 @@ function prepareNewFeed(feed : Feed, feedId : string) {
         const feedItemsAdded = feedItemArchiveService.addFeedItems(feed.items, feedId);
 
         if (!feedItemsAdded) {
-            const message = ``;
-            general_logger.error(`[CollectFeed->prepareNewFeed] Unable to add feed items into the archive.`);
+            const message = `[CollectFeed->prepareNewFeed] Unable to add feed items into the archive.`;
+            general_logger.error(message);
             throw new FeedFetchError(message);
         }
-        //TODO: Send new feed items and feed info to the UI using Socket.IO
+        socketList.forEach(s => {
+            const feedUpdateMessage : FeedUpdateMessage = {
+                feedId,
+                feedName : feed.feedMetadata.title,
+                items: feed.items
+            };
+            s.emit('feedUpdate', feedUpdateMessage);
+        });
+
     }
     catch (err) {
         general_logger.error(`[CollectFeed->prepareNewFeed] ${err.message}`);
@@ -52,7 +67,7 @@ function prepareNewFeed(feed : Feed, feedId : string) {
  * @param feed The feed that needs to be updated.
  * @param feedId The id of the feed.
  */
-function updateExistingFeed(feed : Feed, feedId : string) {
+function updateExistingFeed(feed : Feed, feedId : string, socketList : Namespace[]) {
     const feedUpdated = feedArchiveService.updateFeed(feedId, feed);
 
     if (feedUpdated) {
@@ -67,9 +82,16 @@ function updateExistingFeed(feed : Feed, feedId : string) {
                 general_logger.error(`[CollectFeed->updateExistingFeed] ${message}`);
                 throw new FeedFetchError(message);
             }
-            /*else {
-                //TODO: Add socket io message sender to UI for the new fresh feed data and feed items.
-            }*/
+            else {
+                socketList.forEach(s => {
+                    const feedUpdateMessage : FeedUpdateMessage = {
+                        feedId,
+                        feedName : feed.feedMetadata.title,
+                        items: itemsToBeAddedToArchive
+                    };
+                    s.emit('feedUpdate', feedUpdateMessage);
+                });
+            }
         }
         
     }
@@ -79,7 +101,7 @@ function updateExistingFeed(feed : Feed, feedId : string) {
  * If any case of failure happens during collecting of feeds (such as no internet connection, parsing problems etc.) it will reject with a specific error.
  * @param feedConfig The configuration object of a specific feed defined in the system. The URL should be valid url.
  */
-export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
+export function collectFeed(feedConfig : FeedConfig, socketList : Namespace[]) : Promise<Feed> {
     const feedCollectorPromise = new Promise<Feed>((resolve, reject) => {
         general_logger.info(`Started Collecting feeds from the feed "${feedConfig.name}"`);
         request(feedConfig.url, function(error, response, body) {
@@ -87,7 +109,7 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
             if (error) {
                 if (error.code === 'ENOTFOUND') {
                     general_logger.error(`[CollectFeed] Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`);
-                    reject(new FeedFetchError(`Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`));
+                    reject(new FeedFetchError(`Unable to fetch the feed. (${feedConfig.url}) Please check that there is an stable internet connection available or the feed source URL "${feedConfig.url}" is valid.`));
                 }
                 else {
                     general_logger.error(`[CollectFeed] ${error.message} :: Feed URL: ${feedConfig.url}`);
@@ -109,9 +131,9 @@ export function collectFeed(feedConfig : FeedConfig) : Promise<Feed> {
                     const feedInDb = feedArchiveService.getFeed(feedConfig.feedConfigId);
                     
                     if (feedInDb === undefined) 
-                        prepareNewFeed(feed, feedConfig.feedConfigId);
+                        prepareNewFeed(feed, feedConfig.feedConfigId, socketList);
                     else 
-                        updateExistingFeed(feed, feedConfig.feedConfigId);
+                        updateExistingFeed(feed, feedConfig.feedConfigId, socketList);
 
                     general_logger.info(`Finished collecting feeds from the feed "${feedConfig.name}" successfully.`);
                     resolve(feed);
