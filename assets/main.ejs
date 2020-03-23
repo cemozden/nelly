@@ -29,6 +29,9 @@
             socket.on('connect', () => {
               $('#systemError').css('display', 'none');
               $('#feed-menu').html('');
+              $('#feedContent').html(`<div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
+                <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
+              </div>`);
 
                 $.ajax({
                   url: '<%= expressURL %>/getfeeds',
