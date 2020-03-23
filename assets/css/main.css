@@ -286,8 +286,8 @@ a:hover {
 .sidebar-menu .menu-item-selected {
     height: 30px;
     padding: 5px;
-    font-weight: bolder;
     background-color: #311a7c;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .sidebar-menu .menu-item:hover {

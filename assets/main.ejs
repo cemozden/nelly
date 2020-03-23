@@ -11,6 +11,7 @@
         <script>
           const app = {
             feeds : [],
+            unreadFeedItems : new Map(),
             activeFeed : {
               feedId : null,
               numOfEntries : 0,
@@ -32,21 +33,30 @@
               $('#feedContent').html(`<div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
                 <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
               </div>`);
-
-                $.ajax({
-                  url: '<%= expressURL %>/getfeeds',
-                  method: 'GET'
-                }).done(feeds => {
-                  app.feeds = feeds.sort((a, b) => a.name.localeCompare(b.name));
-                  app.feeds.forEach(feed => addFeedToMenuItem(feed));
-              });
-
+              
               app.activeFeed = {
                 feedId : null,
                 numOfEntries : 0,
                 feedQryStartDate : new Date(),
                 feedQryEndDate : new Date()
               };
+
+                $.ajax({
+                  url: '<%= expressURL %>/getfeeds',
+                  method: 'GET'
+                }).done(feeds => {
+                  app.feeds = feeds.sort((a, b) => a.name.localeCompare(b.name));
+                  
+                  // After fetching feeds, get unread feed item count for each feed...
+                  $.ajax({
+                  url: '<%= expressURL %>/getunreadfeeditemcount',
+                  method: 'GET'
+                }).done(unreadFeedItemStatistics => {
+                    unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                    app.feeds.forEach(feed => addFeedToMenuItem(feed));
+                  });
+
+              });
 
             });
 
@@ -57,6 +67,9 @@
             socket.on('feedUpdate', obj => {
               $('#lastTimeUpdated').text(formatDateTime(new Date()));
               $('#lastUpdatedFeed').text(obj.feedName);
+
+              app.unreadFeedItems.set(obj.feedId, app.unreadFeedItems.get(obj.feedId) + obj.items.length);
+              $(`#${obj.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0]));
 
               // If the feed sent is not the active feed, then don't update the table.
               if (app.activeFeed.feedId !== obj.feedId) return;
@@ -83,10 +96,15 @@
 
             moment.locale('<%= systemLocale %>');
 
+            function generateMenuItemText(feed) {
+              const numberOfUnreadItem = app.unreadFeedItems.get(feed.feedConfigId);  
+              return numberOfUnreadItem > 0 ? `<strong>${feed.name} (${numberOfUnreadItem})</strong>` : feed.name;
+            }
+
             function addFeedToMenuItem(feed) {
               const feedId = feed.feedConfigId;
 
-              $('#feed-menu').append(`<div id="${feedId}" class="menu-item">${feed.name}</div>`);
+              $('#feed-menu').append(`<div id="${feedId}" class="menu-item">${generateMenuItemText(feed)}</div>`);
               
               // Feed clicked event on sidebar.
               $(`#${feedId}`).click(() => {

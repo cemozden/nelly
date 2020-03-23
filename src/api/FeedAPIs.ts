@@ -16,6 +16,12 @@ export default function FeedAPI(express : Express.Application, configManager : C
         res.json(configManager.getFeedConfigManager().getFeedConfigs());
     });
 
+    express.get('/getunreadfeeditemcount', (req, res) => {
+        const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
+
+        res.json(feedItemArchiveService.getUnreadFeedItemCount());
+    });
+
     /**
      * 
      * Required Parameters
@@ -106,18 +112,6 @@ export default function FeedAPI(express : Express.Application, configManager : C
 
     });
 
-
-    /**
-     * 
-     * Required Parameters
-     * feedId : string
-     * categoryId : string
-     * name : string
-     * url : string
-     * fetchPeriod: object
-     * iconUrl : string (optional)
-     * enabled : boolean
-     *  */ 
     express.get('/updatefeed', async (req, res) => {
         const params = req.query;
 

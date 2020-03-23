@@ -1,4 +1,4 @@
-import { FeedItemArchiveService, InvalidFeedItemIdError } from "./FeedItemArchiveService";
+import { FeedItemArchiveService, InvalidFeedItemIdError, FeedItemCountStatistics } from "./FeedItemArchiveService";
 import general_logger from "../utils/Logger";
 import { FeedItem } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
@@ -12,6 +12,7 @@ import { TimeUnit } from "../time/TimeUnit";
  * @see FeedItemArchiveService
  */
 export default class SQLiteFeedItemArchiveService implements FeedItemArchiveService {
+    
     
     private readonly itemIdColumn = 'itemId';
     private readonly feedIdColumn = 'feedId';
@@ -186,6 +187,30 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         const deleteFeedItemsQry = `DELETE FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE strftime('%Y-%m-%d %H:%M:%S', insertedAt) < datetime('now','${sqlDateFilterPattern}');`;
         
         return SQLiteDatabase.getDatabaseInstance().prepare(deleteFeedItemsQry).run().changes;
+    }
+
+    getUnreadFeedItemCount(): FeedItemCountStatistics[] {
+
+        const feedItemQry = `SELECT feedId, count(*) AS itemCount FROM feedItems WHERE itemRead LIKE 'N' GROUP BY feedId`;
+        
+        try {
+            const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all();
+            const feedItemCountStatistics = rows.map(row => {
+                const fics : FeedItemCountStatistics = {
+                    feedId : row.feedId,
+                    itemCount : row.itemCount
+                };
+
+                return fics;
+            });
+
+            return feedItemCountStatistics;
+        }
+        catch(err) {
+            general_logger.error(`[SQLiteArchiveService->getUnreadFeedItemCount] ${err.message}`);
+        }
+        
+        return [];
     }
 
 }

@@ -20,7 +20,18 @@ export interface FeedItemArchiveService {
      * It's used to clean the feed items in the archive that their insert date is before than given duration. 
      * @returns number of deleted feed items.
      */
-    cleanFeedItems(duration : Duration) : number
+    cleanFeedItems(duration : Duration) : number,
+
+    /**
+     * The method that retrieves the number of unread messages per feed.
+     */
+    getUnreadFeedItemCount() : FeedItemCountStatistics[] 
+
+}
+
+export interface FeedItemCountStatistics {
+    feedId : string,
+    itemCount : number
 }
 
 export class InvalidFeedItemIdError extends Error {}
