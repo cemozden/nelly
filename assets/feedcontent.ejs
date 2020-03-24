@@ -3,7 +3,7 @@
 </div>
 <div class="content-header">
     <% if (feedInfo.image !== undefined && feedInfo.image.url !== null && feedInfo.image.url !== undefined){ %>
-        <img src="<%=feedInfo.image.url%>" />
+        <a href="<%= feedInfo.image.link %>" target="_blank"><img title="<%= feedInfo.image.title %>" src="<%=feedInfo.image.url%>" /></a>
     <% }%><span class="title"><%= feedInfo.title %></span><br />
     <span class="attribute"><%= feedInfo.description %></span><br />
     <span class="attribute"><a href="<%= feedInfo.link %>" target="_blank"><%= feedInfo.link %></a></span><br />
