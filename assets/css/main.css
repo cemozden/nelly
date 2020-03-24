@@ -245,7 +245,7 @@ a:hover {
     border-bottom: 1px solid #000000;
 }
 
-.feed-summary-table tr:hover {
+.feed-summary-table tbody tr:hover {
     background-color: #151515;
     border-top: 1px solid #303030;
     border-bottom: 1px solid #303030;
