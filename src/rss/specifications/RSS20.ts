@@ -90,6 +90,7 @@ export interface FeedItem {
  */
 export interface Feed {
     version : RSSVersion,
+    insertedAt : Date,
     feedMetadata : FeedMetadata,
     items : FeedItem[]
 }

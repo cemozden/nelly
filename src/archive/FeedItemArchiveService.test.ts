@@ -39,6 +39,7 @@ describe('FeedItemArchiveService', () => {
         ];
 
         const feed : Feed = {
+            insertedAt : new Date(),
             feedMetadata : {
                 title : 'Feed Title 1',
                 description : 'Feed Description 1',
@@ -103,38 +104,9 @@ describe('FeedItemArchiveService', () => {
                 startDate.setHours(0);
                 startDate.setSeconds(0);
 
-                const items = feedItemArchiveService.getFeedItems('14725836', startDate, endDate);
+                const items = feedItemArchiveService.getFeedItems('14725836', startDate, endDate, false, -1);
                 
                 expect(items.length).toBeGreaterThan(0);
-            });
-        });
-
-        describe('#getLimitedFeedItems(itemLimit : number)', () => {
-            it('should return an array of feed items', () => {
-                const feedItemArchiveService = new SQLiteFeedItemArchiveService();
-                const feedArchiveService = new SQLiteFeedArchiveService();
-
-                const feedAdded = feedArchiveService.addFeed(feed, exampleFeedId);
-                expect(feedAdded).toBe(true);
-
-                const feedItemsAdded = feedItemArchiveService.addFeedItems(feedItems, exampleFeedId);
-                
-                expect(feedItemsAdded).toBe(true);
-
-                const startDate = new Date();
-                const endDate = new Date();
-
-                endDate.setMinutes(59);
-                endDate.setHours(23);
-                endDate.setSeconds(59);
-
-                startDate.setMinutes(0);
-                startDate.setHours(0);
-                startDate.setSeconds(0);
-
-                const items = feedItemArchiveService.getLimitedFeedItems(exampleFeedId, 1);
-                
-                expect(items.length).toEqual(1);
             });
         });
 

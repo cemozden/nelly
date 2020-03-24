@@ -292,7 +292,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         const feedItemArchive: FeedItemArchiveService = new SQLiteFeedItemArchiveService();
 
         try {
-            const feedItems = feedItemArchive.getFeedItems(feedId, new Date(startDateISOStr), new Date(endDateISOStr), allItems);
+            const feedItems = feedItemArchive.getFeedItems(feedId, new Date(startDateISOStr), new Date(endDateISOStr), allItems, -1);
             res.json({ retrieved : true, itemCount : feedItems.length, items : feedItems });
         }
         catch (err) {

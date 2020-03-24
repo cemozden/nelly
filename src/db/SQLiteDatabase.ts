@@ -23,8 +23,10 @@ export default class SQLiteDatabase {
                 title varchar(255) NOT NULL,
                 link varchar(255) NOT NULL,
                 description varchar(255) NOT NULL,
-                imageURL varchar(255) NULL,
-                insertedAt datetime
+                imageURL varchar(255),
+	            imageLink varchar(255),
+	            imageTitle varchar(255),
+                insertedAt datetime NOT NULL
             );`);
     
             this.getDatabaseInstance().exec(`CREATE TABLE IF NOT EXISTS ${this.FEED_ITEMS_TABLE_NAME} (

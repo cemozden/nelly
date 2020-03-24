@@ -280,6 +280,7 @@ a:hover {
     border-bottom: 1px solid #303030;
     background-color: #080808;
     color: #FFFFFF;
+    cursor: pointer;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
@@ -287,6 +288,7 @@ a:hover {
     height: 30px;
     padding: 5px;
     background-color: #311a7c;
+    cursor: pointer;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
@@ -298,7 +300,7 @@ a:hover {
     text-align: center;
     font-size: 18px;
     width: 90%;
-    margin: 0 auto 250 auto;
+    margin: 0 auto 175 auto;
 }
 
 .system-notification {

@@ -39,9 +39,11 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
      * The method that retrieves feed items belong to a specific feed.
      * startDate and endDate variables filter the items for a specific time period.
      * If allItems variable is set to true then all feed items in the specific time period will be yielded. by default it's false
+     * numOfEntries represents how many rows will be fetched. if it's -1 then all rows will be fetched.
      */
-    getFeedItems(feedId: string, startDate: Date, endDate: Date, allItems : boolean = false): FeedItem[] {
-        const feedItemQry = `SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC`;
+    getFeedItems(feedId: string, startDate: Date, endDate: Date, allItems : boolean = false, numOfEntries : number = -1): FeedItem[] {
+        const limitQry = numOfEntries === -1 ? '' : `LIMIT ${numOfEntries}`;
+        const feedItemQry = `SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC ${limitQry}`;
         try {
 
             const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
@@ -73,42 +75,13 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         return [];
     }
 
-    /**
-     * The method that retrieves feed items belong to a specific feed with a spefici entry limit.
-     * @param feedId The id of the specific feed that feed items belong to
-     * @param itemCount The maximum number of items that will be retrieved.
-     */
-    getLimitedFeedItems(feedId : string, itemLimit : number) : FeedItem[] {
-        const feedItemQry = `SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? ORDER BY pubDate DESC, insertedAt DESC LIMIT ${itemLimit}`;
-        try {
-
-            const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId]);
-            const feedItems : FeedItem[] = rows.map((row : any) => {
-                const feedItem : FeedItem = {
-                    description : row.description,
-                    itemId : row.itemId,
-                    title : row.title,
-                    author : row.author == null ? undefined : row.author,
-                    category : row.category != null ? JSON.parse(row.category) : undefined,
-                    comments : row.comments == null ? undefined : row.comments,
-                    enclosure : row.category != null ? JSON.parse(row.enclosure) : undefined,
-                    guid : row.guid != null ? JSON.parse(row.guid) : undefined,
-                    link : row.link == null ? undefined : row.link,
-                    pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
-                    source : row.source != null ? JSON.parse(row.source) : undefined,
-                    read : row.itemRead != null && row.itemRead === 'Y'
-                }
-
-                return feedItem;
-            });
-
-            return feedItems;
-        }
-        catch(err) {
-            general_logger.error(`[SQLiteArchiveService->getLimitedFeedItems] ${err.message}`);
-        }
-
-        return [];
+    getNextItemDate(feedId : string, dateToLookAfter : Date) : Date | undefined {
+        const firstItemQry = `SELECT insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt < ? ORDER BY insertedAt DESC LIMIT 1`;
+        const rows = SQLiteDatabase.getDatabaseInstance().prepare(firstItemQry).all([feedId, dateToLookAfter.toISOString()]);
+        
+        if (rows !== undefined && rows.length !== undefined && rows[0] !== undefined && rows[0].insertedAt !== undefined) return new Date(rows[0].insertedAt);
+        
+        return undefined;        
     }
 
     /**

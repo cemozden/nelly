@@ -36,6 +36,8 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             feed.feedMetadata.link,
             feed.feedMetadata.description,
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
+            feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.link !== undefined ? feed.feedMetadata.image.link : null,
+            feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.title !== undefined ? feed.feedMetadata.image.title : null,
             new Date().toISOString()
         ];
         
@@ -61,20 +63,21 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
     getFeed(feedId: string): Feed | undefined {
         
         try {
-            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT feedId, version, title, link, description, imageURL, insertedAt FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
+            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT feedId, version, title, link, description, imageURL, imageLink, imageTitle, insertedAt FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
             
             if (sqlFeed === undefined) return undefined;
             
             sqlFeed.version = parseInt(sqlFeed.version);
             
             const feed : Feed = {
+                insertedAt : new Date(sqlFeed.insertedAt),
                 feedMetadata : {
                     title : sqlFeed.title,
                     description : sqlFeed.description,
                     link : sqlFeed.link,
                     image: {
-                        link : '',
-                        title : '',
+                        link : sqlFeed.imageLink,
+                        title : sqlFeed.imageTitle,
                         url : sqlFeed.imageURL,
                     }
                 },
@@ -107,6 +110,8 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             title : feed.feedMetadata.title,
             link : feed.feedMetadata.link,
             imageURL : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
+            imageLink : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.link !== undefined ? feed.feedMetadata.image.link : null,
+            imageTitle : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.title !== undefined ? feed.feedMetadata.image.title : null,
             description : feed.feedMetadata.description
         };
 

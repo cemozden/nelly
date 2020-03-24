@@ -119,6 +119,7 @@ export default class RSS20Parser implements RSSParser<Feed> {
         rssObject = rssObject.rss;
  
         const feed : Feed = {
+            insertedAt : new Date(),
             version : RSSVersion.RSS_20,
             feedMetadata : this.parseFeedMedata(rssObject.channel),
             items : this.parseFeedItems(rssObject.channel.item)

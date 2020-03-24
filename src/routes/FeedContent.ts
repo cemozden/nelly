@@ -17,6 +17,7 @@ interface FeedContentResult {
     numberOfEntries : number,
     queryStartDate : Date,
     queryEndDate : Date,
+    noMoreEntry : boolean
 }
 
 export default function FeedContent(exp : Express.Application, expressURL : string, systemLocale : string) {
@@ -49,7 +50,7 @@ export default function FeedContent(exp : Express.Application, expressURL : stri
         // Set locale for date time formatting.
         moment.locale(systemLocale);
 
-        const feedItems = feedItemArchiveService.getFeedItems(feedId, startDate, endDate, true);
+        const feedItems = feedItemArchiveService.getFeedItems(feedId, startDate, endDate, true, -1);
 
         if (feedItems.length > 0) {
             const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
@@ -59,39 +60,50 @@ export default function FeedContent(exp : Express.Application, expressURL : stri
                 systemLocale,
                 moment,
                 queryStartDate : startDate,
-                queryEndDate : endDate
+                queryEndDate : endDate,
+                noMoreEntry : false
             });
     
             const result : FeedContentResult = {
                 html : renderedHTML,
                 numberOfEntries : feedItems.length,
                 queryStartDate : startDate,
-                queryEndDate : endDate
+                queryEndDate : endDate,
+                noMoreEntry : false
             } ;
     
             res.json(result);
         }
-        //If there is no item for the specific date yet, Pull 30 entries from past and send it to the UI.
+        // If there is no item between startDate and endDate then look for older entries.
         else {
-            const feedItems = feedItemArchiveService.getLimitedFeedItems(feedId, minimumEntryLimit);
-            const feedItemCount = feedItems.length;
-            const updatedStartDate = feedItemCount !== 0 ? feedItems[feedItemCount - 1].pubDate : new Date();
-       
+            const nextItemStartDate = feedItemArchiveService.getNextItemDate(feedId, startDate);
+            
+            nextItemStartDate.setHours(0);
+            nextItemStartDate.setMinutes(0);
+            nextItemStartDate.setSeconds(0);
+
+            console.log(nextItemStartDate);
+
+            const feedItems = nextItemStartDate !== undefined ? feedItemArchiveService.getFeedItems(feedId, nextItemStartDate, endDate, true, -1) : [];
+            const noMoreEntry = nextItemStartDate === undefined || feedItemArchiveService.getNextItemDate(feedId, nextItemStartDate) === undefined;
+            
             const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
                 feedInfo : feed.feedMetadata,
                 feedItems,
                 rssVersion : 'RSS 2.0',
                 systemLocale,
                 moment,
-                queryStartDate : updatedStartDate,
-                queryEndDate : endDate
+                queryStartDate : nextItemStartDate,
+                queryEndDate : endDate,
+                noMoreEntry
             });
     
             const result : FeedContentResult = {
                 html : renderedHTML,
                 numberOfEntries : feedItems.length,
-                queryStartDate : updatedStartDate,
-                queryEndDate : endDate
+                queryStartDate : nextItemStartDate,
+                queryEndDate : endDate,
+                noMoreEntry
             } ;
     
             res.json(result);

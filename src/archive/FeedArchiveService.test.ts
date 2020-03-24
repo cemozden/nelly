@@ -19,7 +19,8 @@ describe('FeedArchiveService', () => {
             SQLiteDatabase.getDatabaseInstance().prepare(`DELETE FROM ${SQLiteDatabase.FEEDS_TABLE_NAME};`).run();
         });
 
-        const feed : Feed = { 
+        const feed : Feed = {
+            insertedAt : new Date(),
             feedMetadata : {
                 title : 'Feed Title 1',
                 description : 'Feed Description 1',
@@ -36,6 +37,7 @@ describe('FeedArchiveService', () => {
                 const exampleFeedId = '14725856';
 
                 const feeds : Feed = {
+                        insertedAt : new Date(),
                         feedMetadata : {
                             title : 'Feed Title 1',
                             description : 'Feed Description 1',
@@ -56,6 +58,7 @@ describe('FeedArchiveService', () => {
                 const exampleFeedId = '14725836';
 
                 const feeds : Feed = {
+                        insertedAt : new Date(),
                         feedMetadata : {
                             title : 'Feed Title 1',
                             description : 'Feed Description 1',
@@ -86,8 +89,10 @@ describe('FeedArchiveService', () => {
                 const feedItemArchiveService = new SQLiteFeedItemArchiveService();
 
                 const exampleFeedId = '01472583';
-
+                const insertedAt = new Date();
+                
                 const feed : Feed = {
+                    insertedAt : insertedAt,
                     version : RSSVersion.RSS_20,
                     feedMetadata : {
                         title : 'Example Title',
@@ -119,6 +124,7 @@ describe('FeedArchiveService', () => {
                 const feedArchiveService = new SQLiteFeedArchiveService();
 
                 expect(() => {feedArchiveService.updateFeed('', {
+                    insertedAt : new Date(),
                     feedMetadata : {
                         description : 'Example description',
                         link : 'https://example.com',
@@ -135,6 +141,7 @@ describe('FeedArchiveService', () => {
                 const feedId = '13698521';
                 
                 const updatedFeed : Feed = {
+                    insertedAt : new Date(),
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
@@ -156,6 +163,7 @@ describe('FeedArchiveService', () => {
                 expect(feedAdded).toBe(true);
 
                 const updatedFeed : Feed = {
+                    insertedAt : new Date(),
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
@@ -193,6 +201,7 @@ describe('FeedArchiveService', () => {
                 const newFeedId = 'abcdefgh';
 
                 const newFeed : Feed = {
+                    insertedAt : new Date(),
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
@@ -212,6 +221,7 @@ describe('FeedArchiveService', () => {
                 const exampleFeedId = '01472585';
 
                 const feed : Feed = {
+                    insertedAt : new Date(),
                     version : RSSVersion.RSS_20,
                     feedMetadata : {
                         title : 'Example Title',

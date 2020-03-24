@@ -11,8 +11,7 @@ import Duration from "../time/Duration";
 export interface FeedItemArchiveService {
 
     getFeedItemIds(feedId : string) : string[],
-    getFeedItems(feedId : string, startDate : Date, endDate : Date, allItems : boolean) : FeedItem[],
-    getLimitedFeedItems(feedId : string, itemLimit : number) : FeedItem[],
+    getFeedItems(feedId : string, startDate : Date, endDate : Date, allItems : boolean, numOfEntries : number) : FeedItem[],
     addFeedItems(feedItems : FeedItem[], feedId : string) : boolean,
     deleteFeedItems(itemIds : string[])  : number,
     /**
@@ -25,7 +24,13 @@ export interface FeedItemArchiveService {
     /**
      * The method that retrieves the number of unread messages per feed.
      */
-    getUnreadFeedItemCount() : FeedItemCountStatistics[] 
+    getUnreadFeedItemCount() : FeedItemCountStatistics[],
+
+    /**
+     * Returns the date of the next feed item after the given date parameter.
+     * It yields undefined if there is no next item after the specific date.
+     */
+    getNextItemDate(feedId : string, dateToLookAfter : Date) : Date | undefined
 
 }
 
