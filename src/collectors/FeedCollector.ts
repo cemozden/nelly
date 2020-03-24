@@ -50,7 +50,7 @@ function prepareNewFeed(feed : Feed, feedId : string, socketList : Namespace[]) 
             const feedUpdateMessage : FeedUpdateMessage = {
                 feedId,
                 feedName : feed.feedMetadata.title,
-                items: feed.items
+                items: feed.items.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime()).reverse()
             };
             s.emit('feedUpdate', feedUpdateMessage);
         });
@@ -87,7 +87,7 @@ function updateExistingFeed(feed : Feed, feedId : string, socketList : Namespace
                     const feedUpdateMessage : FeedUpdateMessage = {
                         feedId,
                         feedName : feed.feedMetadata.title,
-                        items: itemsToBeAddedToArchive
+                        items: itemsToBeAddedToArchive.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime()).reverse()
                     };
                     s.emit('feedUpdate', feedUpdateMessage);
                 });
