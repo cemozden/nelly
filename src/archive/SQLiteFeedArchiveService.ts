@@ -38,7 +38,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.link !== undefined ? feed.feedMetadata.image.link : null,
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.title !== undefined ? feed.feedMetadata.image.title : null,
-            new Date().toISOString()
+            feed.insertedAt.toISOString()
         ];
         
         // Create placeholders according to the size of tableData

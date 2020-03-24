@@ -89,7 +89,7 @@ describe('FeedArchiveService', () => {
                 const feedItemArchiveService = new SQLiteFeedItemArchiveService();
 
                 const exampleFeedId = '01472583';
-                const insertedAt = new Date();
+                const insertedAt = new Date('2020-03-24T20:55:59.709Z');
                 
                 const feed : Feed = {
                     insertedAt : insertedAt,
