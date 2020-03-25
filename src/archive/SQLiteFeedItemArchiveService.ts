@@ -16,7 +16,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
     
     private readonly itemIdColumn = 'itemId';
     private readonly feedIdColumn = 'feedId';
-
+    private readonly feedItemTableColumns = 'itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt';
     /**
      * The method that returns a list of ids of feed items that belongs to a specific feed.
      * @param feedId The id of the feed that feed items have.
@@ -43,7 +43,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
      */
     getFeedItems(feedId: string, startDate: Date, endDate: Date, allItems : boolean = false, numOfEntries : number = -1): FeedItem[] {
         const limitQry = numOfEntries === -1 ? '' : `LIMIT ${numOfEntries}`;
-        const feedItemQry = `SELECT itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC ${limitQry}`;
+        const feedItemQry = `SELECT ${this.feedItemTableColumns} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC ${limitQry}`;
         try {
 
             const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
@@ -51,6 +51,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
                 const feedItem : FeedItem = {
                     description : row.description,
                     itemId : row.itemId,
+                    feedId : row.feedId,
                     title : row.title,
                     author : row.author == null ? undefined : row.author,
                     category : row.category != null ? JSON.parse(row.category) : undefined,
@@ -184,6 +185,41 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         }
         
         return [];
+    }
+
+    getFeedItem(itemId: string): FeedItem | undefined {
+        const qry = `SELECT ${this.feedItemTableColumns} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE itemId LIKE ?`;
+
+        try {
+            const row = SQLiteDatabase.getDatabaseInstance().prepare(qry).get(itemId);
+
+            const feedItem : FeedItem = {
+                description : row.description,
+                itemId : row.itemId,
+                feedId : row.feedId,
+                title : row.title,
+                author : row.author == null ? undefined : row.author,
+                category : row.category != null ? JSON.parse(row.category) : undefined,
+                comments : row.comments == null ? undefined : row.comments,
+                enclosure : row.category != null ? JSON.parse(row.enclosure) : undefined,
+                guid : row.guid != null ? JSON.parse(row.guid) : undefined,
+                link : row.link == null ? undefined : row.link,
+                pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
+                source : row.source != null ? JSON.parse(row.source) : undefined,
+                read : row.itemRead != null && row.itemRead === 'Y'
+            }
+
+            return feedItem;
+        }
+        catch(err) {
+            general_logger.error(`[SQLiteArchiveService->getUnreadFeedItemCount] ${err.message}`);
+        }
+
+        return undefined;
+    }
+    setFeedItemRead(itemRead: boolean, itemId: string): void {
+        const qry = `UPDATE ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} SET itemRead = ? WHERE itemId LIKE ?`;
+        SQLiteDatabase.getDatabaseInstance().prepare(qry).run([itemRead ? 'Y' : 'N', itemId]);
     }
 
 }

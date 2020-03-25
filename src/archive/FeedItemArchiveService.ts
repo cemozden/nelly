@@ -30,7 +30,19 @@ export interface FeedItemArchiveService {
      * Returns the date of the next feed item after the given date parameter.
      * It yields undefined if there is no next item after the specific date.
      */
-    getNextItemDate(feedId : string, dateToLookAfter : Date) : Date | undefined
+    getNextItemDate(feedId : string, dateToLookAfter : Date) : Date | undefined,
+
+    /**
+     * The method that retrieves a specific feed item from the archive by asking the id of it.
+     * @param itemId The id of the specific item
+     */
+    getFeedItem(itemId : string) : FeedItem | undefined,
+
+    /**
+     * The method that sets a specific item
+     * @param itemRread The boolean value sets the item to be read or notTrue is read False is not.
+     */
+    setFeedItemRead(itemRead : boolean, itemId : string) : void
 
 }
 

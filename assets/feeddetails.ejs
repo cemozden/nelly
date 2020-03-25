@@ -1,0 +1,38 @@
+<div class="content-navigation">
+    <button id="backToFeeds">Back to feeds</button>
+</div>
+<div class="content-header">
+    <div class="header">
+        <a target="_blank" href="<%= feedItem.link !== undefined && feedItem.link !== null ? feedItem.link : '#' %>"><%= feedItem.title %></a><br />
+    </div>
+    <% if (feedItem.pubDate !== undefined && feedItem.pubDate !== null) { %>
+    <span class="publishedOn">Published on <%= moment(feedItem.pubDate).format('L') + ' ' + moment(feedItem.pubDate).format('LTS') %></span><br />
+    <% } %>
+    <% if (feedItem.author !== undefined && feedItem.author !== null) { %>
+        <span id="author">Author: <%= feedItem.author %></span><br />
+    <% } %>
+    <% if (feedItem.category !== undefined && feedItem.category.length > 0) { %>
+        Categories: <span class="categories" id="categories"><%= feedItem.category.join(', ') %></span><br />
+    <% } %>
+</div>
+<div class="description">
+    <% if (feedItem.enclosure !== undefined && feedItem.enclosure !== null) { %>
+        <div class="entryImage">
+            <a href="#" id="showEntryImage">[Show Entry Image]</a><br />
+            <img id="mediaImage" style="display: none;" src="<%= feedItem.enclosure.url %>" />
+        </div>
+    <% } %>
+    <% if(feedItem.description !== undefined && feedItem.description !== null) { %>
+    <div class="descriptionContent">
+        <%- feedItem.description %>
+    </div>
+    <% } %>
+    </div>
+    <% if(feedItem.comments !== undefined && feedItem.comments !== null) { %>
+    <div class="comments">
+        <span class="commentsTitle">Comments</span><br />
+        <div class="commentDetails">
+            <%- feedItem.comments %>
+        </div>
+    </div>
+    <% } %>

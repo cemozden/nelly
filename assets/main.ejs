@@ -14,7 +14,6 @@
             unreadFeedItems : new Map(),
             activeFeed : {
               feedId : null,
-              numOfEntries : 0,
               feedQryStartDate : new Date(),
               feedQryEndDate : new Date()
             }
@@ -36,7 +35,6 @@
               
               app.activeFeed = {
                 feedId : null,
-                numOfEntries : 0,
                 feedQryStartDate : new Date(),
                 feedQryEndDate : new Date()
               };
@@ -101,15 +99,8 @@
               return numberOfUnreadItem > 0 ? `<strong>${feed.name} (${numberOfUnreadItem})</strong>` : feed.name;
             }
 
-            function addFeedToMenuItem(feed) {
-              const feedId = feed.feedConfigId;
-
-              $('#feed-menu').append(`<div id="${feedId}" class="menu-item">${generateMenuItemText(feed)}</div>`);
-              
-              // Feed clicked event on sidebar.
-              $(`#${feedId}`).click(() => {
-                
-                $.ajax({
+            function loadItems(feedId) {
+              $.ajax({
                     url: `<%= expressURL %>/feedcontent?feedId=${feedId}`,
                     method: 'POST'    
                   }).done(feedContentResult => {
@@ -119,15 +110,21 @@
 
                     app.activeFeed = {
                       feedId,
-                      numOfEntries : feedContentResult.numberOfEntries,
                       feedQryStartDate : new Date(feedContentResult.queryStartDate),
                       feedQryEndDate : new Date(feedContentResult.queryEndDate),
                     }
 
                     $(`#${feedId}`).removeClass('menu-item').addClass('menu-item-selected');
                 });
+            }
 
-              });
+            function addFeedToMenuItem(feed) {
+              const feedId = feed.feedConfigId;
+
+              $('#feed-menu').append(`<div id="${feedId}" class="menu-item">${generateMenuItemText(feed)}</div>`);
+              
+              // Feed clicked event on sidebar.
+              $(`#${feedId}`).click(() => loadItems(feedId));
 
             }
 
@@ -165,7 +162,6 @@
 
                     $('#feedSummaryTable').append(newRows);
 
-                    app.activeFeed.numOfEntries += archiveMessage.itemCount;
                     app.activeFeed.feedQryStartDate = startDate;
 
                     $('#feedStartTime').text(moment(startDate).format('L'))
@@ -174,7 +170,27 @@
                 });
             }
 
+            $('body').on('click', '#feedSummaryTable tr a', function() {
+                const itemId = $(this).attr('id');
+
+                $.ajax({
+                    url: `<%= expressURL %>/feeddetails?itemId=${itemId}`,
+                    method: 'POST'    
+                  }).done(feedDetails => {
+                    $('#feedContent').html(feedDetails.html);
+
+                    if (!feedDetails.itemAlreadyRead) {
+                      app.unreadFeedItems.set(app.activeFeed.feedId, app.unreadFeedItems.get(app.activeFeed.feedId) - 1);
+                      $(`#${app.activeFeed.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === app.activeFeed.feedId)[0]));
+                    }
+
+                });            
+
+            });
+            
+
             $('body').on('click', '#loadMore', () => loadMoreItems());
+            $('body').on('click', '#backToFeeds', () => loadItems(app.activeFeed.feedId));
 
             $("#feedContent").scroll(() => {
               

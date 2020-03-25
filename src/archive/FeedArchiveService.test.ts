@@ -232,6 +232,7 @@ describe('FeedArchiveService', () => {
                         {
                             description : 'Feed Item description',
                             itemId : '36925814',
+                            feedId : exampleFeedId,
                             title : 'Feed Item Title',
                             pubDate : new Date(),
                             category : ['testCategory1', 'testCategory2'],

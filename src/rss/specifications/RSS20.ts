@@ -72,6 +72,7 @@ export interface FeedMetadata {
  */
 export interface FeedItem {
     itemId : string,
+    feedId? : string,
     title : string,
     description : string,
     link? : string,

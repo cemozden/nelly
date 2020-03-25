@@ -9,7 +9,7 @@
     <span class="attribute"><a href="<%= feedInfo.link %>" target="_blank"><%= feedInfo.link %></a></span><br />
     <span class="attribute">RSS Version: <%= rssVersion %></span><br />
     <div class="tableInfo">
-      Presenting feed items between <span id="feedStartTime"><%= moment(queryStartDate).format('L') %></span> - <span id="feedEndTime"><%= moment(queryEndDate).format('L') %></span>
+      Presenting feed items between <span id="feedStartTime"><%= moment(queryStartDate).format('L') %></span> - <span id="feedEndTime"><%= moment(queryEndDate).format('L') %></span><br />
     </div>
 </div>
 <table id="feedSummaryTable" class="feed-summary-table">
@@ -25,7 +25,7 @@
       <% feedItems.forEach(fi => { %>
         <tr <%= !fi.read ? 'class=unreadEntry' : ''  %>>
             <td><img src="<%= !fi.read ? './img/green-icon.png' : './img/white-icon.png'  %>" /></td>
-            <td><a href="#" title="<%= fi.title %>" ><%= fi.title %></a></td>
+            <td><a id="<%= fi.itemId %>" href="#" title="<%= fi.title %>" ><%= fi.title %></a></td>
             <td><%= fi.author !== undefined ? fi.author : '' %></td>
             <td><%= fi.pubDate !== undefined && fi.pubDate !== null ? moment(fi.pubDate).format('L') + ' ' + moment(fi.pubDate).format('LTS') : '' %></td>
         </tr>

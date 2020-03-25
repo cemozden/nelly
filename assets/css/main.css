@@ -3,6 +3,10 @@
     src: url(../fonts/coolveticacondensedrg.ttf);
   }
 
+ @font-face {
+    font-family: exo2;
+    src: url(../fonts/Exo2.otf);
+  }
 
 body {
     margin: 0px;
@@ -128,8 +132,9 @@ a:hover {
 .content-header {
     display: block;
     width: 99%;
-    padding: 5px 0 2px 1%;
-    border-bottom: 1px dashed #101010;
+    padding: 5px 0 8px 1%;
+    
+    margin-bottom: 5px;
 }
 
 .content-header .title {
@@ -139,23 +144,43 @@ a:hover {
     padding-bottom: 4px;
 }
 
+.content-header .publishedOn {
+    font-size: 14px;
+}
+
+.content-header .header a {
+    font-family: exo2;
+    color: #428963;
+    font-size: 20px;
+    padding-bottom: 4px;
+    text-decoration: none;
+}
+
+.content-header .header a:hover {
+    color: #465faf;
+    text-decoration: none;
+}
+
+.content-header .header a:visited {
+    color: #428963;
+}
+
+.content-header .header a:visited:hover {
+    color: #465faf;
+    text-decoration: none;
+}
+
 .content-header .attribute {
     color: #CCCCCC;
     font-weight: bold;
 }
 
 .content-header a {
-    color: #428963;
-    text-decoration: none;
     font-weight: bold;
 }
 
 .content-header a:hover {
     text-decoration: underline;
-}
-
-.content-header .description {
-    font-family: Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;
 }
 
 .content-header a:visited {
@@ -167,9 +192,9 @@ a:hover {
     padding-top:3px;
 }
 
-.content-header p {
-    font-size: 12px;
-    padding-left: 1%;
+.content-header .categories {
+    font-style: italic;
+    margin-top: 3px;
 }
 
 .feedInfo {
@@ -177,6 +202,11 @@ a:hover {
     width: 98%;
     padding: 5px 0 2px 2%;
     border-bottom: 3px solid #101010;
+}
+
+.comments {
+    width: 98%;
+    margin: 0 auto;
 }
 
 .comments .commentsTitle {
@@ -306,4 +336,40 @@ a:hover {
 .system-notification {
     margin: 5px auto 0 auto;
     width: 98%;
+}
+
+.content .content-navigation {
+    height: 40px;
+    border-bottom: 1px solid #151515;
+    padding-left: 5px;
+}
+
+.content .content-navigation button {
+    height: 39px;
+    color: #FFFFFF;
+    padding: 0 10px 0 10px;
+    background-color: #151515;
+    border: 1px solid #000000;
+}
+
+.content .content-navigation button:hover {
+    background-color: #212121;
+}
+
+.content .description {
+    width: 98%;
+    margin:0 auto 35px auto;
+    font-size: 14px;
+}
+
+.content .description .entryImage {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 12px;
+}
+
+.content .description .descriptionContent {
+    border: 1px solid #101010;
+    background-color: #151515;
+    padding: 5px;
 }

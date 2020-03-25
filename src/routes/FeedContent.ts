@@ -1,4 +1,3 @@
-import Express from "express";
 import { FeedArchiveService } from "../archive/FeedArchiveService";
 import SQLiteFeedArchiveService from "../archive/SQLiteFeedArchiveService";
 import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
@@ -7,6 +6,7 @@ import { http_logger } from "../utils/Logger";
 import moment from "moment";
 import { renderFile } from "ejs";
 import { join } from "path";
+import { ExpressSettings } from "./Routes";
 
 const feedArchiveService : FeedArchiveService = new SQLiteFeedArchiveService();
 const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
@@ -20,8 +20,8 @@ interface FeedContentResult {
     noMoreEntry : boolean
 }
 
-export default function FeedContent(exp : Express.Application, expressURL : string, systemLocale : string) {
-    exp.post('/feedcontent', async (req, res) => {
+export default function FeedContent(exp : ExpressSettings, systemLocale : string) {
+    exp.expressObject.post('/feedcontent', async (req, res) => {
         const params = req.query;
         const feedId : string = params.feedId;
 
@@ -81,8 +81,6 @@ export default function FeedContent(exp : Express.Application, expressURL : stri
             nextItemStartDate.setHours(0);
             nextItemStartDate.setMinutes(0);
             nextItemStartDate.setSeconds(0);
-
-            console.log(nextItemStartDate);
 
             const feedItems = nextItemStartDate !== undefined ? feedItemArchiveService.getFeedItems(feedId, nextItemStartDate, endDate, true, -1) : [];
             const noMoreEntry = nextItemStartDate === undefined || feedItemArchiveService.getNextItemDate(feedId, nextItemStartDate) === undefined;
