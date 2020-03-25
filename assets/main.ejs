@@ -192,6 +192,11 @@
             $('body').on('click', '#loadMore', () => loadMoreItems());
             $('body').on('click', '#backToFeeds', () => loadItems(app.activeFeed.feedId));
 
+            $('body').on('click', '#showEntryImage', () => {
+              $('#showEntryImage').css('display', 'none');
+              $('#mediaImage').css('display', 'block');
+            });
+
             $("#feedContent").scroll(() => {
               
               const scrollTop = $('#feedContent').prop('scrollTop');

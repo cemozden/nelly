@@ -49,7 +49,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
             const feedItems : FeedItem[] = rows.map((row : any) => {
                 const feedItem : FeedItem = {
-                    description : row.description,
+                    description : row.description !== null ? row.description : undefined,
                     itemId : row.itemId,
                     feedId : row.feedId,
                     title : row.title,
@@ -212,7 +212,7 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             return feedItem;
         }
         catch(err) {
-            general_logger.error(`[SQLiteArchiveService->getUnreadFeedItemCount] ${err.message}`);
+            general_logger.error(`[SQLiteArchiveService->getFeedItem] ${err.message}`);
         }
 
         return undefined;
