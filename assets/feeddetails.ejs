@@ -14,6 +14,9 @@
     <% if (feedItem.category !== undefined && feedItem.category.length > 0) { %>
         Categories: <span class="categories" id="categories"><%= feedItem.category.join(', ') %></span><br />
     <% } %>
+    <% if(feedItem.comments !== undefined && feedItem.comments !== null) { %>
+        Comments: <a href="<%- feedItem.comments %>" target="_blank"><%- feedItem.comments %></a><br />
+    <% } %>
 </div>
 <div class="description">
     <% if (feedItem.enclosure !== undefined && feedItem.enclosure !== null) { %>
@@ -28,11 +31,3 @@
     </div>
     <% } %>
     </div>
-    <% if(feedItem.comments !== undefined && feedItem.comments !== null) { %>
-    <div class="comments">
-        <span class="commentsTitle">Comments</span><br />
-        <div class="commentDetails">
-            <%- feedItem.comments %>
-        </div>
-    </div>
-    <% } %>

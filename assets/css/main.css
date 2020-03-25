@@ -26,6 +26,10 @@ a {
     color: #465faf;
 }
 
+a:visited {
+    color:#718d99;
+}
+
 a:hover {
     text-decoration: none;
 }
@@ -184,7 +188,6 @@ a:hover {
 }
 
 .content-header a:visited {
-    color: #754289;
     font-weight: lighter;
 }
 
@@ -202,24 +205,6 @@ a:hover {
     width: 98%;
     padding: 5px 0 2px 2%;
     border-bottom: 3px solid #101010;
-}
-
-.comments {
-    width: 98%;
-    margin: 0 auto;
-}
-
-.comments .commentsTitle {
-    font-size: 16px;
-    font-style: italic;
-    color: #465faf;
-}
-
-.comments .commentDetails {
-    font-style: italic;
-    text-decoration: underline;
-    padding: 2px 0 5px 5px;
-    background-color: #151515;
 }
 
 .feedsHeader {
