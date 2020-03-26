@@ -29,7 +29,7 @@
             socket.on('connect', () => {
               $('#systemError').css('display', 'none');
               $('#feed-menu').html('');
-              $('#feedContent').html(`<div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
+              $('#dynamic-content').html(`<div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
                 <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
               </div>`);
               
@@ -104,7 +104,7 @@
                     url: `<%= expressURL %>/feedcontent?feedId=${feedId}`,
                     method: 'POST'    
                   }).done(feedContentResult => {
-                    $('#feedContent').html(feedContentResult.html);
+                    $('#dynamic-content').html(feedContentResult.html);
                     
                     $(`#${app.activeFeed.feedId}`).removeClass('menu-item-selected').addClass('menu-item');
 
@@ -177,7 +177,7 @@
                     url: `<%= expressURL %>/feeddetails?itemId=${itemId}`,
                     method: 'POST'    
                   }).done(feedDetails => {
-                    $('#feedContent').html(feedDetails.html);
+                    $('#dynamic-content').html(feedDetails.html);
 
                     if (!feedDetails.itemAlreadyRead) {
                       app.unreadFeedItems.set(app.activeFeed.feedId, app.unreadFeedItems.get(app.activeFeed.feedId) - 1);
@@ -197,10 +197,10 @@
               $('#mediaImage').css('display', 'block');
             });
 
-            $("#feedContent").scroll(() => {
+            $("#dynamic-content").scroll(() => {
               
-              const scrollTop = $('#feedContent').prop('scrollTop');
-              const scrollTopMax = $('#feedContent').prop('scrollTopMax');
+              const scrollTop = $('#dynamic-content').prop('scrollTop');
+              const scrollTopMax = $('#dynamic-content').prop('scrollTopMax');
 
               if (scrollTop === scrollTopMax && app.activeFeed.feedId !== null) loadMoreItems();
               
@@ -233,6 +233,9 @@
             <div id="feedContent" class="content">
               <div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
                 <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
+              </div>
+              <div id="dynamic-content">
+
               </div>
             </div>
         </div>
