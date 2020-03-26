@@ -131,7 +131,7 @@
             function convertFeedItemToTableRow(feedItem) {
               const rowHTML = `<tr ${!feedItem.read ? 'class="unreadEntry"' : ''}>
                       <td><img src="${!feedItem.read ? './img/green-icon.png' : './img/white-icon.png' }" /></td>
-                      <td><a href="#" title="${feedItem.title}" >${feedItem.title}</a></td>
+                      <td><a href="#" id="${feedItem.itemId}" title="${feedItem.title}" >${feedItem.title}</a></td>
                       <td>${ feedItem.author !== undefined ? feedItem.author : '' }</td>
                       <td>${ feedItem.pubDate !== undefined && feedItem.pubDate !== null ? formatDateTime(feedItem.pubDate) : '' }</td>
                     </tr>`;
