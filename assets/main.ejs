@@ -197,10 +197,10 @@
               $('#mediaImage').css('display', 'block');
             });
 
-            $("#dynamic-content").scroll(() => {
+            $("#feedContent").scroll(() => {
               
-              const scrollTop = $('#dynamic-content').prop('scrollTop');
-              const scrollTopMax = $('#dynamic-content').prop('scrollTopMax');
+              const scrollTop = $('#feedContent').prop('scrollTop');
+              const scrollTopMax = $('#feedContent').prop('scrollTopMax');
 
               if (scrollTop === scrollTopMax && app.activeFeed.feedId !== null) loadMoreItems();
               
