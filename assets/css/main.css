@@ -297,6 +297,12 @@ a:hover {
     color: #FFFFFF;
     cursor: pointer;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 .sidebar-menu .menu-item-selected {
@@ -305,6 +311,12 @@ a:hover {
     background-color: #311a7c;
     cursor: pointer;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 .sidebar-menu .menu-item:hover {
