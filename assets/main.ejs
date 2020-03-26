@@ -64,7 +64,7 @@
 
             socket.on('feedUpdate', obj => {
               $('#lastTimeUpdated').text(formatDateTime(new Date()));
-              $('#lastUpdatedFeed').text(obj.feedName);
+              $('#lastUpdatedFeed').text(app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0].name);
 
               app.unreadFeedItems.set(obj.feedId, app.unreadFeedItems.get(obj.feedId) + obj.items.length);
               $(`#${obj.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0]));
