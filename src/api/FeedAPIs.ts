@@ -302,4 +302,42 @@ export default function FeedAPI(express : Express.Application, configManager : C
         
     });
 
+    express.get('/checkitemexistsafterdate', (req, res) => {
+
+        const params = req.query;
+
+        const dateStr = params.date;
+        const feedId = params.feedId;
+
+        if (dateStr === undefined || dateStr.length === 0) {
+            const errorMessage =  'Date is not a valid date string! Please provide a valid date string to retrieve the feeds.';
+            
+            res.status(400).json({ retrieved : false, message : errorMessage });
+            http_logger.error(`[CheckItemExistsAfterDate] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        if (feedId === undefined || feedId.length === 0) {
+            const errorMessage =  'Feed id is not a valid string! Please provide a valid feed id to retrieve the feeds.';
+            
+            res.status(400).json({ retrieved : false, message : errorMessage });
+            http_logger.error(`[CheckItemExistsAfterDate] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        const date = new Date(dateStr);
+
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+
+        const feedItemArchive: FeedItemArchiveService = new SQLiteFeedItemArchiveService();
+
+        const nextItemDate = feedItemArchive.getNextItemDate(feedId, date);
+
+        res.json({ itemsAvailable : nextItemDate !== undefined, nextDate : nextItemDate });
+    });
+
 }

@@ -44,7 +44,7 @@
                   method: 'GET'
                 }).done(feeds => {
                   app.feeds = feeds.sort((a, b) => a.name.localeCompare(b.name));
-                  
+                  app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
                   // After fetching feeds, get unread feed item count for each feed...
                   $.ajax({
                   url: '<%= expressURL %>/getunreadfeeditemcount',
@@ -140,6 +140,18 @@
             }
 
             function loadMoreItems() {
+
+              function initItems(items) {
+                const newRows = items.map(fi => convertFeedItemToTableRow(fi)).join('');
+
+                $('#feedSummaryTable').append(newRows);
+
+                app.activeFeed.feedQryStartDate = startDate;
+
+                $('#feedStartTime').text(moment(startDate).format('L'));
+                $('#feedEndTime').text(moment(app.activeFeed.feedQryEndDate).format('L'));
+              }
+
                 const startDate = new Date(app.activeFeed.feedQryStartDate);
                 
                 startDate.setDate(startDate.getDate() - 1);
@@ -154,18 +166,37 @@
                 endDate.setSeconds(59);
 
                 $.ajax({
-                    url: `<%= expressURL %>/getarchiveitems?feedId=${app.activeFeed.feedId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+                    url: `<%= expressURL %>/getarchiveitems?feedId=${app.activeFeed.feedId}&allItems=true&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
                     method: 'GET'    
                   }).done(archiveMessage => {
-                    
-                    const newRows = archiveMessage.items.map(fi => convertFeedItemToTableRow(fi)).join('');
+                    const itemCount = archiveMessage.itemCount;
 
-                    $('#feedSummaryTable').append(newRows);
+                    if (itemCount > 0) initItems(archiveMessage.items);
+                    else {
+                      
+                      $.ajax({
+                        url: `<%= expressURL %>/checkitemexistsafterdate?date=${startDate.toISOString()}&feedId=${app.activeFeed.feedId}`,
+                        method: 'GET'    
+                      }).done(itemExistResult => {
 
-                    app.activeFeed.feedQryStartDate = startDate;
+                        if (itemExistResult.itemsAvailable) {
+                          const startDate = new Date(itemExistResult.nextDate);
+                          
+                          startDate.setHours(0);
+                          startDate.setMinutes(0);
+                          startDate.setSeconds(0);
+                          
+                          $.ajax({
+                            url: `<%= expressURL %>/getarchiveitems?feedId=${app.activeFeed.feedId}&allItems=true&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+                            method: 'GET'    
+                          }).done(archiveMessage => initItems(archiveMessage.items));
 
-                    $('#feedStartTime').text(moment(startDate).format('L'))
-                    $('#feedEndTime').text(moment(app.activeFeed.feedQryEndDate).format('L'))
+                        }
+                        else $('#tableFooter').css('display', 'none');
+                        
+                    });
+
+                    }
 
                 });
             }
