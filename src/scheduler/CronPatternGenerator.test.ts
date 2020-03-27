@@ -16,33 +16,38 @@ describe('CronPatternGenerator', () => {
 
         it('should generate minutes pattern correctly', () => {
             const duration : Duration = { unit : TimeUnit.MINUTES, value : 2 };
+            const date = new Date();
+
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('*/2 * * * *');
+            expect(pattern).toEqual(`${date.getSeconds()} */2 * * * *`);
             expect(validate(pattern)).toBe(true);
         });
 
         it('should generate hours pattern correctly', () => {
             const duration : Duration = { unit : TimeUnit.HOURS, value : 1 };
+            const date = new Date();
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* */1 * * *');
+            expect(pattern).toEqual(`${date.getSeconds()} ${date.getMinutes()} */1 * * *`);
             expect(validate(pattern)).toBe(true);
         });
 
         it('should generate days pattern correctly', () => {
             const duration : Duration = { unit : TimeUnit.DAYS, value : 1 };
+            const date = new Date();
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* * */1 * *');
+            expect(pattern).toEqual(`${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} */1 * *`);
             expect(validate(pattern)).toBe(true);
         });
 
         it('should generate months pattern correctly', () => {
             const duration : Duration = { unit : TimeUnit.MONTHS, value : 1 };
+            const date = new Date();
             const pattern = generateCronPattern(duration);
 
-            expect(pattern).toEqual('* * * */1 *');
+            expect(pattern).toEqual(`${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ${date.getDate()} */1 *`);
             expect(validate(pattern)).toBe(true);
         });
 
