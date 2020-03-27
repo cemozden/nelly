@@ -241,6 +241,42 @@
               $('#mediaImage').css('display', 'block');
             });
 
+            $('body').on('click', '#btnAddNewFeed', () => {
+                const feedName = $('#txtFeedName').val();
+                const url = $('#txtFeedURL').val();
+                const value = $('#txtValue').val();
+                const unit = $('#cmbUnit').val();
+                const enabled = $('#chbEnabled').prop('checked');
+
+                const fetchPeriod = { unit, value };
+
+                $.ajax({
+                    url: `<%= expressURL %>/addfeed?categoryId=root&name=${feedName}&url=${url}&fetchPeriod=${JSON.stringify(fetchPeriod)}&enabled=${enabled}`,
+                    method: 'GET'
+                  }).done(addFeedResult => {
+                   app.feeds = addFeedResult.feeds.sort((a, b) => a.name.localeCompare(b.name)); 
+
+                   $.ajax({
+                    url: '<%= expressURL %>/getunreadfeeditemcount',
+                    method: 'GET'
+                  }).done(unreadFeedItemStatistics => {
+                      app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
+                      unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                      $('#feed-menu').html('');
+                      app.feeds.forEach(feed => addFeedToMenuItem(feed));
+                      $('#nellyModal').modal('hide');
+                  });
+
+
+                }).fail(failMessageResponse => {
+                  const failMessage = failMessageResponse.responseJSON;
+
+                  alert(`An error occured while trying to add a new feed!\n${failMessage.message}`);
+                }); 
+
+
+            });
+
             $("#feedContent").scroll(() => {
               
               const scrollTop = $('#feedContent').prop('scrollTop');
