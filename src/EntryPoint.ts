@@ -70,7 +70,7 @@ initAPIs(exp, configManager, feedScheduler);
 console.log('Initialization completed.');
 
 console.log('Initializing ExpressJS Routes..');
-initRoutes(exp, expressURL, systemLocale, configManager.getFeedConfigManager());
+initRoutes(exp, expressURL, systemLocale, configManager.getFeedConfigManager(), configManager.getSettingsManager());
 console.log('Initialization completed.');
 
 const numberOfCleanedItems = feedItemArchiveService.cleanFeedItems(systemSettings.archiveCleaningPeriod);

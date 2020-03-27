@@ -1,0 +1,47 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="addNewFeedTitle">System Settings</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+        <div class="form-group">
+          <label for="txtLanguage" class="col-form-label">Language:</label>
+          <input type="text" class="form-control" value="<%= systemSettings.language %>" id="txtLanguage" readonly />
+          <small class="form-text text-muted">Currently, Nelly doesn't have language support. Will be added in the upcoming releases.</small>
+        </div>
+        <div class="form-group">
+          <label for="txtServerPort" class="col-form-label">Server Port:</label>
+          <input type="text" class="form-control" value="<%= systemSettings.serverPort %>" id="txtServerPort" />
+          <small class="form-text text-muted">The port number which Nelly serves its user interface.</small>
+        </div>
+        <div class="form-group">
+            <label for="value" class="col-form-label">Archive Cleaning Period:</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <div style="width: 20%;" class="col-xs-12"><input type="text" class="form-control" value="<%= systemSettings.archiveCleaningPeriod.value %>" id="txtValue" /></div>
+                    <div class="col-xs-6">
+                        <select class="custom-select" id="cmbUnit">
+                            <option value="0" <%= systemSettings.archiveCleaningPeriod.unit == 0 ? 'selected' : '' %>>Seconds</option>
+                            <option value="1" <%= systemSettings.archiveCleaningPeriod.unit == 1 ? 'selected' : '' %>>Minutes</option>
+                            <option value="2" <%= systemSettings.archiveCleaningPeriod.unit == 2 ? 'selected' : '' %>>Hours</option>
+                            <option value="3" <%= systemSettings.archiveCleaningPeriod.unit == 3 ? 'selected' : '' %>>Days</option>
+                            <option value="4" <%= systemSettings.archiveCleaningPeriod.unit == 4 ? 'selected' : '' %>>Months</option>
+                        </select>
+                    </div>
+                </div>
+            <small class="form-text text-muted">All feeds which are older than above time period will be permanently deleted.</small>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txtSystemLocale" class="col-form-label">System Locale:</label>
+            <input type="text" class="form-control" value="<%= systemSettings.systemLocale %>" id="txtSystemLocale" />
+            <small class="form-text text-muted">The locale information for Nelly. This information is used to identify how to format date and time.</small>
+          </div>
+      </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button type="button" id="btnUpdateSettings" class="btn btn-primary">Update Settings</button>
+</div>

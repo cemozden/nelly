@@ -13,7 +13,7 @@ import general_logger from "../utils/Logger";
  */
 export default class JSONSettingsManager implements SettingsManager {
     
-    private readonly SYSTEM_SETTINGS : SystemSettings;
+    private SYSTEM_SETTINGS : SystemSettings;
     private readonly SETTINGS_FILE_PATH : string;
     private readonly SETTINGS_FILE_NAME : string = 'settings.json';
     private readonly LOG_LABEL : string = 'SettingsManager';
@@ -44,8 +44,9 @@ export default class JSONSettingsManager implements SettingsManager {
             writeFile(this.SETTINGS_FILE_PATH, JSON.stringify(newSettings), err => {
                 if (err) reject(err);
                 else {
-                    resolve(true);
                     general_logger.info(`[${this.LOG_LABEL}] Settings saved. New Settings ${JSON.stringify(newSettings)}`);
+                    this.SYSTEM_SETTINGS = newSettings;
+                    resolve(true);
                 }
             });
         });

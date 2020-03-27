@@ -236,6 +236,19 @@
 
             });
 
+            $('#settings').click(() => {
+
+              $.ajax({
+                    url: `<%= expressURL %>/settings`,
+                    method: 'GET'
+                  }).done(form => {
+                    $('#modal-content').html(form);
+                    $('#nellyModal').modal('show');                    
+                }); 
+
+              });
+
+
             $('body').on('click', '#updateFeed', () => {
               $.ajax({
                     url: `<%= expressURL %>/updatefeed_dialog?feedId=${app.activeFeed.feedId}`,
@@ -371,6 +384,38 @@
 
             });
 
+            $('body').on('click', '#btnUpdateSettings', () => {
+
+                const serverPort = parseInt($('#txtServerPort').val());
+                const value = parseInt($('#txtValue').val());
+                const unit = parseInt($('#cmbUnit').val());
+                const systemLocale = $('#txtSystemLocale').val();
+
+                const fetchPeriod = { unit, value };
+
+                $.ajax({
+                    url: `<%= expressURL %>/updatesettings?serverPort=${serverPort}&archiveCleaningPeriod=${JSON.stringify(fetchPeriod)}&systemLocale=${systemLocale}`,
+                    method: 'GET'
+                  }).done(updatedSettings => {
+                    $('#nellyModal').modal('hide');
+                    if (updatedSettings.portUpdated) {
+                      $('#systemError').html(`<strong>WARNING:</strong> Nelly Server port is updated! <strong>Application will be restarted in 15 seconds.</strong>\nFrom now, You should access the application via <strong>"http://localhost:${updatedSettings.settings.serverPort}/"</strong>`);
+                      $('#systemError').css('display', 'block');
+                    }
+                    else if(updatedSettings.localeUpdated) {
+                      $('#systemError').html(`<strong>WARNING:</strong> Nelly Server locale is updated! <strong>Application will be restarted in 15 seconds.</strong>\nFrom now, You'll be using <strong>"${updatedSettings.settings.systemLocale}"</strong> locale settings.`);
+                      $('#systemError').css('display', 'block');
+                    }
+
+                }).fail(failMessageResponse => {
+                  const failMessage = failMessageResponse.responseJSON;
+
+                  alert(`An error occured while trying to update the feed!\n${failMessage.message}`);
+                }); 
+
+
+            });
+
             $("#feedContent").scroll(() => {
               
               const scrollTop = $('#feedContent').prop('scrollTop');
@@ -395,7 +440,7 @@
                 <div class="top-right">
                   <p>Last Time Updated: <span id="lastTimeUpdated">Not yet updated</span></p>
                   <p>Last Updated Feed: <span id="lastUpdatedFeed">Not yet updated</span></p>
-                  <p><a href="#" id="addNewFeed">Add New Feed</a> | <a href="#">Settings</a></p>
+                  <p><a href="#" id="addNewFeed">Add New Feed</a> | <a id="settings" href="#">Settings</a></p>
                 </div>
             </div>
             <div class="sidebar">
