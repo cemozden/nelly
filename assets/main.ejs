@@ -7,6 +7,7 @@
         <link rel="stylesheet" type="text/css" href="css/main.css">
         <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
         <script type="text/javascript" src="js/moment-with-locales.js"></script>
+        <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
           const app = {
@@ -222,6 +223,18 @@
 
             $('body').on('click', '#loadMore', () => loadMoreItems());
             $('body').on('click', '#backToFeeds', () => loadItems(app.activeFeed.feedId));
+            
+            $('#addNewFeed').click(() => {
+
+              $.ajax({
+                    url: `<%= expressURL %>/addnewfeed_dialog`,
+                    method: 'GET'
+                  }).done(form => {
+                    $('#modal-content').html(form);
+                    $('#nellyModal').modal('show');                    
+                }); 
+
+            });
 
             $('body').on('click', '#showEntryImage', () => {
               $('#showEntryImage').css('display', 'none');
@@ -252,7 +265,7 @@
                 <div class="top-right">
                   <p>Last Time Updated: <span id="lastTimeUpdated">Not yet updated</span></p>
                   <p>Last Updated Feed: <span id="lastUpdatedFeed">Not yet updated</span></p>
-                  <p><a href="#">Add New Feed</a> | <a href="#">Settings</a></p>
+                  <p><a href="#" id="addNewFeed">Add New Feed</a> | <a href="#">Settings</a></p>
                 </div>
             </div>
             <div class="sidebar">
@@ -269,6 +282,13 @@
 
               </div>
             </div>
+        </div>
+        <div class="modal fade" id="nellyModal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div id="modal-content" class="modal-content">
+              
+            </div>
+          </div>
         </div>
     </body>
 </html>

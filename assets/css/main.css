@@ -26,6 +26,10 @@ a {
     color: #465faf;
 }
 
+label {
+    font-size: 16px;
+}
+
 a:visited {
     color:#718d99;
 }
@@ -338,11 +342,11 @@ a:hover {
 .content .content-navigation {
     height: 40px;
     border-bottom: 1px solid #151515;
-    padding-left: 5px;
+    padding: 5px;
 }
 
 .content .content-navigation button {
-    height: 39px;
+    height: 30px;
     color: #FFFFFF;
     padding: 0 10px 0 10px;
     background-color: #151515;

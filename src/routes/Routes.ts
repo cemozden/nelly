@@ -2,6 +2,7 @@ import Express from "express";
 import Index from "./Index";
 import FeedContent from "./FeedContent";
 import FeedDetails from "./FeedDetails";
+import Dialogs from "./Dialogs";
 
 export interface ExpressSettings {
    expressObject : Express.Application,
@@ -17,4 +18,5 @@ export default function initRoutes(exp : Express.Application, expressURL : strin
         Index(expressSettings, systemLocale);
         FeedContent(expressSettings, systemLocale);
         FeedDetails(expressSettings, systemLocale);
+        Dialogs(expressSettings);
 }
