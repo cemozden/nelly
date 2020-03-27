@@ -69,7 +69,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
             return;
         }
 
-        if (fetchPeriod === undefined || fetchPeriod.unit === undefined || fetchPeriod.value === undefined) {
+        if (fetchPeriod === undefined || fetchPeriod.unit === undefined || fetchPeriod.value === undefined || isNaN(fetchPeriod.value)) {
             const errorMessage =  'Fetch period is not valid! Please provide a valid fetch period to add a new feed.';
             
             res.status(400).json({ added : false, message : errorMessage });

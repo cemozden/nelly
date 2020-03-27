@@ -66,7 +66,7 @@ initAPIs(exp, configManager, feedScheduler);
 console.log('Initialization completed.');
 
 console.log('Initializing ExpressJS Routes..');
-initRoutes(exp, expressURL, systemLocale);
+initRoutes(exp, expressURL, systemLocale, configManager.getFeedConfigManager());
 console.log('Initialization completed.');
 
 const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();

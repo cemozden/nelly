@@ -4,9 +4,13 @@
     <% }%><span class="title"><%= feedInfo.title %></span><br />
     <span class="attribute"><%= feedInfo.description %></span><br />
     <span class="attribute"><a href="<%= feedInfo.link %>" target="_blank"><%= feedInfo.link %></a></span><br />
-    <span class="attribute">RSS Version: <%= rssVersion %></span><br />
+    <span class="attribute">RSS Version: <%= rssVersion %></span><br /><br />
+    <div >
+      <button type="button" class="btn btn-primary btn-sm" id="updateFeed">Update this Feed</button>
+      <button type="button" class="btn btn-danger btn-sm" id="deleteFeed">Delete this Feed</button>
+    </div>
     <div class="tableInfo">
-      Presenting feed items between <span id="feedStartTime"><%= moment(queryStartDate).format('L') %></span> - <span id="feedEndTime"><%= moment(queryEndDate).format('L') %></span><br />
+      Presenting feeds between <span id="feedStartTime"><%= moment(queryStartDate).format('L') %></span> - <span id="feedEndTime"><%= moment(queryEndDate).format('L') %></span><br />
     </div>
 </div>
 <table id="feedSummaryTable" class="feed-summary-table">

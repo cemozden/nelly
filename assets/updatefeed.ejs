@@ -1,0 +1,48 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="addNewFeedTitle">Update <%= feedConfig.name %></h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+        <div class="form-group">
+          <label for="feedName" class="col-form-label">Feed Name:</label>
+          <input type="text" class="form-control" value="<%= feedConfig.name %>" id="txtFeedName" />
+          <small id="emailHelp" class="form-text text-muted">A friendly name to recognize your RSS feed.</small>
+        </div>
+        <div class="form-group">
+          <label for="url" class="col-form-label">Feed URL:</label>
+          <input type="text" class="form-control" value="<%= feedConfig.url %>" id="txtFeedURL" />
+          <small id="emailHelp" class="form-text text-muted">The URL of the RSS feed source where Nelly will fetch the data.</small>
+        </div>
+        <div class="form-group">
+            <label for="value" class="col-form-label">Fetching Period:</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <div style="width: 20%;" class="col-xs-12"><input type="text" class="form-control" value="<%= feedConfig.fetchPeriod.value %>" id="txtValue" /></div>
+                    <div class="col-xs-6">
+                        <select class="custom-select" id="cmbUnit">
+                            <option value="0" <%= feedConfig.fetchPeriod.unit == 0 ? 'selected' : '' %>>Seconds</option>
+                            <option value="1" <%= feedConfig.fetchPeriod.unit == 1 ? 'selected' : '' %>>Minutes</option>
+                            <option value="2" <%= feedConfig.fetchPeriod.unit == 2 ? 'selected' : '' %>>Hours</option>
+                            <option value="3" <%= feedConfig.fetchPeriod.unit == 3 ? 'selected' : '' %>>Days</option>
+                            <option value="4" <%= feedConfig.fetchPeriod.unit == 4 ? 'selected' : '' %>>Months</option>
+                        </select>
+                    </div>
+                </div>
+            <small id="emailHelp" class="form-text text-muted">This is the fetching period that tells Nelly when to fetch the feeds.</small>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>Feed Enabled?: <input type="checkbox" id="chbEnabled" <%= feedConfig.enabled ? 'checked' : '' %> /></label>
+                <small id="emailHelp" class="form-text text-muted">If the feed is not enabled, then Nelly will not fetch for any new feeds.</small>
+            </div>
+        </div>
+      </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button type="button" id="btnUpdateFeed" class="btn btn-primary">Update Feed</button>
+</div>
