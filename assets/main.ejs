@@ -246,6 +246,16 @@
                 }); 
             });
 
+            $('body').on('click', '#deleteFeed', () => {
+              $.ajax({
+                    url: `<%= expressURL %>/deletefeed_dialog?feedId=${app.activeFeed.feedId}`,
+                    method: 'GET'
+                  }).done(form => {
+                    $('#modal-content').html(form);
+                    $('#nellyModal').modal('show');                    
+                }); 
+            });
+
             $('body').on('click', '#showEntryImage', () => {
               $('#showEntryImage').css('display', 'none');
               $('#mediaImage').css('display', 'block');
@@ -282,6 +292,44 @@
                   const failMessage = failMessageResponse.responseJSON;
 
                   alert(`An error occured while trying to add a new feed!\n${failMessage.message}`);
+                }); 
+
+
+            });
+
+            $('body').on('click', '#btnDeleteFeed', () => {
+                
+                $.ajax({
+                    url: `<%= expressURL %>/deletefeed?feedId=${app.activeFeed.feedId}`,
+                    method: 'GET'
+                  }).done(addFeedResult => {
+                   app.feeds = addFeedResult.feeds.sort((a, b) => a.name.localeCompare(b.name)); 
+
+                   $.ajax({
+                    url: '<%= expressURL %>/getunreadfeeditemcount',
+                    method: 'GET'
+                  }).done(unreadFeedItemStatistics => {
+
+                    app.activeFeed = {
+                      feedId : null,
+                      feedQryStartDate : new Date(),
+                      feedQryEndDate : new Date()
+                    };
+
+                      app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
+                      unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                      
+                      $('#feed-menu').html('');
+                      app.feeds.forEach(feed => addFeedToMenuItem(feed));
+                      $('#dynamic-content').html('');
+                      $('#nellyModal').modal('hide');
+                  });
+
+
+                }).fail(failMessageResponse => {
+                  const failMessage = failMessageResponse.responseJSON;
+
+                  alert(`An error occured while trying to delete the feed!\n${failMessage.message}`);
                 }); 
 
 
