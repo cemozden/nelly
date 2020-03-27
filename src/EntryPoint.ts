@@ -15,6 +15,9 @@ import initAPIs from "./api/APIs";
 import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
 import initRoutes from "./routes/Routes";
+import { FeedItemArchiveService } from "./archive/FeedItemArchiveService";
+import SQLiteFeedItemArchiveService from "./archive/SQLiteFeedItemArchiveService";
+import { TimeUnit } from "./time/TimeUnit";
 
 console.log(`Nelly RSS Feeder, Version: ${process.env.npm_package_version}`);
 general_logger.info('[Nelly] Application started.');
@@ -60,6 +63,7 @@ exp.set('view engine', 'ejs');
 exp.set('views', ASSETS_PATH);
 
 const feedScheduler : FeedScheduler = new CronFeedScheduler();
+const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
 
 console.log('Initializing APIs..');
 initAPIs(exp, configManager, feedScheduler);
@@ -69,8 +73,12 @@ console.log('Initializing ExpressJS Routes..');
 initRoutes(exp, expressURL, systemLocale, configManager.getFeedConfigManager());
 console.log('Initialization completed.');
 
-const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
+const numberOfCleanedItems = feedItemArchiveService.cleanFeedItems(systemSettings.archiveCleaningPeriod);
+const archiveCleaningMessage = `${numberOfCleanedItems} item(s) cleaned from archive due to archive cleaning period. Archive Cleaning Period: ${systemSettings.archiveCleaningPeriod.value} ${TimeUnit[systemSettings.archiveCleaningPeriod.unit]}`;
+console.log(archiveCleaningMessage);
+general_logger.info(archiveCleaningMessage);
 
+const feedConfigs = configManager.getFeedConfigManager().getFeedConfigs();
 feedConfigs.forEach(fc => feedScheduler.addFeedToSchedule(fc));
 
 httpServerInstance.listen(serverPort, () => {
