@@ -9,12 +9,12 @@
         <div class="form-group">
           <label for="feedName" class="col-form-label">Feed Name:</label>
           <input type="text" class="form-control" placeholder="My Personal RSS Feed" id="txtFeedName" />
-          <small id="emailHelp" class="form-text text-muted">A friendly name to recognize your RSS feed.</small>
+          <small class="form-text text-muted">A friendly name to recognize your RSS feed.</small>
         </div>
         <div class="form-group">
           <label for="url" class="col-form-label">Feed URL:</label>
           <input type="text" class="form-control" placeholder="http://example.com/rss.xml" id="txtFeedURL" />
-          <small id="emailHelp" class="form-text text-muted">The URL of the RSS feed source where Nelly will fetch the data.</small>
+          <small class="form-text text-muted">The URL of the RSS feed source where Nelly will fetch the data.</small>
         </div>
         <div class="form-group">
             <label for="value" class="col-form-label">Fetching Period:</label>
@@ -31,15 +31,21 @@
                         </select>
                     </div>
                 </div>
-            <small id="emailHelp" class="form-text text-muted">This is the fetching period that tells Nelly when to fetch the feeds.</small>
+            <small class="form-text text-muted">This is the fetching period that tells Nelly when to fetch the feeds.</small>
             </div>
         </div>
         <div class="form-group">
             <div class="checkbox">
                 <label>Feed Enabled?: <input type="checkbox" id="chbEnabled" value="" checked /></label>
-                <small id="emailHelp" class="form-text text-muted">If the feed is not enabled, then Nelly will not fetch for any new feeds.</small>
+                <small class="form-text text-muted">If the feed is not enabled, then Nelly will not fetch for any new feeds.</small>
             </div>
         </div>
+        <div class="form-group">
+          <div class="checkbox">
+              <label>Notify Me?: <input type="checkbox" id="chbNotifyUser" value="" /></label>
+              <small class="form-text text-muted">If you want to be notified in case of new feeds. You can check this option. (Note: Notification must be allowed by user in order to receive new feeds Notifications)</small>
+          </div>
+      </div>
       </form>
   </div>
   <div class="modal-footer">

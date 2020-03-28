@@ -10,7 +10,8 @@ describe('FeedCollector', () => {
             feedConfigId : '123456789',
             fetchPeriod : {unit : TimeUnit.SECONDS, value : 30},
             name : 'Gizmodo',
-            url : 'https://gizmodo.com/rss'
+            url : 'https://gizmodo.com/rss',
+            notifyUser : false
         };
 
         it('should reject with an error if no internet connection is available', () => {  

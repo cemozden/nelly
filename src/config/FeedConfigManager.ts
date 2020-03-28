@@ -10,7 +10,8 @@ export interface FeedConfig {
     url : string,
     fetchPeriod : Duration,
     iconURL? : string,
-    enabled : boolean
+    enabled : boolean,
+    notifyUser : boolean
 }
 
 /** Mandatory feed config parameters to be checked during runtime.

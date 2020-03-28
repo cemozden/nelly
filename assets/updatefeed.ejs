@@ -40,6 +40,12 @@
                 <small id="emailHelp" class="form-text text-muted">If the feed is not enabled, then Nelly will not fetch for any new feeds.</small>
             </div>
         </div>
+        <div class="form-group">
+          <div class="checkbox">
+              <label>Notify Me?: <input type="checkbox" id="chbNotifyUser" <%= feedConfig.notifyUser ? 'checked' : '' %> /></label>
+              <small class="form-text text-muted">If you want to be notified in case of new feeds. You can check this option. (Note: Notification must be allowed by user in order to receive new feeds Notifications)</small>
+          </div>
+      </div>
       </form>
   </div>
   <div class="modal-footer">

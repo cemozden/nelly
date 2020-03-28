@@ -29,6 +29,9 @@
 
             socket.on('connect', () => {
               $('#systemError').css('display', 'none');
+
+              if (window.Notification !== undefined && Notification.permission === 'default') $('#notification-alert').slideDown('slow');
+
               $('#feed-menu').html('');
               $('#dynamic-content').html(`<div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
                 <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
@@ -64,11 +67,44 @@
             });
 
             socket.on('feedUpdate', obj => {
+              const feedConfig = app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0];
+              const numOfItemsReceived = obj.items.length;
+              
               $('#lastTimeUpdated').text(formatDateTime(new Date()));
-              $('#lastUpdatedFeed').text(app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0].name);
+              $('#lastUpdatedFeed').text(feedConfig.name);
 
-              app.unreadFeedItems.set(obj.feedId, app.unreadFeedItems.get(obj.feedId) + obj.items.length);
+              app.unreadFeedItems.set(obj.feedId, app.unreadFeedItems.get(obj.feedId) + numOfItemsReceived);
               $(`#${obj.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0]));
+
+              // If Notifications are granted then send notifications to the user..
+              if(Notification.permission === 'granted' && feedConfig.notifyUser) {
+                
+                const bodyMessage =  numOfItemsReceived !== 1 ? `${numOfItemsReceived} feeds received recently!` : `1 feed received recently!`;
+                
+                const newFeedNotification = new Notification(`New feeds received for ${feedConfig.name}`, {
+                    body : bodyMessage,
+                    icon: '/img/rss-icon.png'
+                });
+
+                newFeedNotification.onclick = () => {
+                  if (numOfItemsReceived === 1) {
+                    const itemId = obj.items[0].itemId;
+
+                    $.ajax({
+                        url: `<%= expressURL %>/feeddetails?itemId=${itemId}`,
+                        method: 'POST'    
+                      }).done(feedDetails => {
+                        $('#dynamic-content').html(feedDetails.html);
+
+                        if (!feedDetails.itemAlreadyRead) {
+                          app.unreadFeedItems.set(app.activeFeed.feedId, app.unreadFeedItems.get(app.activeFeed.feedId) - 1);
+                          $(`#${app.activeFeed.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === app.activeFeed.feedId)[0]));
+                        }
+
+                    });    
+                  }
+                };
+              }
 
               // If the feed sent is not the active feed, then don't update the table.
               if (app.activeFeed.feedId !== obj.feedId) return;
@@ -280,11 +316,12 @@
                 const value = parseInt($('#txtValue').val());
                 const unit = parseInt($('#cmbUnit').val());
                 const enabled = $('#chbEnabled').prop('checked');
+                const notifyUser = $('#chbNotifyUser').prop('checked');
 
                 const fetchPeriod = { unit, value };
 
                 $.ajax({
-                    url: `<%= expressURL %>/addfeed?categoryId=root&name=${feedName}&url=${url}&fetchPeriod=${JSON.stringify(fetchPeriod)}&enabled=${enabled}`,
+                    url: `<%= expressURL %>/addfeed?categoryId=root&name=${feedName}&url=${url}&fetchPeriod=${JSON.stringify(fetchPeriod)}&enabled=${enabled}&notifyUser=${notifyUser}`,
                     method: 'GET'
                   }).done(addFeedResult => {
                    app.feeds = addFeedResult.feeds.sort((a, b) => a.name.localeCompare(b.name)); 
@@ -354,11 +391,12 @@
                 const value = parseInt($('#txtValue').val());
                 const unit = parseInt($('#cmbUnit').val());
                 const enabled = $('#chbEnabled').prop('checked');
+                const notifyUser = $('#chbNotifyUser').prop('checked');
 
                 const fetchPeriod = { unit, value };
 
                 $.ajax({
-                    url: `<%= expressURL %>/updatefeed?categoryId=root&name=${feedName}&url=${url}&fetchPeriod=${JSON.stringify(fetchPeriod)}&enabled=${enabled}&feedId=${app.activeFeed.feedId}`,
+                    url: `<%= expressURL %>/updatefeed?categoryId=root&name=${feedName}&url=${url}&fetchPeriod=${JSON.stringify(fetchPeriod)}&enabled=${enabled}&feedId=${app.activeFeed.feedId}&notifyUser=${notifyUser}`,
                     method: 'GET'
                   }).done(addFeedResult => {
                    app.feeds = addFeedResult.feeds.sort((a, b) => a.name.localeCompare(b.name)); 
@@ -382,6 +420,14 @@
                 }); 
 
 
+            });
+
+            $('#btnAskNotification').click(() => {
+              if (window.Notification !== undefined && Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'denied' || permission === 'granted') $('#notification-alert').slideUp('slow');
+                });
+              }
             });
 
             $('body').on('click', '#btnUpdateSettings', () => {
@@ -450,6 +496,12 @@
               <div id="feed-menu" class="sidebar-menu"></div>
             </div>
             <div id="feedContent" class="content">
+              <div id="notification-alert" style="display: none;" class="alert alert-primary system-notification" role="alert">
+                <h4 class="alert-heading">Notifications, better way to follow up feeds.</h4>
+                <p>Notifications allow you to be informed when an important feed of yours is updated. In order to activate it, Please allow this page to send notifications.</p>
+                <hr>
+                <button id="btnAskNotification" class="btn btn-primary">Activate Now!</button>
+              </div>
               <div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
                 <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
               </div>

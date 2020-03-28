@@ -31,6 +31,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
      * fetchPeriod: object
      * iconUrl : string (optional)
      * enabled : boolean
+     * notifyUser : boolean 
      *  */ 
     express.get('/addfeed', async (req, res) => {
         const params = req.query;
@@ -41,6 +42,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         const fetchPeriod : Duration = params.fetchPeriod !== undefined ? JSON.parse(params.fetchPeriod) : {};
         const enabled = params.enabled !== undefined && params.enabled === 'true';
         const iconURL = params.iconURL !== undefined ? params.iconURL : '';
+        const notifyUser = params.notifyUser !== undefined && params.notifyUser === 'true';
 
         if (categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Category id is not a valid id! Please provide a valid id to add a new feed.';
@@ -87,7 +89,8 @@ export default function FeedAPI(express : Express.Application, configManager : C
             fetchPeriod : fetchPeriod,
             name : name,
             url : url,
-            iconURL : iconURL
+            iconURL : iconURL,
+            notifyUser
         };
 
         try {
@@ -121,6 +124,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
         const url = params.url;
         const fetchPeriod : Duration = params.fetchPeriod !== undefined ? JSON.parse(params.fetchPeriod) : {};
         const enabled = params.enabled !== undefined && params.enabled === 'true';
+        const notifyUser = params.notifyUser !== undefined && params.notifyUser === 'true';
         const iconURL = params.iconURL !== undefined ? params.iconURL : '';
 
         if (feedId === undefined || feedId.length === 0) {
@@ -178,7 +182,8 @@ export default function FeedAPI(express : Express.Application, configManager : C
             fetchPeriod : fetchPeriod,
             name : name,
             url : url,
-            iconURL : iconURL
+            iconURL : iconURL,
+            notifyUser
         };
 
         try {

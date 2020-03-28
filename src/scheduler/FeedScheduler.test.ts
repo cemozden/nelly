@@ -16,7 +16,8 @@ describe('FeedScheduler', () => {
                     feedConfigId : '123456789',
                     fetchPeriod : { unit : TimeUnit.MINUTES, value : 5},
                     name : 'Test Config',
-                    url : 'https://example.com'
+                    url : 'https://example.com',
+                    notifyUser : false
                 };
 
                 scheduler.addFeedToSchedule(feedConfig);
@@ -34,7 +35,8 @@ describe('FeedScheduler', () => {
                     feedConfigId : '123456789',
                     fetchPeriod : { unit : TimeUnit.MINUTES, value : 5},
                     name : 'Test Config',
-                    url : 'https://example.com'
+                    url : 'https://example.com',
+                    notifyUser : false
                 };
 
                 scheduler.addFeedToSchedule(feedConfig);
@@ -81,7 +83,8 @@ describe('FeedScheduler', () => {
                     feedConfigId : '123456789',
                     fetchPeriod : { unit : TimeUnit.MINUTES, value : 5},
                     name : 'Test Config',
-                    url : 'https://example.com'
+                    url : 'https://example.com',
+                    notifyUser : false
                 };
 
                 scheduler.addFeedToSchedule(feedConfig);

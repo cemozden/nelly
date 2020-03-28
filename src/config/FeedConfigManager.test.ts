@@ -51,7 +51,8 @@ describe('FeedManager', () => {
                     feedConfigId : feedId,
                     fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                     name : 'Test Feed',
-                    url : 'https://examplea.com'
+                    url : 'https://examplea.com',
+                    notifyUser : false
                 };
 
                 const feedConfig2 : FeedConfig = {
@@ -60,7 +61,8 @@ describe('FeedManager', () => {
                     feedConfigId : feedId,
                     fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                     name : 'Test Feed',
-                    url : 'https://exampleb.com'
+                    url : 'https://exampleb.com',
+                    notifyUser : false
                 };
 
                 writeFileSync(`${tmpFeedsFolder}${sep}${feedId}.json`, JSON.stringify(feedConfig1));
@@ -82,7 +84,8 @@ describe('FeedManager', () => {
                 feedConfigId : feedId,
                 fetchPeriod : {value : 5, unit : TimeUnit.MINUTES},
                 name : 'Test Feed',
-                url : 'https://examplec.com'
+                url : 'https://examplec.com',
+                notifyUser : false
             };
 
             if (!existsSync(tmpFeedsFolder)) 
@@ -125,7 +128,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example3.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
                 const addFeedPromise = feedConfigManager.addFeedConfig(feedConfig);
@@ -148,7 +152,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example1.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
                 const firstFeedAdded = await feedConfigManager.addFeedConfig(feedConfig);
@@ -167,7 +172,8 @@ describe('FeedManager', () => {
                     feedConfigId : feedConfigId,
                     fetchPeriod : {unit : TimeUnit.MINUTES, value : 5},
                     name : 'Test',
-                    url : 'https://example2.com'
+                    url : 'https://example2.com',
+                    notifyUser : false
                 };
 
                 return expect(feedConfigManager.addFeedConfig(feedConfig)).rejects.toThrowError(new InvalidFeedCategoryIdError(`The given category id "${feedConfig.categoryId}" does not exist!`));
@@ -186,7 +192,8 @@ describe('FeedManager', () => {
                     feedConfigId : feedConfigId,
                     fetchPeriod : {unit : TimeUnit.MINUTES, value : 5},
                     name : 'Test',
-                    url : 'https://axample.com'
+                    url : 'https://axample.com',
+                    notifyUser : false
                 };
 
                 const feedConfigAdded = await feedConfigManager.addFeedConfig(feedConfig);
@@ -198,7 +205,8 @@ describe('FeedManager', () => {
                     feedConfigId : feedConfigId2,
                     fetchPeriod : {unit : TimeUnit.MINUTES, value : 5},
                     name : 'Test',
-                    url : 'https://axample.com'
+                    url : 'https://axample.com',
+                    notifyUser : false
                 };
 
 
@@ -217,7 +225,8 @@ describe('FeedManager', () => {
                     feedConfigId : feedConfigId,
                     fetchPeriod : ({} as Duration),
                     name : 'Test',
-                    url : 'https://bxample.com'
+                    url : 'https://bxample.com',
+                    notifyUser : false
                 };
 
                 return expect(feedConfigManager.addFeedConfig(feedConfig)).rejects.toThrowError(`The given Fetch Period "${JSON.stringify(feedConfig.fetchPeriod)}" is not a valid fetch period!!`);
@@ -234,7 +243,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example4.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
                 const feedConfigCount = feedConfigManager.getFeedConfigCount();
@@ -266,7 +276,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example5.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
                 const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAdded);
@@ -285,7 +296,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example6.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
                 const feedToBeAddedUpdated : FeedConfig = {
@@ -294,7 +306,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example7.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
                 const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAdded);
@@ -313,7 +326,8 @@ describe('FeedManager', () => {
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
                 url : 'https://example8.com',
-                enabled : true
+                enabled : true,
+                notifyUser : false
             };
             
             const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAddedUpdated);
@@ -338,7 +352,8 @@ describe('FeedManager', () => {
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
                 url : 'https://example9.com',
-                enabled : true
+                enabled : true,
+                notifyUser : false
             };
             
             const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAddedUpdated);
@@ -371,7 +386,8 @@ describe('FeedManager', () => {
                     fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                     name : 'Example RSS FeedConfig',
                     url : 'https://example10.com',
-                    enabled : true
+                    enabled : true,
+                    notifyUser : false
                 };
 
             const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAdded);
@@ -392,7 +408,8 @@ describe('FeedManager', () => {
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
                 url : 'https://example11.com',
-                enabled : true
+                enabled : true,
+                notifyUser : false
             };
             
             const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAddedDeleted);
@@ -414,7 +431,8 @@ describe('FeedManager', () => {
                 fetchPeriod : { value : 1, unit : TimeUnit.MINUTES },
                 name : 'Example RSS FeedConfig',
                 url : 'https://example12.com',
-                enabled : true
+                enabled : true,
+                notifyUser : false
             };
             
             const feedConfigAdded = await feedConfigManager.addFeedConfig(feedToBeAddedDeleted);
