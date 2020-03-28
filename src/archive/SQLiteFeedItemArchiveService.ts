@@ -13,7 +13,6 @@ import { TimeUnit } from "../time/TimeUnit";
  */
 export default class SQLiteFeedItemArchiveService implements FeedItemArchiveService {
     
-    
     private readonly itemIdColumn = 'itemId';
     private readonly feedIdColumn = 'feedId';
     private readonly feedItemTableColumns = 'itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt';
@@ -217,9 +216,16 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
 
         return undefined;
     }
+
     setFeedItemRead(itemRead: boolean, itemId: string): void {
         const qry = `UPDATE ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} SET itemRead = ? WHERE itemId LIKE ?`;
         SQLiteDatabase.getDatabaseInstance().prepare(qry).run([itemRead ? 'Y' : 'N', itemId]);
+    }
+
+    setFeedItemsRead(itemRead: boolean, itemIds: string[]): void {
+        const sqlInCondition = itemIds.map(id => `'${id}'`).join(', ')
+        const qry = `UPDATE ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} SET itemRead = ? WHERE itemId IN (${sqlInCondition});`;
+        SQLiteDatabase.getDatabaseInstance().prepare(qry).run([itemRead ? 'Y' : 'N']);
     }
 
 }

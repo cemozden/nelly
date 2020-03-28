@@ -345,4 +345,26 @@ export default function FeedAPI(express : Express.Application, configManager : C
         res.json({ itemsAvailable : nextItemDate !== undefined, nextDate : nextItemDate });
     });
 
+    express.get('/setfeeditemsread', (req, res) => {
+        const params = req.query;
+        const itemIdsQry = params.itemIds;
+        const itemRead = params.itemRead !== undefined && params.itemRead === 'true';
+
+        if (itemIdsQry === undefined || itemIdsQry.length === 0) {
+            const errorMessage =  'Item IDs are not valid! Please provide a valid item id array to change item read state.';
+            
+            res.status(400).json({ done : false, message : errorMessage });
+            http_logger.error(`[SetFeedItemsRead] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+
+        const itemIds : string[] = JSON.parse(itemIdsQry);
+        const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
+
+        feedItemArchiveService.setFeedItemsRead(itemRead, itemIds);
+        res.json({ done : true, message : 'Operation Completed.' });
+    });
+
 }

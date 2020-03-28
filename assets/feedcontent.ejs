@@ -11,13 +11,18 @@
     </div>
     <div class="tableInfo">
       Presenting feeds between <span id="feedStartTime"><%= moment(queryStartDate).format('L') %></span> - <span id="feedEndTime"><%= moment(queryEndDate).format('L') %></span><br />
+      <div id="tableOptions" style="display:none">
+        <br />
+        <button id="markAsRead" class="btn btn-dark btn-sm">Mark as read</button>
+      </div>
     </div>
 </div>
 <table id="feedSummaryTable" class="feed-summary-table">
     <thead>
       <tr>
+        <th style="width: 2%;"><input type="checkbox" id="selectAll" /></th>
         <th style="width: 2%;"></th>
-        <th style="width: 78%;">TITLE</th>
+        <th style="width: 76%;">TITLE</th>
         <th style="width: 10%;">AUTHOR</th>
         <th style="width: 10%;">DATE</th>
       </tr>
@@ -25,6 +30,7 @@
     <tbody>
       <% feedItems.forEach(fi => { %>
         <tr <%= !fi.read ? 'class=unreadEntry' : ''  %>>
+            <td><input type="checkbox" name="<%= fi.itemId %>" id="chbSelectRow" /></td>
             <td><img src="<%= !fi.read ? './img/green-icon.png' : './img/white-icon.png'  %>" /></td>
             <td><a id="<%= fi.itemId %>" href="#" title="<%= fi.title %>" ><%= fi.title %></a></td>
             <td><%= fi.author !== undefined ? fi.author : '' %></td>

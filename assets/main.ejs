@@ -167,6 +167,7 @@
 
             function convertFeedItemToTableRow(feedItem) {
               const rowHTML = `<tr ${!feedItem.read ? 'class="unreadEntry"' : ''}>
+                      <td><input type="checkbox" name="${feedItem.itemId}" id="chbSelectRow" /></td>
                       <td><img src="${!feedItem.read ? './img/green-icon.png' : './img/white-icon.png' }" /></td>
                       <td><a href="#" id="${feedItem.itemId}" title="${feedItem.title}" >${feedItem.title}</a></td>
                       <td>${ feedItem.author !== undefined ? feedItem.author : '' }</td>
@@ -469,6 +470,66 @@
 
               if (scrollTop === scrollTopMax && app.activeFeed.feedId !== null) loadMoreItems();
               
+            });
+
+            $('body').on('click', 'input[id=chbSelectRow]', function() {
+
+               if ($('#tableOptions').css('display') === 'none' && $('input[id=chbSelectRow]').length > 0) {
+                $('#tableOptions').css('display', 'block');
+               }
+               else if ($('#chbSelectRow:checked').length === 0) {
+                $('#tableOptions').css('display', 'none');
+               }
+            });
+
+            $('body').on('click', '#markAsRead', () => {
+              const selectedRows = $('#chbSelectRow:checked');
+              const selectedItemIds = [];
+
+              for (let i = 0 ; i < selectedRows.length ; i++) selectedItemIds.push(selectedRows[i].name);
+
+              $.ajax({
+                    url: `<%= expressURL %>/setfeeditemsread?itemRead=true&itemIds=${JSON.stringify(selectedItemIds)}`,
+                    method: 'GET'
+                  }).done(itemsRead => {
+                    loadItems(app.activeFeed.feedId);
+                    const feedId = app.activeFeed.feedId;
+
+                    $.ajax({
+                      url: '<%= expressURL %>/getunreadfeeditemcount',
+                      method: 'GET'
+                    }).done(unreadFeedItemStatistics => {
+                        app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
+                        unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                        $('#feed-menu').html('');
+                        app.feeds.forEach(feed => addFeedToMenuItem(feed));
+                        $(`#${feedId}`).addClass('menu-item-selected');
+                      });
+
+                }).fail(failMessageResponse => {
+                  const failMessage = failMessageResponse.responseJSON;
+
+                  alert(`An error occured while trying to mark feed items read!\n${failMessage.message}`);
+                }); 
+
+            });
+
+            $('body').on('click', '#selectAll', () => {
+                const checkBoxSelected = $('#selectAll').prop('checked');
+
+                if (checkBoxSelected) {
+                  $('input[id=chbSelectRow]').each(function() {
+                    $(this).prop('checked', true);
+                  });
+                  $('#tableOptions').css('display', 'block');
+                }
+                else {
+                  $('input[id=chbSelectRow]').each(function() {
+                    $(this).prop('checked', false);
+                  });
+                  $('#tableOptions').css('display', 'none');
+                }
+
             });
 
             

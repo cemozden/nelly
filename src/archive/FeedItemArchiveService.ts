@@ -44,6 +44,12 @@ export interface FeedItemArchiveService {
      */
     setFeedItemRead(itemRead : boolean, itemId : string) : void
 
+    /**
+     * The method that sets a specific item
+     * @param itemRead The boolean value sets the item to be read or notTrue is read False is not.
+     */
+    setFeedItemsRead(itemRead : boolean, itemIds : string[]) : void
+
 }
 
 export interface FeedItemCountStatistics {

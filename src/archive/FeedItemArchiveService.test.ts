@@ -238,5 +238,47 @@ describe('FeedItemArchiveService', () => {
 
         });
 
+        describe('#setFeedItemsRead(itemRead: boolean, itemId: string[])', () => {
+            it('should set itemRead to be Y for specific feed items', () => {
+                const feedItemArchiveService = new SQLiteFeedItemArchiveService();
+                const feedArchiveService = new SQLiteFeedArchiveService();
+
+                const feedAdded = feedArchiveService.addFeed(feed, exampleFeedId);
+                expect(feedAdded).toBe(true);
+
+                const feedItemsAdded = feedItemArchiveService.addFeedItems(feedItems, exampleFeedId);    
+                expect(feedItemsAdded).toBe(true);
+
+                feedItemArchiveService.setFeedItemsRead(true, ['12345678', '12345679']);
+
+                const feedItem = feedItemArchiveService.getFeedItem('12345678');
+                const feedItem2 = feedItemArchiveService.getFeedItem('12345679');
+
+                expect(feedItem.read).toBe(true);
+                expect(feedItem2.read).toBe(true);
+
+            });
+
+            it('should set itemRead to be N for specific feed items', () => {
+                const feedItemArchiveService = new SQLiteFeedItemArchiveService();
+                const feedArchiveService = new SQLiteFeedArchiveService();
+
+                const feedAdded = feedArchiveService.addFeed(feed, exampleFeedId);
+                expect(feedAdded).toBe(true);
+
+                const feedItemsAdded = feedItemArchiveService.addFeedItems(feedItems, exampleFeedId);    
+                expect(feedItemsAdded).toBe(true);
+
+                feedItemArchiveService.setFeedItemsRead(false, ['12345678', '12345679']);
+
+                const feedItem = feedItemArchiveService.getFeedItem('12345678');
+                const feedItem2 = feedItemArchiveService.getFeedItem('12345679');
+
+                expect(feedItem.read).toBe(false);
+                expect(feedItem2.read).toBe(false);
+            });
+
+        });
+
     });
 });
