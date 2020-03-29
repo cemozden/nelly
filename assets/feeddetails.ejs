@@ -10,7 +10,9 @@
     <% } %>
     <% if (feedItem.author !== undefined && feedItem.author !== null) { %>
         <span id="author">Author: <%= feedItem.author %></span><br />
-    <% } %>
+    <% } else if(feedItem._NS_DC !== undefined && feedItem._NS_DC.creator !== undefined){ %>
+        <span id="author">Creator: <%= feedItem._NS_DC.creator %></span><br />
+    <%}%>
     <% if (feedItem.category !== undefined && feedItem.category.length > 0) { %>
         Categories: <span class="categories" id="categories"><%= feedItem.category.join(', ') %></span><br />
     <% } %>

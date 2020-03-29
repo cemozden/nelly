@@ -36,12 +36,16 @@ describe('FeedItemArchiveService', () => {
                 itemId : '12345679',
                 feedId : exampleFeedId,
                 pubDate : new Date(),
-                read : false
+                read : false,
+                _NS_DC : {
+                    creator : 'test_creator'
+                }
             }
         ];
 
         const feed : Feed = {
             insertedAt : new Date(),
+            namespaces : ['dc'],
             feedMetadata : {
                 title : 'Feed Title 1',
                 description : 'Feed Description 1',

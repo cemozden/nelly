@@ -21,6 +21,7 @@ describe('FeedArchiveService', () => {
 
         const feed : Feed = {
             insertedAt : new Date(),
+            namespaces : ['dc'],
             feedMetadata : {
                 title : 'Feed Title 1',
                 description : 'Feed Description 1',
@@ -38,6 +39,7 @@ describe('FeedArchiveService', () => {
 
                 const feeds : Feed = {
                         insertedAt : new Date(),
+                        namespaces : ['dc'],
                         feedMetadata : {
                             title : 'Feed Title 1',
                             description : 'Feed Description 1',
@@ -59,6 +61,7 @@ describe('FeedArchiveService', () => {
 
                 const feeds : Feed = {
                         insertedAt : new Date(),
+                        namespaces : ['dc'],
                         feedMetadata : {
                             title : 'Feed Title 1',
                             description : 'Feed Description 1',
@@ -94,6 +97,7 @@ describe('FeedArchiveService', () => {
                 const feed : Feed = {
                     insertedAt : insertedAt,
                     version : RSSVersion.RSS_20,
+                    namespaces : ['dc'],
                     feedMetadata : {
                         title : 'Example Title',
                         description : 'Example Description',
@@ -125,6 +129,7 @@ describe('FeedArchiveService', () => {
 
                 expect(() => {feedArchiveService.updateFeed('', {
                     insertedAt : new Date(),
+                    namespaces : ['dc'],
                     feedMetadata : {
                         description : 'Example description',
                         link : 'https://example.com',
@@ -142,6 +147,7 @@ describe('FeedArchiveService', () => {
                 
                 const updatedFeed : Feed = {
                     insertedAt : new Date(),
+                    namespaces : ['dc'],
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
@@ -164,6 +170,7 @@ describe('FeedArchiveService', () => {
 
                 const updatedFeed : Feed = {
                     insertedAt : new Date(),
+                    namespaces : ['dc'],
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
@@ -202,6 +209,7 @@ describe('FeedArchiveService', () => {
 
                 const newFeed : Feed = {
                     insertedAt : new Date(),
+                    namespaces : ['dc'],
                     feedMetadata : {
                         title : 'Updated Feed Title 1',
                         description : 'Updated Feed Description 1',
@@ -223,6 +231,7 @@ describe('FeedArchiveService', () => {
                 const feed : Feed = {
                     insertedAt : new Date(),
                     version : RSSVersion.RSS_20,
+                    namespaces : ['dc'],
                     feedMetadata : {
                         title : 'Example Title',
                         description : 'Example Description',
@@ -262,6 +271,32 @@ describe('FeedArchiveService', () => {
                 expect(feedIds.length).toBe(0);
             });
 
+        });
+
+        describe('#getNamespaces(feedId: string)', () => {
+            it('should return namespace list', () => {
+                const archiveService = new SQLiteFeedArchiveService();
+                const exampleFeedId = '14725836';
+
+                const feeds : Feed = {
+                        insertedAt : new Date(),
+                        namespaces : ['dc'],
+                        feedMetadata : {
+                            title : 'Feed Title 1',
+                            description : 'Feed Description 1',
+                            link : 'https://example.com'
+                        },
+                        items : [],
+                        version : RSSVersion.RSS_20
+                }
+
+                const feedAdded = archiveService.addFeed(feeds, exampleFeedId);
+                
+                expect(feedAdded).toBe(true);
+                
+                const namespaces = archiveService.getNamespaces(exampleFeedId);
+                expect(namespaces).toEqual(['dc']);
+            });
         });
 
     });

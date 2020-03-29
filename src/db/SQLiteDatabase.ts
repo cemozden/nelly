@@ -14,6 +14,7 @@ export default class SQLiteDatabase {
     
     static FEEDS_TABLE_NAME = 'feeds';
     static FEED_ITEMS_TABLE_NAME = 'feedItems';
+    static NS_DC_TABLE_NAME = 'ns_dc';
 
     private static initializeDb() : void {
         try {
@@ -23,6 +24,7 @@ export default class SQLiteDatabase {
                 title varchar(255) NOT NULL,
                 link varchar(255) NOT NULL,
                 description varchar(255) NOT NULL,
+                namespaces TEXT,
                 imageURL varchar(255),
 	            imageLink varchar(255),
 	            imageTitle varchar(255),
@@ -30,7 +32,7 @@ export default class SQLiteDatabase {
             );`);
     
             this.getDatabaseInstance().exec(`CREATE TABLE IF NOT EXISTS ${this.FEED_ITEMS_TABLE_NAME} (
-                itemId char(8) NOT NULL,
+                itemId char(8) PRIMARY KEY NOT NULL,
                 feedId char(8) NOT NULL,
                 title TEXT,
                 description TEXT,
@@ -44,8 +46,29 @@ export default class SQLiteDatabase {
                 source TEXT,
                 itemRead char(1) NOT NULL,
                 insertedAt datetime NOT NULL,
-                FOREIGN KEY(feedId) REFERENCES feeds(feedId) ON DELETE CASCADE
+                FOREIGN KEY(feedId) REFERENCES ${this.FEEDS_TABLE_NAME}(feedId) ON DELETE CASCADE
             );`);
+
+            this.getDatabaseInstance().exec(`CREATE TABLE IF NOT EXISTS ${this.NS_DC_TABLE_NAME} (
+                itemId char(8) NOT NULL,
+                contributor varchar(255),
+                coverage varchar(255),
+                creator varchar(255),
+                dcDate datetime,
+                description TEXT,
+                format varchar(255),
+                identifier varchar(255),
+                language varchar(255),
+                publisher varchar(255),
+                relation varchar(255),
+                rights varchar(255),
+                source varchar(255),
+                subject varchar(255),
+                title varchar(255),
+                type varchar(255),
+                FOREIGN KEY(itemId) REFERENCES ${this.FEED_ITEMS_TABLE_NAME}(itemId) ON DELETE CASCADE
+            );`);
+
         }
         catch(err) {
             general_logger.error(`[initializeDb] ${err.message}`);

@@ -33,7 +33,7 @@
             <td><input type="checkbox" name="<%= fi.itemId %>" id="chbSelectRow" /></td>
             <td><img src="<%= !fi.read ? './img/green-icon.png' : './img/white-icon.png'  %>" /></td>
             <td><a id="<%= fi.itemId %>" href="#" title="<%= fi.title %>" ><%= fi.title %></a></td>
-            <td><%= fi.author !== undefined ? fi.author : '' %></td>
+            <td><%= fi.author !== undefined ? fi.author : fi._NS_DC !== undefined && fi._NS_DC.creator !== undefined ? fi._NS_DC.creator : '' %></td>
             <td><%= fi.pubDate !== undefined && fi.pubDate !== null ? moment(fi.pubDate).format('L') + ' ' + moment(fi.pubDate).format('LTS') : '' %></td>
         </tr>
       <% }); %>  

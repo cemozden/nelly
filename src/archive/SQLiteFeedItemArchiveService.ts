@@ -4,6 +4,8 @@ import { FeedItem } from "../rss/specifications/RSS20";
 import SQLiteDatabase from "../db/SQLiteDatabase";
 import Duration from "../time/Duration";
 import { TimeUnit } from "../time/TimeUnit";
+import { FeedArchiveService } from "./FeedArchiveService";
+import SQLiteFeedArchiveService from "./SQLiteFeedArchiveService";
 
 /**
  * The archive service implemention that manages archive using SQLite database for feed items.
@@ -16,6 +18,8 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
     private readonly itemIdColumn = 'itemId';
     private readonly feedIdColumn = 'feedId';
     private readonly feedItemTableColumns = 'itemId, feedId, title, description, link, author, category, comments, pubDate, enclosure, guid, source, itemRead, insertedAt';
+    private readonly feedArchiveService : FeedArchiveService = new SQLiteFeedArchiveService();
+
     /**
      * The method that returns a list of ids of feed items that belongs to a specific feed.
      * @param feedId The id of the feed that feed items have.
@@ -34,6 +38,16 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         return [];
     }  
 
+    private collectNamespace(itemIds : string[], namespace : string) : any[] {
+
+        const itemInQry = itemIds.map(i => `'${i}'`).join(', ');
+        const namespaceQry = `SELECT * FROM ns_${namespace} WHERE itemId IN (${itemInQry})`;
+        
+        const namespaceObjects = SQLiteDatabase.getDatabaseInstance().prepare(namespaceQry).all();
+
+        return namespaceObjects;
+    }
+
     /**
      * The method that retrieves feed items belong to a specific feed.
      * startDate and endDate variables filter the items for a specific time period.
@@ -44,8 +58,13 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         const limitQry = numOfEntries === -1 ? '' : `LIMIT ${numOfEntries}`;
         const feedItemQry = `SELECT ${this.feedItemTableColumns} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE feedId LIKE ? AND insertedAt > ? AND insertedAt < ? ${!allItems ? "AND itemRead = 'N'" : '' } ORDER BY pubDate DESC, insertedAt DESC ${limitQry}`;
         try {
-
+            const itemNamespaces = this.feedArchiveService.getNamespaces(feedId);
             const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
+            const dcNamespaceMap : Map<string, any> = new Map();
+            
+            // dc namespace setup...
+            this.collectNamespace(rows.map((row : any) => row.itemId), 'dc').forEach(item => dcNamespaceMap.set(item.itemId, item));
+
             const feedItems : FeedItem[] = rows.map((row : any) => {
                 const feedItem : FeedItem = {
                     description : row.description !== null ? row.description : undefined,
@@ -60,7 +79,8 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
                     link : row.link == null ? undefined : row.link,
                     pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
                     source : row.source != null ? JSON.parse(row.source) : undefined,
-                    read : row.itemRead != null && row.itemRead === 'Y'
+                    read : row.itemRead != null && row.itemRead === 'Y',
+                    _NS_DC : itemNamespaces.includes('dc') ? dcNamespaceMap.get(row.itemId) : undefined
                 }
 
                 return feedItem;
@@ -73,6 +93,40 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         }
 
         return [];
+    }
+
+    getFeedItem(itemId: string): FeedItem | undefined {
+        const qry = `SELECT ${this.feedItemTableColumns} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE itemId LIKE ?`;
+
+        try {
+            
+            const row = SQLiteDatabase.getDatabaseInstance().prepare(qry).get(itemId);
+            const itemNamespaces = this.feedArchiveService.getNamespaces(row.feedId);
+
+            const feedItem : FeedItem = {
+                description : row.description,
+                itemId : row.itemId,
+                feedId : row.feedId,
+                title : row.title,
+                author : row.author == null ? undefined : row.author,
+                category : row.category != null ? JSON.parse(row.category) : undefined,
+                comments : row.comments == null ? undefined : row.comments,
+                enclosure : row.category != null ? JSON.parse(row.enclosure) : undefined,
+                guid : row.guid != null ? JSON.parse(row.guid) : undefined,
+                link : row.link == null ? undefined : row.link,
+                pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
+                source : row.source != null ? JSON.parse(row.source) : undefined,
+                read : row.itemRead != null && row.itemRead === 'Y',
+                _NS_DC : itemNamespaces.includes('dc') ? this.collectNamespace([row.itemId], 'dc')[0] : undefined
+            }
+
+            return feedItem;
+        }
+        catch(err) {
+            general_logger.error(`[SQLiteArchiveService->getFeedItem] ${err.message}`);
+        }
+
+        return undefined;
     }
 
     getNextItemDate(feedId : string, dateToLookAfter : Date) : Date | undefined {
@@ -132,6 +186,27 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         
         try {
             SQLiteDatabase.getDatabaseInstance().prepare(addFeedItemsQry).run(tableValues);
+
+            //Namespace dc archive insert.
+            feedItems.filter(fi => fi._NS_DC !== undefined).forEach(fi => {
+                const qryColumns = ['itemId'];
+                const qryValues = [fi.itemId];
+
+                // Get all defined dc columns from the object.
+                const definedKeys = Object.keys(fi._NS_DC).filter(k => fi._NS_DC[k] !== undefined);
+                
+                // If no keys presented then we dont need to add anyting... should we?
+                if (definedKeys.length === 0) return true;
+
+                definedKeys.forEach(k => {
+                    qryColumns.push(k);
+                    qryValues.push(fi._NS_DC[k]);
+                });
+                
+                const nsDcQry = `INSERT INTO ${SQLiteDatabase.NS_DC_TABLE_NAME} (${qryColumns.join(', ')}) VALUES (${qryValues.map(v => `'${v}'`).join(', ')})`;
+                SQLiteDatabase.getDatabaseInstance().prepare(nsDcQry).run();
+            });
+
             return true;
         }
         catch(err) {
@@ -184,37 +259,6 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
         }
         
         return [];
-    }
-
-    getFeedItem(itemId: string): FeedItem | undefined {
-        const qry = `SELECT ${this.feedItemTableColumns} FROM ${SQLiteDatabase.FEED_ITEMS_TABLE_NAME} WHERE itemId LIKE ?`;
-
-        try {
-            const row = SQLiteDatabase.getDatabaseInstance().prepare(qry).get(itemId);
-
-            const feedItem : FeedItem = {
-                description : row.description,
-                itemId : row.itemId,
-                feedId : row.feedId,
-                title : row.title,
-                author : row.author == null ? undefined : row.author,
-                category : row.category != null ? JSON.parse(row.category) : undefined,
-                comments : row.comments == null ? undefined : row.comments,
-                enclosure : row.category != null ? JSON.parse(row.enclosure) : undefined,
-                guid : row.guid != null ? JSON.parse(row.guid) : undefined,
-                link : row.link == null ? undefined : row.link,
-                pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
-                source : row.source != null ? JSON.parse(row.source) : undefined,
-                read : row.itemRead != null && row.itemRead === 'Y'
-            }
-
-            return feedItem;
-        }
-        catch(err) {
-            general_logger.error(`[SQLiteArchiveService->getFeedItem] ${err.message}`);
-        }
-
-        return undefined;
     }
 
     setFeedItemRead(itemRead: boolean, itemId: string): void {

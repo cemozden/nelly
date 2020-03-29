@@ -10,7 +10,14 @@ import { RSSVersion } from "../specifications/RSSVersion";
  */
 export default class RSS20Parser implements RSSParser<Feed> {
     
-    private parseFeedMedata(channel : any) : FeedMetadata {
+    private readonly AVAILABLE_NAMESPACES : Map<string, string> = new Map();
+
+    constructor() {
+        this.AVAILABLE_NAMESPACES.set('dc', 'http://purl.org/dc/elements/1.1/');
+    }
+
+
+    private parseFeedMedata(channel : any, namespaces : string[]) : FeedMetadata {
 
         function getCategories(category : any) : string[] {
             if (category === undefined) return [];
@@ -61,7 +68,7 @@ export default class RSS20Parser implements RSSParser<Feed> {
         return feedMetadata;
     }
 
-    private parseFeedItems(items : any) : FeedItem[] {
+    private parseFeedItems(items : any, namespaces : string[]) : FeedItem[] {
         const feedItems : FeedItem[] = [];
 
         function getFeedCategories(category : any) : string[] {
@@ -99,7 +106,24 @@ export default class RSS20Parser implements RSSParser<Feed> {
                     url : item.source.$.url,
                     value : item.source._
                 } : undefined,
-                read : false
+                read : false,
+                _NS_DC : namespaces.includes('dc') ? {
+                    contributor : item['dc:contributor'],
+                    coverage : item['dc:coverage'],
+                    creator : item['dc:creator'],
+                    dcDate : item['dc:date'] !== undefined ? new Date(item['dc:date']) : undefined,
+                    description : item['dc:description'],
+                    format : item['dc:format'],
+                    identifier : item['dc:identifier'],
+                    language : item['dc:language'],
+                    publisher : item['dc:publisher'],
+                    relation : item['dc:relation'],
+                    rights : item['dc:rights'],
+                    source : item['dc:source'],
+                    subject : item['dc:subject'],
+                    title : item['dc:title'],
+                    type : item['dc:type']
+                } : undefined
             };
 
             return feedItem;
@@ -117,13 +141,20 @@ export default class RSS20Parser implements RSSParser<Feed> {
 
     parseRSS(rssObject : any): Feed {
         rssObject = rssObject.rss;
-        const feedMetadata = this.parseFeedMedata(rssObject.channel);
+
+        const feedNamespaces = Object.keys(rssObject.$)
+            .filter(key => key.startsWith('xmlns:'))
+            .map(ns => ns.substring(6, ns.length))
+            .filter(ns => this.AVAILABLE_NAMESPACES.get(ns) !== undefined && rssObject.$[`xmlns:${ns}`] === this.AVAILABLE_NAMESPACES.get(ns));
+
+        const feedMetadata = this.parseFeedMedata(rssObject.channel, feedNamespaces);
 
         const feed : Feed = {
+            namespaces : feedNamespaces,
             insertedAt : new Date(),
             version : RSSVersion.RSS_20,
             feedMetadata,
-            items : this.parseFeedItems(rssObject.channel.item)
+            items : this.parseFeedItems(rssObject.channel.item, feedNamespaces)
         };
 
         return feed;

@@ -10,6 +10,7 @@ import general_logger from "../utils/Logger";
  * @see FeedArchiveService
  */
 export default class SQLiteFeedArchiveService implements FeedArchiveService {
+
     
     private readonly feedIdColumn = 'feedId';
 
@@ -35,6 +36,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             feed.feedMetadata.title,
             feed.feedMetadata.link,
             feed.feedMetadata.description,
+            JSON.stringify(feed.namespaces),
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.link !== undefined ? feed.feedMetadata.image.link : null,
             feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.title !== undefined ? feed.feedMetadata.image.title : null,
@@ -63,13 +65,14 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
     getFeed(feedId: string): Feed | undefined {
         
         try {
-            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT feedId, version, title, link, description, imageURL, imageLink, imageTitle, insertedAt FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
+            const sqlFeed = SQLiteDatabase.getDatabaseInstance().prepare(`SELECT feedId, version, title, link, description, namespaces, imageURL, imageLink, imageTitle, insertedAt FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`).get(feedId);
             
             if (sqlFeed === undefined) return undefined;
             
             sqlFeed.version = parseInt(sqlFeed.version);
             
             const feed : Feed = {
+                namespaces : JSON.parse(sqlFeed.namespaces),
                 insertedAt : new Date(sqlFeed.insertedAt),
                 feedMetadata : {
                     title : sqlFeed.title,
@@ -109,6 +112,7 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
             version : feed.version,
             title : feed.feedMetadata.title,
             link : feed.feedMetadata.link,
+            namespaces : JSON.stringify(feed.namespaces),
             imageURL : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.url !== undefined ? feed.feedMetadata.image.url : null,
             imageLink : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.link !== undefined ? feed.feedMetadata.image.link : null,
             imageTitle : feed.feedMetadata.image !== undefined  && feed.feedMetadata.image.title !== undefined ? feed.feedMetadata.image.title : null,
@@ -143,5 +147,21 @@ export default class SQLiteFeedArchiveService implements FeedArchiveService {
         }
 
         return false;
+    }
+
+    getNamespaces(feedId: string): string[] {
+        const feedItemQry = `SELECT namespaces FROM ${SQLiteDatabase.FEEDS_TABLE_NAME} WHERE ${this.feedIdColumn} LIKE ?`;
+        
+        try {
+            const row = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).get(feedId);
+            
+            if (row === undefined) return [];
+
+            return JSON.parse(row.namespaces);
+        }
+        catch(err) {
+            general_logger.error(`[SQLiteArchiveService->getFeedItemIds] ${err.message}`);
+        }
+        return [];
     }
 }

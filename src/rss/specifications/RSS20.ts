@@ -76,6 +76,7 @@ export interface FeedItem {
     title : string,
     description : string,
     link? : string,
+    _NS_DC? : NAMESPACE_DC,
     author? : string,
     category? : string[],
     comments? : string,
@@ -86,12 +87,31 @@ export interface FeedItem {
     read : boolean
 }
 
+export interface NAMESPACE_DC {
+	contributor? : string,
+	coverage? : string,
+	creator? : string,
+	dcDate? : Date,
+	description? : string,
+	format? : string,
+	identifier? : string,
+	language? : string,
+	publisher? : string,
+	relation? : string,
+	rights? : string,
+	source? : string,
+	subject? : string,
+	title? : string,
+	type? : string,
+}
+
 /**
  * The interface that covers the whole RSS feed read from the server.
  */
 export interface Feed {
     version : RSSVersion,
     insertedAt : Date,
+    namespaces : string[],
     feedMetadata : FeedMetadata,
     items : FeedItem[]
 }
