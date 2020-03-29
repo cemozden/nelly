@@ -27,7 +27,7 @@
             <img id="mediaImage" style="display: none;" src="<%= feedItem.enclosure.url %>" />
         </div>
     <% } %>
-    <% if(feedItem.description !== undefined && feedItem.description !== null && feedItem._NS_CONTENT === undefined && feedItem._NS_CONTENT.encoded === undefined) { %>
+    <% if(feedItem.description !== undefined && feedItem.description !== null && feedItem._NS_CONTENT === undefined || feedItem._NS_CONTENT.encoded === undefined) { %>
     <div class="descriptionContent">
         <%- feedItem.description %>
     </div>
