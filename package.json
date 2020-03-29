@@ -7,7 +7,8 @@
     "test": "jest --watch",
     "testci": "jest --ci",
     "start": "tsc && node copy-assets.js && env-cmd -f .env.prod node .",
-    "start-dev": "tsc && node copy-assets.js && env-cmd -f .env.dev nodemon node ."
+    "start-dev": "tsc && node copy-assets.js && env-cmd -f .env.dev nodemon node .",
+    "package" : "rm -rf dist && NODE_ENV=production pkg build/EntryPoint.js --targets linux,macos,win --output dist/nelly --debug > /home/cemozden/pkg.log"
   },
   "repository": "https://github.com/cemozden/nelly",
   "author": "cemozden",
@@ -35,6 +36,7 @@
     "moment": "^2.24.0",
     "node-cron": "^2.0.3",
     "nodemon": "^2.0.2",
+    "pkg": "^4.4.4",
     "request": "^2.88.2",
     "rimraf": "^3.0.2",
     "shelljs": "^0.8.3",
@@ -45,5 +47,9 @@
   },
   "devDependencies": {
     "ts-jest": "^25.2.1"
+  },
+  "pkg": {
+    "bin": "build/EntryPoint.js",
+    "assets": "assets/**/*"
   }
 }

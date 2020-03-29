@@ -22,7 +22,7 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
         }
 
         const feedConfig = feedConfigManager.getFeedConfig(feedId);
-        console.log(feedConfig.fetchPeriod);
+        
         res.render('updatefeed', {
             feedConfig
         });
@@ -42,7 +42,7 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
         }
 
         const feedConfig = feedConfigManager.getFeedConfig(feedId);
-        console.log(feedConfig.fetchPeriod);
+        
         res.render('deletefeed', {
             feedConfig
         });

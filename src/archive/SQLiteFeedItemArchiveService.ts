@@ -216,7 +216,8 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             //Namespace content archive insert.
             feedItems.filter(fi => fi._NS_CONTENT !== undefined).forEach(fi => {
                 const nsContentQry = `INSERT INTO ${SQLiteDatabase.NS_CONTENT_TABLE_NAME} VALUES (?, ?);`;
-                SQLiteDatabase.getDatabaseInstance().prepare(nsContentQry).run(fi.itemId, fi._NS_CONTENT.encoded !== undefined ? fi._NS_CONTENT.encoded : null);
+                if (fi._NS_CONTENT.encoded !== undefined)
+                    SQLiteDatabase.getDatabaseInstance().prepare(nsContentQry).run(fi.itemId, fi._NS_CONTENT.encoded);
             });
 
             return true;
