@@ -39,6 +39,9 @@ describe('FeedItemArchiveService', () => {
                 read : false,
                 _NS_DC : {
                     creator : 'test_creator'
+                },
+                _NS_CONTENT : {
+                    encoded : 'Example encoded'
                 }
             }
         ];

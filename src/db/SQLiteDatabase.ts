@@ -15,6 +15,7 @@ export default class SQLiteDatabase {
     static FEEDS_TABLE_NAME = 'feeds';
     static FEED_ITEMS_TABLE_NAME = 'feedItems';
     static NS_DC_TABLE_NAME = 'ns_dc';
+    static NS_CONTENT_TABLE_NAME = 'ns_content';
 
     private static initializeDb() : void {
         try {
@@ -66,6 +67,12 @@ export default class SQLiteDatabase {
                 subject varchar(255),
                 title varchar(255),
                 type varchar(255),
+                FOREIGN KEY(itemId) REFERENCES ${this.FEED_ITEMS_TABLE_NAME}(itemId) ON DELETE CASCADE
+            );`);
+
+            this.getDatabaseInstance().exec(`CREATE TABLE IF NOT EXISTS ${this.NS_CONTENT_TABLE_NAME} (
+                itemId char(8) NOT NULL,
+                encoded TEXT,
                 FOREIGN KEY(itemId) REFERENCES ${this.FEED_ITEMS_TABLE_NAME}(itemId) ON DELETE CASCADE
             );`);
 

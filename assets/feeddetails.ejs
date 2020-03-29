@@ -27,9 +27,14 @@
             <img id="mediaImage" style="display: none;" src="<%= feedItem.enclosure.url %>" />
         </div>
     <% } %>
-    <% if(feedItem.description !== undefined && feedItem.description !== null) { %>
+    <% if(feedItem.description !== undefined && feedItem.description !== null && feedItem._NS_CONTENT === undefined && feedItem._NS_CONTENT.encoded === undefined) { %>
     <div class="descriptionContent">
         <%- feedItem.description %>
     </div>
+    <% } %>
+    <% if(feedItem._NS_CONTENT !== undefined && feedItem._NS_CONTENT.encoded !== undefined) { %>
+        <div class="descriptionContent">
+            <%- feedItem._NS_CONTENT.encoded %>
+        </div>
     <% } %>
     </div>

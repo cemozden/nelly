@@ -10,7 +10,8 @@ describe('RSSParser', () => {
                 rss : { 
                     $ : {
                         version : '2.0',
-                        'xmlns:dc' : 'http://purl.org/dc/elements/1.1/'
+                        'xmlns:dc' : 'http://purl.org/dc/elements/1.1/',
+                        'xmlns:content' : 'http://purl.org/rss/1.0/modules/content/'
                     },
                     channel : { 
                         title : 'BBC News - Home',
@@ -41,7 +42,7 @@ describe('RSSParser', () => {
 
                 const parsedRSS = rssParser.parseRSS(rssObject);
 
-                expect(parsedRSS.namespaces).toEqual(['dc']);
+                expect(parsedRSS.namespaces).toEqual(['dc', 'content']);
             });
 
             it('should fetch feed categories correctly', () => {
@@ -333,6 +334,43 @@ describe('RSSParser', () => {
 
                 expect(feed.items[0]._NS_DC.creator).toBe(rssObject.rss.channel.item['dc:creator']);
                 expect(feed.items[0]._NS_DC.description).toBeUndefined();
+            });
+
+            it('should generate content namespace if available', () => {
+                const rssParser = new RSS20Parser();
+
+                rssObject.rss.channel.item = {
+                    title : 'Example title 1',
+                    description : 'Example description 1',
+                    link : 'https://link.com',
+                    author : 'test@test.com',
+                    comments : 'https://example.com',
+                    pubDate : 'Wed, 01 Jan 2020 01:00:47 GMT',
+                    'content:encoded' : 'An example content Encoded',
+                    enclosure : {
+                        $ : {
+                            url : 'https://example.com',
+                            length : 12216320,
+                            type : 'audio/mpeg'
+                        }
+                    },
+                    guid : {
+                        _: "https://example.com/",
+                        $ : {
+                          "isPermaLink": "true"
+                        }
+                    },
+                    source : {
+                        _: "Example Source",
+                        $ : {
+                          "url": "https://example.com/"
+                        }
+                    }
+                };
+
+                const feed = rssParser.parseRSS(rssObject);
+
+                expect(feed.items[0]._NS_CONTENT.encoded).toBe(rssObject.rss.channel.item['content:encoded']);
             });
 
 

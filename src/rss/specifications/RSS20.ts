@@ -77,6 +77,7 @@ export interface FeedItem {
     description : string,
     link? : string,
     _NS_DC? : NAMESPACE_DC,
+    _NS_CONTENT? : NAMESPACE_CONTENT,
     author? : string,
     category? : string[],
     comments? : string,
@@ -103,6 +104,10 @@ export interface NAMESPACE_DC {
 	subject? : string,
 	title? : string,
 	type? : string,
+}
+
+export interface NAMESPACE_CONTENT {
+    encoded? : string
 }
 
 /**

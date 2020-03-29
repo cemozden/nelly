@@ -379,3 +379,11 @@ a:hover {
     background-color: #151515;
     padding: 5px;
 }
+
+.content .description .descriptionContent pre {
+    color:#CCCCCC;
+    border: 1px solid #000000;
+    padding: 7px;
+    background-color: #131313;
+    
+}

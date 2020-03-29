@@ -61,9 +61,13 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
             const itemNamespaces = this.feedArchiveService.getNamespaces(feedId);
             const rows = SQLiteDatabase.getDatabaseInstance().prepare(feedItemQry).all([feedId, startDate.toISOString(), endDate.toISOString()]);
             const dcNamespaceMap : Map<string, any> = new Map();
-            
+            const contentNamespaceMap : Map<string, any> = new Map();
+
             // dc namespace setup...
             this.collectNamespace(rows.map((row : any) => row.itemId), 'dc').forEach(item => dcNamespaceMap.set(item.itemId, item));
+
+            //content namespace setup
+            this.collectNamespace(rows.map((row : any) => row.itemId), 'content').forEach(item => contentNamespaceMap.set(item.itemId, item));
 
             const feedItems : FeedItem[] = rows.map((row : any) => {
                 const feedItem : FeedItem = {
@@ -80,7 +84,8 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
                     pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
                     source : row.source != null ? JSON.parse(row.source) : undefined,
                     read : row.itemRead != null && row.itemRead === 'Y',
-                    _NS_DC : itemNamespaces.includes('dc') ? dcNamespaceMap.get(row.itemId) : undefined
+                    _NS_DC : itemNamespaces.includes('dc') ? dcNamespaceMap.get(row.itemId) : undefined,
+                    _NS_CONTENT : itemNamespaces.includes('content') ? dcNamespaceMap.get(row.itemId) : undefined
                 }
 
                 return feedItem;
@@ -117,7 +122,8 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
                 pubDate : row.pubDate != null ? new Date(row.pubDate) : undefined,
                 source : row.source != null ? JSON.parse(row.source) : undefined,
                 read : row.itemRead != null && row.itemRead === 'Y',
-                _NS_DC : itemNamespaces.includes('dc') ? this.collectNamespace([row.itemId], 'dc')[0] : undefined
+                _NS_DC : itemNamespaces.includes('dc') ? this.collectNamespace([row.itemId], 'dc')[0] : undefined,
+                _NS_CONTENT : itemNamespaces.includes('content') ? this.collectNamespace([row.itemId], 'content')[0] : undefined
             }
 
             return feedItem;
@@ -205,6 +211,12 @@ export default class SQLiteFeedItemArchiveService implements FeedItemArchiveServ
                 
                 const nsDcQry = `INSERT INTO ${SQLiteDatabase.NS_DC_TABLE_NAME} (${qryColumns.join(', ')}) VALUES (${qryValues.map(v => `'${v}'`).join(', ')})`;
                 SQLiteDatabase.getDatabaseInstance().prepare(nsDcQry).run();
+            });
+
+            //Namespace content archive insert.
+            feedItems.filter(fi => fi._NS_CONTENT !== undefined).forEach(fi => {
+                const nsContentQry = `INSERT INTO ${SQLiteDatabase.NS_CONTENT_TABLE_NAME} VALUES (?, ?);`;
+                SQLiteDatabase.getDatabaseInstance().prepare(nsContentQry).run(fi.itemId, fi._NS_CONTENT.encoded !== undefined ? fi._NS_CONTENT.encoded : null);
             });
 
             return true;

@@ -14,6 +14,7 @@ export default class RSS20Parser implements RSSParser<Feed> {
 
     constructor() {
         this.AVAILABLE_NAMESPACES.set('dc', 'http://purl.org/dc/elements/1.1/');
+        this.AVAILABLE_NAMESPACES.set('content', 'http://purl.org/rss/1.0/modules/content/');
     }
 
 
@@ -123,6 +124,9 @@ export default class RSS20Parser implements RSSParser<Feed> {
                     subject : item['dc:subject'],
                     title : item['dc:title'],
                     type : item['dc:type']
+                } : undefined,
+                _NS_CONTENT : namespaces.includes('content') ? {
+                    encoded : item['content:encoded']
                 } : undefined
             };
 
