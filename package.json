@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --watch",
     "testci": "jest --ci",
-    "start": "tsc && node copy-assets.js && env-cmd -f .env.prod node .",
+    "compile" : "tsc && node copy-assets.js",
+    "start": "env-cmd -f .env.prod node .",
     "start-dev": "tsc && node copy-assets.js && env-cmd -f .env.dev nodemon node .",
     "package" : "rm -rf dist && NODE_ENV=production pkg build/EntryPoint.js --targets linux,macos,win --output dist/nelly --debug > /home/cemozden/pkg.log"
   },

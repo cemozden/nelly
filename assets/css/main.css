@@ -387,3 +387,29 @@ a:hover {
     background-color: #131313;
     
 }
+
+.content .description .descriptionContent table {
+    background-color:#101010;
+    color:#FFFFFF;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+.content .description .descriptionContent  td, th {
+    border: 1px solid #000000;
+    padding: 3px;
+  }
+  
+.content .description .descriptionContent tr:nth-child(even){background-color: #202020;}
+ 
+.content .description .descriptionContent tr:hover {background-color: #161616;}
+  
+.content .description .descriptionContent th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    font-weight:bolder;
+    background-color: #131313;
+    color: #FFFFFF;
+  }
