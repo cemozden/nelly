@@ -170,7 +170,7 @@
                       <td><input type="checkbox" name="${feedItem.itemId}" id="chbSelectRow" /></td>
                       <td><img src="${!feedItem.read ? './img/green-icon.png' : './img/white-icon.png' }" /></td>
                       <td><a href="#" id="${feedItem.itemId}" title="${feedItem.title}" >${feedItem.title}</a></td>
-                      <td>${ feedItem.author !== undefined ? feedItem.author : '' }</td>
+                      <td>${ feedItem.author !== undefined ? feedItem.author : feedItem._NS_DC !== undefined && feedItem._NS_DC.creator !== undefined ? feedItem._NS_DC.creator : '' }</td>
                       <td>${ feedItem.pubDate !== undefined && feedItem.pubDate !== null ? formatDateTime(feedItem.pubDate) : '' }</td>
                     </tr>`;
 
