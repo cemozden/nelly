@@ -24,6 +24,13 @@
             return moment(date).format('L') + ' ' + moment(date).format('LTS');
           }
 
+          function updateDocumentTitle() {
+            if (app.activeFeed.feedId !== null) {
+                        const numOfUnreadItemActiveFeed = app.unreadFeedItems.get(app.activeFeed.feedId);
+                        document.title = numOfUnreadItemActiveFeed > 0 ? `(${numOfUnreadItemActiveFeed}) Nelly RSS Feeder` : 'Nelly RSS Feeder' ;
+            }
+          }
+
           $(document).ready(() => {
             const socket = io('<%= expressURL %>/feedCollector');
 
@@ -42,6 +49,7 @@
                 feedQryStartDate : new Date(),
                 feedQryEndDate : new Date()
               };
+              updateDocumentTitle();
 
                 $.ajax({
                   url: '<%= expressURL %>/getfeeds',
@@ -55,6 +63,9 @@
                   method: 'GET'
                 }).done(unreadFeedItemStatistics => {
                     unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+
+                    updateDocumentTitle();
+
                     app.feeds.forEach(feed => addFeedToMenuItem(feed));
                   });
 
@@ -74,6 +85,8 @@
               $('#lastUpdatedFeed').text(feedConfig.name);
 
               app.unreadFeedItems.set(obj.feedId, app.unreadFeedItems.get(obj.feedId) + numOfItemsReceived);
+              updateDocumentTitle();
+
               $(`#${obj.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === obj.feedId)[0]));
 
               // If Notifications are granted then send notifications to the user..
@@ -83,7 +96,9 @@
                 
                 const newFeedNotification = new Notification(`New feeds received for ${feedConfig.name}`, {
                     body : bodyMessage,
-                    icon: '/img/rss-icon.png'
+                    icon: '/img/rss-icon.png',
+                    renotify : true,
+                    requireInteraction : true
                 });
 
                 newFeedNotification.onclick = () => {
@@ -98,6 +113,8 @@
 
                         if (!feedDetails.itemAlreadyRead) {
                           app.unreadFeedItems.set(app.activeFeed.feedId, app.unreadFeedItems.get(app.activeFeed.feedId) - 1);
+                          updateDocumentTitle();
+
                           $(`#${app.activeFeed.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === app.activeFeed.feedId)[0]));
                         }
 
@@ -150,7 +167,7 @@
                       feedQryStartDate : new Date(feedContentResult.queryStartDate),
                       feedQryEndDate : new Date(feedContentResult.queryEndDate),
                     }
-
+                    updateDocumentTitle();
                     $(`#${feedId}`).removeClass('menu-item').addClass('menu-item-selected');
                 });
             }
@@ -250,6 +267,8 @@
 
                     if (!feedDetails.itemAlreadyRead) {
                       app.unreadFeedItems.set(app.activeFeed.feedId, app.unreadFeedItems.get(app.activeFeed.feedId) - 1);
+                      updateDocumentTitle();
+
                       $(`#${app.activeFeed.feedId}`).html(generateMenuItemText(app.feeds.filter(feed => feed.feedConfigId === app.activeFeed.feedId)[0]));
                     }
 
@@ -333,6 +352,8 @@
                   }).done(unreadFeedItemStatistics => {
                       app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
                       unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                      updateDocumentTitle();
+
                       $('#feed-menu').html('');
                       app.feeds.forEach(feed => addFeedToMenuItem(feed));
                       $('#nellyModal').modal('hide');
@@ -366,9 +387,10 @@
                       feedQryStartDate : new Date(),
                       feedQryEndDate : new Date()
                     };
-
+                    updateDocumentTitle();
                       app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
                       unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                      updateDocumentTitle();
                       
                       $('#feed-menu').html('');
                       app.feeds.forEach(feed => addFeedToMenuItem(feed));
@@ -408,6 +430,8 @@
                   }).done(unreadFeedItemStatistics => {
                       app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
                       unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                      updateDocumentTitle();
+
                       $('#feed-menu').html('');
                       app.feeds.forEach(feed => addFeedToMenuItem(feed));
                       $('#nellyModal').modal('hide');
@@ -501,6 +525,8 @@
                     }).done(unreadFeedItemStatistics => {
                         app.feeds.forEach(feed => app.unreadFeedItems.set(feed.feedConfigId, 0));
                         unreadFeedItemStatistics.forEach(ufis => app.unreadFeedItems.set(ufis.feedId, ufis.itemCount));
+                        updateDocumentTitle();
+
                         $('#feed-menu').html('');
                         app.feeds.forEach(feed => addFeedToMenuItem(feed));
                         $(`#${feedId}`).addClass('menu-item-selected');
