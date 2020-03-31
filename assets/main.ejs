@@ -97,8 +97,7 @@
                 const newFeedNotification = new Notification(`New feeds received for ${feedConfig.name}`, {
                     body : bodyMessage,
                     icon: '/img/rss-icon.png',
-                    renotify : true,
-                    requireInteraction : true
+                    renotify : true
                 });
 
                 newFeedNotification.onclick = () => {

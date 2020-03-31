@@ -1,5 +1,5 @@
 # Nelly
-[![TravisCI](https://api.travis-ci.com/cemozden/nelly.svg?branch=master)][travisci]
+![TravisCI](https://api.travis-ci.com/cemozden/nelly.svg?branch=master)
 
 Nelly is a real time, web based RSS Feeder written in TypeScript that targets to meet best quality to read feeds from all over the internet websites, blogs, news chanells.
 
