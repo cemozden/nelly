@@ -83,6 +83,7 @@ feedConfigs.forEach(fc => feedScheduler.addFeedToSchedule(fc));
 
 httpServerInstance.listen(serverPort, () => {
     general_logger.info(`[Nelly] HTTP Server has started listening on localhost:${serverPort}.`);
+    console.log(`Nelly HTTP Server has started listening on http://localhost:${serverPort}`);
 });
 
 io.on('connection', socket => {
