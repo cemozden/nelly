@@ -23,7 +23,7 @@ interface FeedContentResult {
 export default function FeedContent(exp : ExpressSettings, systemLocale : string) {
     exp.expressObject.post('/feedcontent', async (req, res) => {
         const params = req.query;
-        const feedId : string = params.feedId;
+        const feedId : string = params.feedId as string;
 
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'feedId parameter is missing!';

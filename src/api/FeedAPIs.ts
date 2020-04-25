@@ -36,12 +36,12 @@ export default function FeedAPI(express : Express.Application, configManager : C
     express.get('/addfeed', async (req, res) => {
         const params = req.query;
 
-        const categoryId = params.categoryId;
-        const name = params.name;
-        const url = params.url;
-        const fetchPeriod : Duration = params.fetchPeriod !== undefined ? JSON.parse(params.fetchPeriod) : {};
+        const categoryId = params.categoryId as string;
+        const name = params.name as string;
+        const url = params.url as string;
+        const fetchPeriod : Duration = params.fetchPeriod !== undefined ? JSON.parse(params.fetchPeriod as string) : {};
         const enabled = params.enabled !== undefined && params.enabled === 'true';
-        const iconURL = params.iconURL !== undefined ? params.iconURL : '';
+        const iconURL = params.iconURL !== undefined ? params.iconURL as string : '';
         const notifyUser = params.notifyUser !== undefined && params.notifyUser === 'true';
 
         if (categoryId === undefined || categoryId.length === 0) {
@@ -118,14 +118,14 @@ export default function FeedAPI(express : Express.Application, configManager : C
     express.get('/updatefeed', async (req, res) => {
         const params = req.query;
 
-        const feedId = params.feedId;
-        const categoryId = params.categoryId;
-        const name = params.name;
-        const url = params.url;
-        const fetchPeriod : Duration = params.fetchPeriod !== undefined ? JSON.parse(params.fetchPeriod) : {};
+        const feedId = params.feedId as string;
+        const categoryId = params.categoryId as string;
+        const name = params.name as string;
+        const url = params.url as string;
+        const fetchPeriod : Duration = params.fetchPeriod !== undefined ? JSON.parse(params.fetchPeriod as string) : {};
         const enabled = params.enabled !== undefined && params.enabled === 'true';
         const notifyUser = params.notifyUser !== undefined && params.notifyUser === 'true';
-        const iconURL = params.iconURL !== undefined ? params.iconURL : '';
+        const iconURL = params.iconURL !== undefined ? params.iconURL as string : '';
 
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'Feed id is not a valid id! Please provide a valid id to update a new feed.';
@@ -217,7 +217,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
     express.get('/deletefeed', async (req, res) => {
         const params = req.query;
 
-        const feedId = params.feedId;
+        const feedId = params.feedId as string;
 
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'Feed id is not a valid id! Please provide a valid id to update a new feed.';
@@ -262,9 +262,9 @@ export default function FeedAPI(express : Express.Application, configManager : C
     express.get('/getarchiveitems', (req, res) => {
         const params = req.query;
 
-        const feedId : string = params.feedId;
-        const startDateISOStr : string = params.startDate;
-        const endDateISOStr : string = params.endDate;
+        const feedId : string = params.feedId as string;
+        const startDateISOStr : string = params.startDate as string;
+        const endDateISOStr : string = params.endDate as string;
         const allItems = params.allItems === 'true';
 
         if (feedId === undefined || feedId.length === 0) {
@@ -311,8 +311,8 @@ export default function FeedAPI(express : Express.Application, configManager : C
 
         const params = req.query;
 
-        const dateStr = params.date;
-        const feedId = params.feedId;
+        const dateStr = params.date as string;
+        const feedId = params.feedId as string;
 
         if (dateStr === undefined || dateStr.length === 0) {
             const errorMessage =  'Date is not a valid date string! Please provide a valid date string to retrieve the feeds.';
@@ -347,7 +347,7 @@ export default function FeedAPI(express : Express.Application, configManager : C
 
     express.get('/setfeeditemsread', (req, res) => {
         const params = req.query;
-        const itemIdsQry = params.itemIds;
+        const itemIdsQry = params.itemIds as string;
         const itemRead = params.itemRead !== undefined && params.itemRead === 'true';
 
         if (itemIdsQry === undefined || itemIdsQry.length === 0) {

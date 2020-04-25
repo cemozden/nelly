@@ -11,9 +11,9 @@ export default function SettingsAPI(express : Express.Application, settingsManag
 
         const params = req.query;
 
-        const serverPort : number = parseInt(params.serverPort);
-        const archiveCleaningPeriod : Duration = params.archiveCleaningPeriod !== undefined ? JSON.parse(params.archiveCleaningPeriod) : {};
-        const systemLocale = params.systemLocale;
+        const serverPort : number = parseInt(params.serverPort as string);
+        const archiveCleaningPeriod : Duration = params.archiveCleaningPeriod !== undefined ? JSON.parse(params.archiveCleaningPeriod as string) : {};
+        const systemLocale = params.systemLocale as string;
 
         if (serverPort === undefined || isNaN(serverPort)) {
             const errorMessage =  'Server Port is not a valid number! Please provide a valid number to set server port.';

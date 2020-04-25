@@ -20,9 +20,9 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
     express.get('/addfeedcategory', async (req, res) => {
         const params = req.query;
         
-        const categoryName : string = params.categoryName;
+        const categoryName : string = params.categoryName as string;
         const visible = params.visible !== undefined && params.visible === 'true';
-        const parentCategoryId = params.parentCategoryId;
+        const parentCategoryId = params.parentCategoryId as string;
 
         if (categoryName === undefined || categoryName.length === 0) {
             const errorMessage =  'Category name is not a valid name! Please provide a valid name to add a new feed category.';
@@ -82,8 +82,8 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
     express.get('/updatefeedcategory', async (req, res) => {
         const params = req.query;
         
-        const categoryId = params.categoryId;
-        const categoryName = params.categoryName;
+        const categoryId = params.categoryId as string;
+        const categoryName = params.categoryName as string;
         const visible = params.visible !== undefined && params.visible === 'true';
 
         if (categoryName === undefined || categoryName.length === 0) {
@@ -141,7 +141,7 @@ export default function FeedCategoryAPI(express : Express.Application, configMan
      */
     express.get('/deletefeedcategory', async (req, res) => {
         const params = req.query;
-        const categoryId = params.categoryId;
+        const categoryId = params.categoryId as string;
 
         if(categoryId === undefined || categoryId.length === 0) {
             const errorMessage =  'Parent category id is not a valid id!';

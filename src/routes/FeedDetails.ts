@@ -17,7 +17,7 @@ export default function FeedDetails(exp : ExpressSettings, systemLocale : string
 
     exp.expressObject.post('/feeddetails', async (req, res) => {
         const params = req.query;
-        const itemId : string = params.itemId;
+        const itemId : string = params.itemId as string;
 
         if (itemId === undefined || itemId.length === 0) {
             const errorMessage =  'feedId parameter is missing!';

@@ -10,7 +10,7 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
 
     exp.expressObject.get('/updatefeed_dialog', (req, res) => {
         const params = req.query;
-        const feedId : string = params.feedId;
+        const feedId : string = params.feedId as string;
 
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'feedId parameter is missing!';
@@ -30,7 +30,7 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
 
     exp.expressObject.get('/deletefeed_dialog', (req, res) => {
         const params = req.query;
-        const feedId : string = params.feedId;
+        const feedId : string = params.feedId as string;
 
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'feedId parameter is missing!';
