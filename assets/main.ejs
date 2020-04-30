@@ -173,9 +173,8 @@
 
             function addFeedToMenuItem(feed) {
               const feedId = feed.feedConfigId;
-
-              $('#feed-menu').append(`<div id="${feedId}" class="menu-item">${generateMenuItemText(feed)}</div>`);
-              
+              const menuItemStyle = feed.enabled ? 'menu-item' : 'menu-item menu-item-disabled';
+              $('#feed-menu').append(`<div id="${feedId}" class="${menuItemStyle}">${generateMenuItemText(feed) + (!feed.enabled ? ' (Disabled)' : '')}</div>`);
               // Feed clicked event on sidebar.
               $(`#${feedId}`).click(() => loadItems(feedId));
 

@@ -310,6 +310,11 @@ a:hover {
             user-select: none;
 }
 
+.sidebar-menu .menu-item-disabled {
+    background-color: #820e16;
+}
+
+
 .sidebar-menu .menu-item-selected {
     height: 30px;
     padding: 5px;
@@ -372,6 +377,11 @@ a:hover {
 
 .content .description .entryImage img {
     margin:0 auto;
+}
+
+.content .feedNotEnabledText {
+    color: #b5242d;
+    font-weight: bold;
 }
 
 .content .description .descriptionContent {

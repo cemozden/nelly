@@ -4,6 +4,9 @@
     <% }%><span class="title"><%= feedInfo.title %></span><br />
     <span class="attribute"><%= feedInfo.description %></span><br />
     <span class="attribute"><a href="<%= feedInfo.link %>" target="_blank"><%= feedInfo.link %></a></span><br />
+    <% if(!feedEnabled) {%>
+      <span class="attribute feedNotEnabledText">WARNING: This feed is NOT enabled. No new entry will be fetched from the RSS feed source.</span><br />
+    <%}%>
     <span class="attribute">RSS Version: <%= rssVersion %></span><br /><br />
     <div >
       <% if(feedEnabled) {%>
