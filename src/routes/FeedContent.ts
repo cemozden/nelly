@@ -77,10 +77,12 @@ export default function FeedContent(exp : ExpressSettings, systemLocale : string
         // If there is no item between startDate and endDate then look for older entries.
         else {
             const nextItemStartDate = feedItemArchiveService.getNextItemDate(feedId, startDate);
-            
-            nextItemStartDate.setHours(0);
-            nextItemStartDate.setMinutes(0);
-            nextItemStartDate.setSeconds(0);
+
+            if (nextItemStartDate !== undefined) {
+                nextItemStartDate.setHours(0);
+                nextItemStartDate.setMinutes(0);
+                nextItemStartDate.setSeconds(0);
+            }
 
             const feedItems = nextItemStartDate !== undefined ? feedItemArchiveService.getFeedItems(feedId, nextItemStartDate, endDate, true, -1) : [];
             const noMoreEntry = nextItemStartDate === undefined || feedItemArchiveService.getNextItemDate(feedId, nextItemStartDate) === undefined;
@@ -91,7 +93,7 @@ export default function FeedContent(exp : ExpressSettings, systemLocale : string
                 rssVersion : 'RSS 2.0',
                 systemLocale,
                 moment,
-                queryStartDate : nextItemStartDate,
+                queryStartDate : nextItemStartDate !== undefined ? nextItemStartDate : startDate,
                 queryEndDate : endDate,
                 noMoreEntry
             });
@@ -99,7 +101,7 @@ export default function FeedContent(exp : ExpressSettings, systemLocale : string
             const result : FeedContentResult = {
                 html : renderedHTML,
                 numberOfEntries : feedItems.length,
-                queryStartDate : nextItemStartDate,
+                queryStartDate : nextItemStartDate !== undefined ? nextItemStartDate : startDate,
                 queryEndDate : endDate,
                 noMoreEntry
             } ;

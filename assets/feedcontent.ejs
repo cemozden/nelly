@@ -17,7 +17,10 @@
       </div>
     </div>
 </div>
-<table id="feedSummaryTable" class="feed-summary-table">
+<% if (feedItems.length === 0) { %>
+  <div class="noEntryExist">There is no entry available for this RSS feed.</div>
+<% } else { %>
+  <table id="feedSummaryTable" class="feed-summary-table">
     <thead>
       <tr>
         <th style="width: 2%;"><input type="checkbox" id="selectAll" /></th>
@@ -46,3 +49,4 @@
   <% if (!noMoreEntry) { %>
   <div id="tableFooter" class="feed-summary-table-footer"><a id="loadMore" href="#">Load More</a></div>
   <% } %>
+<% } %>
