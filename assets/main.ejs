@@ -129,7 +129,7 @@
                 const pubDate = new Date(fi.pubDate);
 
                 return pubDate >= app.activeFeed.feedQryStartDate && pubDate <= app.activeFeed.feedQryEndDate;
-              }).map(fi => convertFeedItemToTableRow(fi)).join('');
+              }).map((fi, index) => convertFeedItemToTableRow(fi, index)).join('');
 
               $('#feedSummaryTable tbody').before(rowsHTML);
 
@@ -180,9 +180,9 @@
 
             }
 
-            function convertFeedItemToTableRow(feedItem) {
+            function convertFeedItemToTableRow(feedItem, index) {
               const rowHTML = `<tr ${!feedItem.read ? 'class="unreadEntry"' : ''}>
-                      <td><input type="checkbox" name="${feedItem.itemId}" id="chbSelectRow" /></td>
+                      <td><input type="checkbox" name="${index}" value="${feedItem.itemId}" id="chbSelectRow" /></td>
                       <td><img src="${!feedItem.read ? './img/green-icon.png' : './img/white-icon.png' }" /></td>
                       <td><a href="#" id="${feedItem.itemId}" title="${feedItem.title}" >${feedItem.title}</a></td>
                       <td>${ feedItem.author !== undefined ? feedItem.author : feedItem._NS_DC !== undefined && feedItem._NS_DC.creator !== undefined ? feedItem._NS_DC.creator : '' }</td>
@@ -195,7 +195,7 @@
             function loadMoreItems() {
 
               function initItems(items) {
-                const newRows = items.map(fi => convertFeedItemToTableRow(fi)).join('');
+                const newRows = items.map((fi, index) => convertFeedItemToTableRow(fi, index)).join('');
 
                 $('#feedSummaryTable').append(newRows);
 
@@ -521,20 +521,27 @@
             });
 
             $('body').on('click', 'input[id=chbSelectRow]', function() {
-
                if ($('#tableOptions').css('display') === 'none' && $('input[id=chbSelectRow]').length > 0) {
                 $('#tableOptions').css('display', 'block');
                }
                else if ($('#chbSelectRow:checked').length === 0) {
                 $('#tableOptions').css('display', 'none');
                }
+
+               const checkBoxIndex = parseInt($(this).attr('name'));
+               if ($(this).prop('checked')) 
+                  $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).addClass('selectedEntry');
+               else 
+                $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).removeClass('selectedEntry');
+               
+
             });
 
             $('body').on('click', '#markAsRead', () => {
               const selectedRows = $('#chbSelectRow:checked');
               const selectedItemIds = [];
 
-              for (let i = 0 ; i < selectedRows.length ; i++) selectedItemIds.push(selectedRows[i].name);
+              for (let i = 0 ; i < selectedRows.length ; i++) selectedItemIds.push(selectedRows[i].value);
 
               $.ajax({
                     url: `<%= expressURL %>/setfeeditemsread?itemRead=true&itemIds=${JSON.stringify(selectedItemIds)}`,
@@ -570,12 +577,22 @@
                 if (checkBoxSelected) {
                   $('input[id=chbSelectRow]').each(function() {
                     $(this).prop('checked', true);
+
+                    const checkBoxIndex = parseInt($(this).attr('name'));
+                    
+                    $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).removeClass('selectedEntry');  
+                    $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).addClass('selectedEntry');
+                    
                   });
                   $('#tableOptions').css('display', 'block');
                 }
                 else {
                   $('input[id=chbSelectRow]').each(function() {
                     $(this).prop('checked', false);
+
+                    const checkBoxIndex = parseInt($(this).attr('name'));
+                    $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).removeClass('selectedEntry');  
+
                   });
                   $('#tableOptions').css('display', 'none');
                 }

@@ -37,9 +37,9 @@
       </tr>
     </thead>
     <tbody>
-      <% feedItems.forEach(fi => { %>
+      <% feedItems.forEach((fi, index) => { %>
         <tr <%= !fi.read ? 'class=unreadEntry' : ''  %>>
-            <td><input type="checkbox" name="<%= fi.itemId %>" id="chbSelectRow" /></td>
+            <td><input type="checkbox" name="<%=index%>" value="<%= fi.itemId %>" id="chbSelectRow" /></td>
             <td><img src="<%= !fi.read ? './img/green-icon.png' : './img/white-icon.png'  %>" /></td>
             <% if(!fi.description && !fi._NS_CONTENT) { %>
               <td><a id="<%= fi.itemId %>" href="<%= fi.link %>" target="_blank" title="<%= fi.title %>" ><%= fi.title %></a></td>

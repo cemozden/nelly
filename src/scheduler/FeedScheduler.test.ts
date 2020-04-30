@@ -7,7 +7,7 @@ describe('FeedScheduler', () => {
     describe('CronFeedScheduler', () => {
         describe('#addFeedToSchedule(feedConfig : FeedConfig)', () => {
             it('should increase the number of scheduled cron jobs.', () => {
-                const scheduler = new CronFeedScheduler();
+                const scheduler = new CronFeedScheduler([]);
                 const numOfExistingScheduledTasks = scheduler.getScheduledTaskCount();
 
                 const feedConfig : FeedConfig = {
@@ -26,7 +26,7 @@ describe('FeedScheduler', () => {
             });
 
             it('should throw an error if a task is already existing', () => {
-                const scheduler = new CronFeedScheduler();
+                const scheduler = new CronFeedScheduler([]);
                 const numOfExistingScheduledTasks = scheduler.getScheduledTaskCount();
 
                 const feedConfig : FeedConfig = {
@@ -47,7 +47,7 @@ describe('FeedScheduler', () => {
 
         describe('#stopTask(feedConfigId: string)', () => {
             it('should throw an error if the giveen feedConfigId does not exist', () => {
-                const scheduler = new CronFeedScheduler();
+                const scheduler = new CronFeedScheduler([]);
                 const feedConfigId = 'non_exist_Id';
                 
                 expect(() => scheduler.stopTask(feedConfigId))
@@ -57,7 +57,7 @@ describe('FeedScheduler', () => {
 
         describe('#startTask(feedConfigId: string)', () => {
             it('should throw an error if the giveen feedConfigId does not exist', () => {
-                const scheduler = new CronFeedScheduler();
+                const scheduler = new CronFeedScheduler([]);
                 const feedConfigId = 'non_exist_Id';
                 
                 expect(() => scheduler.startTask(feedConfigId))
@@ -67,7 +67,7 @@ describe('FeedScheduler', () => {
 
         describe('#deleteScheduledTask(feedConfigId: string)', () => {
             it('should throw an error if given feed config id does not exist!', () => {
-                const scheduler = new CronFeedScheduler();
+                const scheduler = new CronFeedScheduler([]);
                 const feedConfigId = 'non_exist_Id';
                 
                 expect(() => scheduler.deleteScheduledTask(feedConfigId))
@@ -76,7 +76,7 @@ describe('FeedScheduler', () => {
             });
 
             it('should remove the the task from scheduled cron jobs', () => {
-                const scheduler = new CronFeedScheduler();
+                const scheduler = new CronFeedScheduler([]);
                 const feedConfig : FeedConfig = {
                     categoryId : '123456789',
                     enabled : false,

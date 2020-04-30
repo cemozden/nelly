@@ -275,6 +275,11 @@ a:hover {
     font-weight: bold;
 } 
 
+.feed-summary-table .selectedEntry {
+    background-color: #272a38;
+    border: 1px solid #000;
+}
+
 
 .feed-summary-table td {
     padding: 7px;
