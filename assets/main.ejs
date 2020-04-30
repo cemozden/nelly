@@ -454,6 +454,32 @@
               }
             });
 
+            $('body').on('click', '#syncNow', () => {
+                const feedId = app.activeFeed.feedId;
+
+                $.ajax({
+                    url: `<%= expressURL %>/syncfeed?feedId=${feedId}`,
+                    method: 'GET'
+                  }).done(response => {
+                    const feedConfig = app.feeds.filter(feed => feed.feedConfigId === app.activeFeed.feedId)[0];
+
+                    $('#systemInfo').css('display', 'block');
+                    $('#systemInfoDescription').text(`Synchronization of "${feedConfig.name}" has started.`);
+                    
+                    setTimeout(() => {
+                      $('#systemInfo').css('display', 'none');
+                    }, 4000);
+                    
+                  })
+                  .fail(failMessageResponse => {
+                    console.log(failMessageResponse);
+                  const failMessage = failMessageResponse.responseJSON;
+
+                  alert(`An error occured while trying to syncronize the feed!\n${failMessage.message}`);
+                }); 
+
+            });
+
             $('body').on('click', '#btnUpdateSettings', () => {
 
                 const serverPort = parseInt($('#txtServerPort').val());
@@ -590,6 +616,9 @@
               </div>
               <div id="systemError" style="display:none;" class="alert alert-danger system-notification" role="alert">
                 <strong>ERROR:</strong> Connection has been lost to Nelly server. This is probably due to Nelly shutted down. No feed update will occur...
+              </div>
+              <div id="systemInfo" style="display:none;" class="alert alert-success system-notification" role="alert">
+                <strong>INFO: </strong><span id="systemInfoDescription"></span>
               </div>
               <div id="dynamic-content">
 

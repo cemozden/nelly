@@ -9,8 +9,10 @@ import { FeedArchiveService } from "../archive/FeedArchiveService";
 import SQLiteFeedArchiveService from "../archive/SQLiteFeedArchiveService";
 import { FeedItemArchiveService } from "../archive/FeedItemArchiveService";
 import SQLiteFeedItemArchiveService from "../archive/SQLiteFeedItemArchiveService";
+import { Namespace } from "socket.io";
+import { collectFeed } from "../collectors/FeedCollector";
 
-export default function FeedAPI(express : Express.Application, configManager : ConfigManager, feedScheduler : FeedScheduler) {
+export default function FeedAPI(express : Express.Application, configManager : ConfigManager, feedScheduler : FeedScheduler, socketList : Namespace[]) {
 
     express.get('/getfeeds', (req, res) => {
         res.json(configManager.getFeedConfigManager().getFeedConfigs());
@@ -365,6 +367,25 @@ export default function FeedAPI(express : Express.Application, configManager : C
 
         feedItemArchiveService.setFeedItemsRead(itemRead, itemIds);
         res.json({ done : true, message : 'Operation Completed.' });
+    });
+
+    express.get('/syncfeed', (req, res) => {
+        const params = req.query;
+
+        const feedId = params.feedId as string;
+        
+        if (feedId === undefined || feedId.length === 0) {
+            const errorMessage =  'Given feed id is not valid! Please provide a valid feed id to sync.';
+            
+            res.status(400).json({ synced : false, message : errorMessage });
+            http_logger.error(`[SyncFeed] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        const feedConfig = configManager.getFeedConfigManager().getFeedConfig(feedId);
+        collectFeed(feedConfig, socketList);
+        res.json({ synced : true });
     });
 
 }

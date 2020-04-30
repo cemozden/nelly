@@ -7,6 +7,7 @@ import moment from "moment";
 import { renderFile } from "ejs";
 import { join } from "path";
 import { ExpressSettings } from "./Routes";
+import { FeedConfigManager } from "../config/FeedConfigManager";
 
 const feedArchiveService : FeedArchiveService = new SQLiteFeedArchiveService();
 const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
@@ -20,11 +21,11 @@ interface FeedContentResult {
     noMoreEntry : boolean
 }
 
-export default function FeedContent(exp : ExpressSettings, systemLocale : string) {
+export default function FeedContent(exp : ExpressSettings, systemLocale : string, feedConfigManager : FeedConfigManager) {
     exp.expressObject.post('/feedcontent', async (req, res) => {
         const params = req.query;
         const feedId : string = params.feedId as string;
-
+        
         if (feedId === undefined || feedId.length === 0) {
             const errorMessage =  'feedId parameter is missing!';
             
@@ -50,8 +51,9 @@ export default function FeedContent(exp : ExpressSettings, systemLocale : string
         // Set locale for date time formatting.
         moment.locale(systemLocale);
 
+        const feedEnabled = feedConfigManager.getFeedConfig(feedId).enabled;
         const feedItems = feedItemArchiveService.getFeedItems(feedId, startDate, endDate, true, -1);
-
+        
         if (feedItems.length > 0) {
             const renderedHTML = await renderFile(join(__dirname, '..', '..', 'assets', 'feedcontent.ejs'), {
                 feedInfo : feed.feedMetadata,
@@ -61,7 +63,8 @@ export default function FeedContent(exp : ExpressSettings, systemLocale : string
                 moment,
                 queryStartDate : startDate,
                 queryEndDate : endDate,
-                noMoreEntry : false
+                noMoreEntry : false,
+                feedEnabled
             });
     
             const result : FeedContentResult = {
@@ -95,7 +98,8 @@ export default function FeedContent(exp : ExpressSettings, systemLocale : string
                 moment,
                 queryStartDate : nextItemStartDate !== undefined ? nextItemStartDate : startDate,
                 queryEndDate : endDate,
-                noMoreEntry
+                noMoreEntry,
+                feedEnabled
             });
     
             const result : FeedContentResult = {

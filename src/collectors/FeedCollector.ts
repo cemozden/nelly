@@ -16,6 +16,11 @@ interface FeedUpdateMessage {
     items : FeedItem[]
 }
 
+interface CollectFeedErrorMessage {
+    feedName : string,
+    message : string
+}
+
 const xmlParseOptions : OptionsV2 = {
     cdata : true,
     explicitArray : false
@@ -101,53 +106,59 @@ function updateExistingFeed(feed : Feed, feedId : string, socketList : Namespace
  * If any case of failure happens during collecting of feeds (such as no internet connection, parsing problems etc.) it will reject with a specific error.
  * @param feedConfig The configuration object of a specific feed defined in the system. The URL should be valid url.
  */
-export function collectFeed(feedConfig : FeedConfig, socketList : Namespace[]) : Promise<Feed> {
-    const feedCollectorPromise = new Promise<Feed>((resolve, reject) => {
-        general_logger.info(`Started Collecting feeds from the feed "${feedConfig.name}"`);
-        request(feedConfig.url, function(error, response, body) {
+export function collectFeed(feedConfig : FeedConfig, socketList : Namespace[]) : void {
 
-            if (error) {
-                if (error.code === 'ENOTFOUND') {
-                    general_logger.error(`[CollectFeed] Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`);
-                    reject(new FeedFetchError(`Unable to fetch the feed. (${feedConfig.url}) Please check that there is an stable internet connection available or the feed source URL "${feedConfig.url}" is valid.`));
-                }
-                else {
-                    general_logger.error(`[CollectFeed] ${error.message} :: Feed URL: ${feedConfig.url}`);
-                    reject(error);
-                }
+    function sendErrorMessageThroughSocket(message : string) {
+        const errorMessage : CollectFeedErrorMessage = {
+            feedName : feedConfig.name,
+            message
+        };
 
-                return;
-            }
-            //Parse XML to JavaScript object.
-            parseString(body, xmlParseOptions, (err, rssObject) => {
-                if (err) {
-                    general_logger.error(`[CollectFeed->ParsingXML] ${err.message}`);
-                    reject(err);
-                    return;
-                }
+        socketList.forEach(s => s.emit('feedCollectorError', errorMessage));
+    }
 
-                try {
-                    const feed = RSSParserFactory.generateRSSParser(rssObject).parseRSS(rssObject);
-                    const feedInDb = feedArchiveService.getFeed(feedConfig.feedConfigId);
-                    
-                    if (feedInDb === undefined) 
-                        prepareNewFeed(feed, feedConfig.feedConfigId, socketList);
-                    else 
-                        updateExistingFeed(feed, feedConfig.feedConfigId, socketList);
+    general_logger.info(`Started Collecting feeds from the feed "${feedConfig.name}"`);
+    request(feedConfig.url, function(error, response, body) {
 
-                    general_logger.info(`Finished collecting feeds from the feed "${feedConfig.name}" successfully.`);
-                    resolve(feed);
-                }
-                catch (err) {
-                    general_logger.error(`[CollectFeed] ${err.message}`);
-                    reject(err);
-                }
-            });
+    if (error) {
+        if (error.code === 'ENOTFOUND') {
+            general_logger.error(`[CollectFeed] Unable to fetch the feed. (${feedConfig.url}) Please check that the feed url is valid or an internet connection is available.`);
+            sendErrorMessageThroughSocket(`Unable to fetch the feed. (${feedConfig.url}) Please check that there is an stable internet connection available or the feed source URL "${feedConfig.url}" is valid.`);
+        }
+        else {
+            general_logger.error(`[CollectFeed] ${error.message} :: Feed URL: ${feedConfig.url}`);
+            sendErrorMessageThroughSocket(error.message);
+        }
+
+    return;
+    }
+    //Parse XML to JavaScript object.
+    parseString(body, xmlParseOptions, (err, rssObject) => {
+        if (err) {
+            general_logger.error(`[CollectFeed->ParsingXML] ${err.message}`);
+            sendErrorMessageThroughSocket(err.message);
+            return;
+        }
+
+    try {
+        const feed = RSSParserFactory.generateRSSParser(rssObject).parseRSS(rssObject);
+        const feedInDb = feedArchiveService.getFeed(feedConfig.feedConfigId);
         
-        });
-    });
+        if (feedInDb === undefined) 
+            prepareNewFeed(feed, feedConfig.feedConfigId, socketList);
+        else 
+            updateExistingFeed(feed, feedConfig.feedConfigId, socketList);
 
-    return feedCollectorPromise;
+                general_logger.info(`Finished collecting feeds from the feed "${feedConfig.name}" successfully.`);
+            }
+            catch (err) {
+                general_logger.error(`[CollectFeed] ${err.message}`);
+                sendErrorMessageThroughSocket(err.message);
+            }
+        });
+    
+    });
+    
 }
 
 export class FeedFetchError extends Error {}

@@ -18,7 +18,7 @@ export default function initRoutes(exp : Express.Application, expressURL : strin
         };
 
         Index(expressSettings, systemLocale);
-        FeedContent(expressSettings, systemLocale);
+        FeedContent(expressSettings, systemLocale, feedConfigManager);
         FeedDetails(expressSettings, systemLocale);
         Dialogs(expressSettings, feedConfigManager, settingsManager);
 }

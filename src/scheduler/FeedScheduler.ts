@@ -46,10 +46,4 @@ export interface FeedScheduler {
      * @throws InvalidFeedConfigIdError if feed config id does not exist.
      */
     startTask(feedConfigId : string) : void,
-
-    /**
-     * The method that adds the given Socket.IO Server into feed scheduling in order to inform UI clients real-time via Socket.IO.
-     * @param socket The Socket.IO Server instance that namespaces will be created for feed schedules.
-     */
-    addSocket(socket : Server) : void
 }

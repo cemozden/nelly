@@ -7,11 +7,6 @@ import general_logger from "../utils/Logger";
 import { Server, Namespace } from "socket.io";
 import { TimeUnit } from "../time/TimeUnit";
 
-interface CollectFeedErrorMessage {
-    feedName : string,
-    message : string
-}
-
 /**
  * The feed scheduler that schedules using cron style job system.
  * @author cemozden
@@ -19,18 +14,8 @@ interface CollectFeedErrorMessage {
 export default class CronFeedScheduler implements FeedScheduler {
     
     private readonly scheduledTaskMap = new Map<string, ScheduledTask>();
-    private readonly socketList : Namespace[] = [];
 
-    private feedCollector(feedConfig : FeedConfig) {
-        collectFeed(feedConfig, this.socketList).catch(reason => {
-            const errorMessage : CollectFeedErrorMessage = {
-                feedName : feedConfig.name,
-                message: reason.message
-            };
-
-            this.socketList.forEach(s => s.emit('feedCollectorError', errorMessage));
-        });
-    }
+    constructor(private socketList : Namespace[]) {}
 
     addFeedToSchedule(feedConfig: FeedConfig): void {
         const feedConfigId = feedConfig.feedConfigId;
@@ -46,20 +31,18 @@ export default class CronFeedScheduler implements FeedScheduler {
         
         // First fetch all data then schedule.
         if (feedConfig.enabled)
-            this.feedCollector(feedConfig);
+            collectFeed(feedConfig, this.socketList);
         else 
             console.log(`The feed "${feedConfig.name} is disabled in config. No feed collection will occur..."`);
         
 
-        const task = schedule(cronExpression, () => {
-            this.feedCollector(feedConfig);
-        },{
+        const task = schedule(cronExpression, () => collectFeed(feedConfig, this.socketList), {
             scheduled : feedConfig.enabled
         });
 
         this.scheduledTaskMap.set(feedConfigId, task);
         
-        if(feedConfig.enabled){
+        if(feedConfig.enabled) {
             console.log(`The feed "${feedConfig.name}" is scheduled for receiving new feeds. Source: ${feedConfig.url}, Fetch Period: ${feedConfig.fetchPeriod.value} ${TimeUnit[feedConfig.fetchPeriod.unit]}`);
             general_logger.info(`[CronFeedScheduler->addFeedToSchedule] ${feedConfig.name} is scheduled for receiving feeds.`);
         }
@@ -111,24 +94,6 @@ export default class CronFeedScheduler implements FeedScheduler {
         task.destroy();
         this.scheduledTaskMap.delete(feedConfigId);
         general_logger.info(`[CronFeedScheduler->deleteScheduledTask] A task with the id "${feedConfigId}" is destroyed and removed.`);
-    }
-
-    addSocket(io: Server): void {
-        const feedCollectorNamespace = io.of('/feedCollector');
-        
-        feedCollectorNamespace.on('connection', nsSocket => {
-            if (!this.socketList.includes(feedCollectorNamespace)) {
-                this.socketList.push(feedCollectorNamespace);
-                console.log(`A new Socket.IO server has been added. Socket ID: ${nsSocket.id}`);
-            }
-        });
-
-        feedCollectorNamespace.on('disconnect', () => {
-            const socketIndex = this.socketList.indexOf(feedCollectorNamespace);
-            this.socketList.splice(socketIndex, 1);
-            console.log(`Socket removed.`);
-        });
-
     }
 
 }

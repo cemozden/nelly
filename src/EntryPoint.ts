@@ -10,7 +10,7 @@ import JSONConfigManager from "./config/JSONConfigManager";
 import { SettingsManager } from "./config/SettingsManager";
 import general_logger, { http_logger } from "./utils/Logger";
 import { createServer } from "http";
-import socketIO from "socket.io";
+import socketIO, { Namespace } from "socket.io";
 import initAPIs from "./api/APIs";
 import { FeedScheduler } from "./scheduler/FeedScheduler";
 import CronFeedScheduler from "./scheduler/CronFeedScheduler";
@@ -30,6 +30,8 @@ const io = socketIO(httpServerInstance);
 
 const configManager: ConfigManager = new JSONConfigManager(process.env.CONFIG_DIR);
 const settingsManager : SettingsManager = configManager.getSettingsManager();
+
+const socketList : Namespace[] = [];
 
 /**
  * The middleware that logs all API requests to the daemon
@@ -62,11 +64,11 @@ exp.use(expStatic(ASSETS_PATH));
 exp.set('view engine', 'ejs');
 exp.set('views', ASSETS_PATH);
 
-const feedScheduler : FeedScheduler = new CronFeedScheduler();
+const feedScheduler : FeedScheduler = new CronFeedScheduler(socketList);
 const feedItemArchiveService : FeedItemArchiveService = new SQLiteFeedItemArchiveService();
 
 console.log('Initializing APIs..');
-initAPIs(exp, configManager, feedScheduler);
+initAPIs(exp, configManager, feedScheduler, socketList);
 console.log('Initialization completed.');
 
 console.log('Initializing ExpressJS Routes..');
@@ -89,10 +91,19 @@ httpServerInstance.listen(serverPort, () => {
 io.on('connection', socket => {
     console.log('Socket.IO connection successful. Client: ' + socket.client.id);
 
-    feedScheduler.addSocket(io);
-});
+    const feedCollectorNamespace = io.of('/feedCollector');
+        
+    feedCollectorNamespace.on('connection', nsSocket => {
+        if (!socketList.includes(feedCollectorNamespace)) {
+            socketList.push(feedCollectorNamespace);
+            console.log(`A new Socket.IO server has been added. Socket ID: ${nsSocket.id}`);
+        }
+    });
 
-io.on('disconnect', () => {
-    //feedScheduler.removeSocket(io);
-    console.log('blablabal');
+    feedCollectorNamespace.on('disconnect', () => {
+        const socketIndex = socketList.indexOf(feedCollectorNamespace);
+        socketList.splice(socketIndex, 1);
+        console.log(`Socket removed.`);
+    });
+
 });
