@@ -1,6 +1,9 @@
 import { sep, join } from "path";
+import { platform } from "os";
 
-process.env.CONFIG_DIR = `${process.env.HOME}${sep}.nelly${sep}`;
+const homeDir = platform() === 'win32' ? process.env.HOMEPATH as string : process.env.HOME as string;
+
+process.env.CONFIG_DIR = `${homeDir}${sep}.nelly${sep}`;
 process.env.LOGS_DIR = `${process.env.CONFIG_DIR}logs${sep}`;
 process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
 
