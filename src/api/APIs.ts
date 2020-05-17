@@ -9,5 +9,5 @@ import { Namespace } from "socket.io";
 export default function initAPIs(express : Express.Application, configManager : ConfigManager, feedScheduler : FeedScheduler, socketList: Namespace[]) {
     FeedCategoryAPI(express, configManager);
     FeedAPI(express, configManager, feedScheduler, socketList);
-    SettingsAPI(express, configManager.getSettingsManager());
+    SettingsAPI(express, configManager);
 }

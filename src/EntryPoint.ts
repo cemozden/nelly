@@ -6,6 +6,7 @@ const homeDir = platform() === 'win32' ? process.env.HOMEPATH as string : proces
 process.env.CONFIG_DIR = `${homeDir}${sep}.nelly${sep}`;
 process.env.LOGS_DIR = `${process.env.CONFIG_DIR}logs${sep}`;
 process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
+process.env.THEMES_DIR = join(__dirname, 'assets', 'css', 'themes');
 
 import express, { static as expStatic } from "express";
 import { ConfigManager } from "./config/ConfigManager";
@@ -75,7 +76,7 @@ initAPIs(exp, configManager, feedScheduler, socketList);
 console.log('Initialization completed.');
 
 console.log('Initializing ExpressJS Routes..');
-initRoutes(exp, expressURL, systemLocale, configManager.getFeedConfigManager(), configManager.getSettingsManager());
+initRoutes(exp, expressURL, systemLocale, configManager);
 console.log('Initialization completed.');
 
 const numberOfCleanedItems = feedItemArchiveService.cleanFeedItems(systemSettings.archiveCleaningPeriod);

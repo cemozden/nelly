@@ -6,6 +6,7 @@ process.env.APPLICATION_DIR = process.env.PWD;
 process.env.CONFIG_DIR = `${process.env.APPLICATION_DIR}${sep}testresources${sep}`;
 process.env.LOGS_DIR = `${process.env.APPLICATION_DIR}${sep}testresources${sep}logs${sep}`;
 process.env.DATABASE_FOLDER = `${process.env.APPLICATION_DIR}${sep}testresources${sep}`;
+process.env.THEMES_DIR = `${process.env.CONFIG_DIR}${sep}themes${sep}`;
 
 if (!existsSync(process.env.CONFIG_DIR))
     mkdirSync(process.env.CONFIG_DIR);

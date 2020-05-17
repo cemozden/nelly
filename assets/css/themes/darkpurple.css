@@ -1,11 +1,11 @@
 @font-face {
     font-family: coolvetica;
-    src: url(../fonts/coolveticacondensedrg.ttf);
+    src: url(../../fonts/coolveticacondensedrg.ttf);
   }
 
  @font-face {
     font-family: exo2;
-    src: url(../fonts/Exo2.otf);
+    src: url(../../fonts/Exo2.otf);
   }
 
 body {
@@ -250,7 +250,7 @@ a:hover {
     font-size: 12px;
     padding: 5px;
     color: #FFFFFF;
-    background-image: url('../img/th-bg.png');
+    background-image: url('../../img/th-bg.png');
     background-repeat: repeat-x;
 }
 

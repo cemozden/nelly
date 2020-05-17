@@ -1,6 +1,7 @@
 import { SettingsManager } from "./SettingsManager";
 import { LanguageManager } from "./LanguageManager";
 import { FeedConfigManager } from "./FeedConfigManager";
+import { ThemeManager } from "./ThemeManager";
 
 /**
  * The interface that represents management of all configurations of Nelly.
@@ -12,7 +13,8 @@ export interface ConfigManager {
     
     getSettingsManager() : SettingsManager,
     getLanguageManager() : LanguageManager,
-    getFeedConfigManager() : FeedConfigManager
+    getFeedConfigManager() : FeedConfigManager,
+    getThemeManager() : ThemeManager
    
 }
 

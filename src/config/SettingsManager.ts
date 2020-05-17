@@ -9,17 +9,21 @@ export interface SystemSettings {
     language : string,
     archiveCleaningPeriod : Duration,
     serverPort : number,
-    systemLocale : string
+    systemLocale : string,
+    theme : string
 }
 
 export const DEFAULT_SYSTEM_SETTINGS : SystemSettings = {
     language : "en",
     archiveCleaningPeriod : {unit : TimeUnit.MONTHS, value : 6},
     serverPort : 6150,
-    systemLocale : 'en-US'
+    systemLocale : 'en-US',
+    theme : "dark_purple"
 }
 
 export interface SettingsManager {
     getSettings() : SystemSettings,
     writeSettings(newSettings : SystemSettings) : Promise<boolean>,
 } 
+
+export class ConfigFileNotFoundError extends Error {}

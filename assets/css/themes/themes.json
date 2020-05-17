@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Dark Purple",
+        "id" : "dark_purple",
+        "filename" : "darkpurple.css"
+    },
+    {
+        "name": "Aqua Light",
+        "id" : "aqua_light",
+        "filename" : "aqualight.css"
+    }
+]

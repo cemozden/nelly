@@ -6,10 +6,10 @@
   "scripts": {
     "test": "jest --watch",
     "testci": "jest --ci",
-    "compile" : "tsc && node copy-assets.js",
+    "compile": "tsc && node copy-assets.js",
     "start": "env-cmd -f .env.prod node .",
     "start-dev": "tsc && node copy-assets.js && env-cmd -f .env.dev nodemon node .",
-    "package" : "rm -rf dist && NODE_ENV=production pkg build/EntryPoint.js --targets linux,macos,win --output dist/nelly --debug > /home/cemozden/pkg.log"
+    "package": "rm -rf dist && NODE_ENV=production pkg build/EntryPoint.js --targets linux,macos,win --output dist/nelly --debug > /home/cemozden/pkg.log"
   },
   "repository": "https://github.com/cemozden/nelly",
   "author": "cemozden",
@@ -25,6 +25,7 @@
     "@types/nodemon": "^1.19.0",
     "@types/request": "^2.48.4",
     "@types/rimraf": "^2.0.3",
+    "@types/shelljs": "^0.8.8",
     "@types/socket.io": "^2.1.4",
     "@types/winston": "^2.4.4",
     "@types/xml2js": "^0.4.5",

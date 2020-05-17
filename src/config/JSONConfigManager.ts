@@ -8,6 +8,8 @@ import JSONSettingsManager from "./JSONSettingsManager";
 import JSONLanguageManager from "./JSONLanguageManager";
 import JSONFeedConfigManager from "./JSONFeedConfigManager";
 import general_logger from "../utils/Logger";
+import { ThemeManager } from "./ThemeManager";
+import JSONThemeManager from "./JSONThemeManager";
 
 /**
  * A config manager class that is providing Nelly config functionality in JSON format.
@@ -18,10 +20,12 @@ import general_logger from "../utils/Logger";
  * - SettingsManager, A JSON based implementation which is intended to handle general settings of the application.
  * - LanguageManager, A JSON based implementation which is intented to be used for application language.
  * - FeedConfigManager, A JSON based implementation which is intented to be handling feed configurations of users.
+ * - ThemeManager, A JSON based implementation which is intented to be handling UI themes.
  * 
  * @see JSONFeedConfigManager
  * @see JSONLanguageManager
  * @see JSONSettingsManager
+ * @see JSONThemeManager
  * @author cemozden  
  */
 export default class JSONConfigManager implements ConfigManager {
@@ -32,7 +36,8 @@ export default class JSONConfigManager implements ConfigManager {
    
     private readonly SETTINGS_MANAGER : SettingsManager;
     private readonly LANGUAGE_MANAGER : LanguageManager;
-    private readonly FEED_CONFIG_MANAGER : FeedConfigManager
+    private readonly FEED_CONFIG_MANAGER : FeedConfigManager;
+    private readonly THEME_MANAGER : ThemeManager;
 
     /**
      * @throws ConfigPathNotAvailableError
@@ -54,6 +59,7 @@ export default class JSONConfigManager implements ConfigManager {
             this.SETTINGS_MANAGER = new JSONSettingsManager(configPath);
             this.LANGUAGE_MANAGER = new JSONLanguageManager(`${configPathStr}${sep}${this.LANGUAGE_FOLDER_NAME}`);
             this.FEED_CONFIG_MANAGER = new JSONFeedConfigManager(`${configPathStr}${sep}${this.FEED_CONFIG_FOLDER_NAME}`);
+            this.THEME_MANAGER = new JSONThemeManager(process.env.THEMES_DIR as string);
         }
         catch (err) {
             general_logger.error(`[JSONConfigManager] ${err.message}`);
@@ -71,6 +77,10 @@ export default class JSONConfigManager implements ConfigManager {
 
     getSettingsManager() : SettingsManager {
         return this.SETTINGS_MANAGER;
+    }
+
+    getThemeManager() : ThemeManager {
+        return this.THEME_MANAGER;
     }
 
 }

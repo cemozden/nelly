@@ -1,9 +1,8 @@
 import { ExpressSettings } from "./Routes";
-import { FeedConfigManager } from "../config/FeedConfigManager";
 import { http_logger } from "../utils/Logger";
-import { SettingsManager } from "../config/SettingsManager";
+import { ConfigManager } from "../config/ConfigManager";
 
-export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedConfigManager, settingsManager : SettingsManager) {
+export default function Dialogs(exp : ExpressSettings, configManager : ConfigManager) {
     exp.expressObject.get('/addnewfeed_dialog', (req, res) => {
         res.render('addfeed');
     });
@@ -21,7 +20,7 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
             return;
         }
 
-        const feedConfig = feedConfigManager.getFeedConfig(feedId);
+        const feedConfig = configManager.getFeedConfigManager().getFeedConfig(feedId);
         
         res.render('updatefeed', {
             feedConfig
@@ -41,7 +40,7 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
             return;
         }
 
-        const feedConfig = feedConfigManager.getFeedConfig(feedId);
+        const feedConfig = configManager.getFeedConfigManager().getFeedConfig(feedId);
         
         res.render('deletefeed', {
             feedConfig
@@ -50,10 +49,12 @@ export default function Dialogs(exp : ExpressSettings, feedConfigManager : FeedC
 
     exp.expressObject.get('/settings', (req, res) => {
         
-        const systemSettings = settingsManager.getSettings();
+        const systemSettings = configManager.getSettingsManager().getSettings();
+        const themes = configManager.getThemeManager().getThemes();
 
         res.render('settings', {
-            systemSettings
+            systemSettings,
+            themes
         });
     });
 

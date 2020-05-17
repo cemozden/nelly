@@ -1,11 +1,12 @@
-import { SettingsManager, SystemSettings } from "../config/SettingsManager";
+import { SystemSettings } from "../config/SettingsManager";
 import Express from "express";
 import Duration from "../time/Duration";
 import general_logger, { http_logger } from "../utils/Logger";
+import { ConfigManager } from "../config/ConfigManager";
 
 const SECONDS_TO_WAIT_FOR_RESTART = 15;
 
-export default function SettingsAPI(express : Express.Application, settingsManager : SettingsManager) {
+export default function SettingsAPI(express : Express.Application, configManager : ConfigManager) {
     
     express.get('/updatesettings', async (req, res) => {
 
@@ -14,6 +15,7 @@ export default function SettingsAPI(express : Express.Application, settingsManag
         const serverPort : number = parseInt(params.serverPort as string);
         const archiveCleaningPeriod : Duration = params.archiveCleaningPeriod !== undefined ? JSON.parse(params.archiveCleaningPeriod as string) : {};
         const systemLocale = params.systemLocale as string;
+        const theme = params.theme as string;
 
         if (serverPort === undefined || isNaN(serverPort)) {
             const errorMessage =  'Server Port is not a valid number! Please provide a valid number to set server port.';
@@ -42,15 +44,25 @@ export default function SettingsAPI(express : Express.Application, settingsManag
             return;
         }
 
-        const oldSettings = settingsManager.getSettings();
+        if (theme === undefined || theme.length === 0) {
+            const errorMessage =  'Theme id is not a valid theme id! Please provide a valid theme id to update settings.';
+            
+            res.status(400).json({ settingsUpdated : false, message : errorMessage });
+            http_logger.error(`[UpdateSettings] ${errorMessage}, Request params: ${JSON.stringify(params)}`);
+            
+            return;
+        }
+
+        const oldSettings = configManager.getSettingsManager().getSettings();
         const newSettings : SystemSettings = {
             archiveCleaningPeriod,
             language : oldSettings.language,
             serverPort,
-            systemLocale
+            systemLocale,
+            theme
         };
 
-        const settingsUpdated = await settingsManager.writeSettings(newSettings);
+        const settingsUpdated = await configManager.getSettingsManager().writeSettings(newSettings);
 
         if (settingsUpdated) {
 
@@ -68,9 +80,9 @@ export default function SettingsAPI(express : Express.Application, settingsManag
                     process.exit();
                 }, SECONDS_TO_WAIT_FOR_RESTART * 1000);
             }
-
+            const themeObject = configManager.getThemeManager().getThemeById(theme);
             http_logger.info(`[UpdateSettings] System settings updated! Old Settings: ${JSON.stringify(oldSettings)}, New Settings: ${JSON.stringify(newSettings)}`);
-            res.json({ settingsUpdated : true, localeUpdated : oldSettings.systemLocale !== newSettings.systemLocale, portUpdated : oldSettings.serverPort !== newSettings.serverPort, settings : newSettings });
+            res.json({ settingsUpdated : true, localeUpdated : oldSettings.systemLocale !== newSettings.systemLocale, portUpdated : oldSettings.serverPort !== newSettings.serverPort, themeUpdated : oldSettings.theme !== newSettings.theme, theme : themeObject, settings : newSettings });
         }
         else {
             http_logger.error(`[UpdateSettings] An error occured while updating system settings! Request Params: ${JSON.stringify(params)}`);
