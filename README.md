@@ -8,6 +8,7 @@ Nelly is a real time, web based RSS Feeder written in TypeScript that targets to
 * [x] Real time RSS feed fetching that supports RSS 2.0 Specifications.
 * [x] Archiving system to search through previous feeds received in the past.
 * [x] dc and content namespace implementations.
+* [x] 2 UI themes (Dark Purple, Aqua Light) by default.
 * [x] Realtime notifications through Notification API.
 * [x] REST APIs to fetch feeds from different applications.
 * [x] Rich configuration to set the application settings according to the user will.
