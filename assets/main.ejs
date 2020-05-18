@@ -590,7 +590,7 @@
                     $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).addClass('selectedEntry');
                     
                   });
-                  $('#tableOptions').css('display', 'block');
+                  $('#markAsRead').removeAttr('disabled');
                 }
                 else {
                   $('input[id=chbSelectRow]').each(function() {
@@ -600,7 +600,7 @@
                     $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).removeClass('selectedEntry');  
 
                   });
-                  $('#tableOptions').css('display', 'none');
+                  $('#markAsRead').attr('disabled', true);
                 }
 
             });
