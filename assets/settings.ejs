@@ -36,16 +36,14 @@
         </div>
         <div class="form-group">
           <label for="value" class="col-form-label">Theme:</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <div class="col-xs-6">
-                        <select class="custom-select" id="cmbTheme">
-                          <% themes.forEach(theme => { %>
-                            <option value="<%= theme.id %>" <%= systemSettings.theme == theme.id ? 'selected' : '' %>><%= theme.name %></option>
-                          <% }); %>
-                          </select>
-                    </div>
-                </div>
+              <div class="input-group-prepend"> 
+                  <select class="custom-select" id="cmbTheme">
+                      <% themes.forEach(theme => { %>
+                        <option value="<%= theme.id %>" <%= systemSettings.theme == theme.id ? 'selected' : '' %>><%= theme.name %></option>
+                      <% }); %>
+                  </select>
+              </div>
+              <small class="form-text text-muted">Choose your favorite theme.</small>
         </div>
         <div class="form-group">
             <label for="txtSystemLocale" class="col-form-label">System Locale:</label>
