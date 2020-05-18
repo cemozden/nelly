@@ -181,7 +181,7 @@
             }
 
             function convertFeedItemToTableRow(feedItem, index) {
-              const rowHTML = `<tr ${!feedItem.read ? 'class="unreadEntry"' : ''}>
+              const rowHTML = `<tr id="r_${feedItem.itemId}" ${!feedItem.read ? 'class="unreadEntry"' : ''}>
                       <td><input type="checkbox" name="${index}" value="${feedItem.itemId}" id="chbSelectRow" /></td>
                       <td><img src="${!feedItem.read ? './img/green-icon.png' : './img/white-icon.png' }" /></td>
                       <td><a href="#" id="${feedItem.itemId}" title="${feedItem.title}" >${feedItem.title}</a></td>
@@ -527,18 +527,18 @@
             });
 
             $('body').on('click', 'input[id=chbSelectRow]', function() {
-               if ($('#tableOptions').css('display') === 'none' && $('input[id=chbSelectRow]').length > 0) {
-                $('#tableOptions').css('display', 'block');
+               if ($('input[id=chbSelectRow]').length > 0) {
+                $('#markAsRead').removeAttr('disabled');
                }
                else if ($('#chbSelectRow:checked').length === 0) {
-                $('#tableOptions').css('display', 'none');
+                $('#markAsRead').attr('disabled', true);
                }
 
-               const checkBoxIndex = parseInt($(this).attr('name'));
+               const checkBoxIndex = $(this).val();
                if ($(this).prop('checked')) 
-                  $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).addClass('selectedEntry');
+                  $(`#feedSummaryTable tbody tr[id=r_${checkBoxIndex}]`).addClass('selectedEntry');
                else 
-                $(`#feedSummaryTable tbody tr:eq(${checkBoxIndex})`).removeClass('selectedEntry');
+                $(`#feedSummaryTable tbody tr[id=r_${checkBoxIndex}]`).removeClass('selectedEntry');
                
 
             });
