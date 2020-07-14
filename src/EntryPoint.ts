@@ -2,8 +2,10 @@ import { sep, join } from "path";
 import { platform } from "os";
 
 const homeDir = platform() === 'win32' ? process.env.HOMEPATH as string : process.env.HOME as string;
+const isDockerEnvironment = process.env.DOCKER_ENVIRONMENT && process.env.DOCKER_ENVIRONMENT === 'true';
+const dockerConfigDir = '/nelly/resources/';
 
-process.env.CONFIG_DIR = `${homeDir}${sep}.nelly${sep}`;
+process.env.CONFIG_DIR = isDockerEnvironment ? dockerConfigDir : `${homeDir}${sep}.nelly${sep}`;
 process.env.LOGS_DIR = `${process.env.CONFIG_DIR}logs${sep}`;
 process.env.DATABASE_FOLDER = `${process.env.CONFIG_DIR}${sep}`;
 process.env.THEMES_DIR = join(__dirname, 'assets', 'css', 'themes');
@@ -23,7 +25,7 @@ import { FeedItemArchiveService } from "./archive/FeedItemArchiveService";
 import SQLiteFeedItemArchiveService from "./archive/SQLiteFeedItemArchiveService";
 import { TimeUnit } from "./time/TimeUnit";
 
-console.log(`Nelly RSS Feeder, Version: ${process.env.npm_package_version}`);
+console.log(`Nelly RSS Feeder${isDockerEnvironment ? ' on Docker' : ''}, Version: ${process.env.npm_package_version}`);
 general_logger.info('[Nelly] Application started.');
 
 const ASSETS_PATH = join(__dirname, 'assets');
