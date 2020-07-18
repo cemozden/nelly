@@ -19,7 +19,7 @@ WORKDIR /bin/nelly
 
 RUN npm install && npm run-script compile
 
-EXPOSE 80
+EXPOSE 6150
 VOLUME [ "/mnt/nelly" ]
 
 ENTRYPOINT [ "./run.sh" ]
