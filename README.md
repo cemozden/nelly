@@ -12,7 +12,21 @@ Nelly is a real time, web based RSS Feeder written in TypeScript that targets to
 * [x] Realtime notifications through Notification API.
 * [x] REST APIs to fetch feeds from different applications.
 * [x] Rich configuration to set the application settings according to the user will.
+* [x] Docker Image support. 
 ***
+
+## Running Nelly on Docker
+Nelly is available on [Docker Hub](https://hub.docker.com/repository/docker/cemozden/nelly/).
+
+In order to start Docker container,
+* 6150 port must be published.
+* A volume must be created to store db, config etc.
+* Created volume must be mounted to /mnt/nelly
+
+Example
+```
+docker run -d -p 6150:6150 -v "your_volume":/mnt/nelly cemozden/nelly
+```
 
 ## Installation
 ```
