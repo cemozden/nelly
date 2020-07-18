@@ -1,24 +1,25 @@
-FROM node:latest
+FROM node:alpine
 
 LABEL MAINTAINER="Cem Ozden <cem@cemozden.com>"
+
 ENV DOCKER_ENVIRONMENT=true
 
-RUN apt-get update -y
+RUN apk add --update --no-cache python3 make g++ gcc
+RUN mkdir -p /bin/nelly/src && mkdir -p /bin/nelly/assets
 
-RUN mkdir -p /nelly/src && mkdir -p /nelly/assets
+COPY package.json /bin/nelly
+COPY tsconfig.json /bin/nelly
+COPY copy-assets.js /bin/nelly
+COPY .env.prod /bin/nelly
+COPY run.sh /bin/nelly
+COPY ./assets /bin/nelly/assets/
+COPY ./src /bin/nelly/src/
 
-COPY package.json /nelly
-COPY tsconfig.json /nelly
-COPY copy-assets.js /nelly
-COPY .env.prod /nelly
-COPY run.sh /nelly
-
-COPY ./assets /nelly/assets/
-COPY ./src /nelly/src/
-WORKDIR /nelly
+WORKDIR /bin/nelly
 
 RUN npm install && npm run-script compile
 
-EXPOSE 6150
-VOLUME [ "/nelly/resources" ]
+EXPOSE 80
+VOLUME [ "/mnt/nelly" ]
+
 ENTRYPOINT [ "./run.sh" ]

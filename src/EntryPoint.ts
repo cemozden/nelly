@@ -3,7 +3,7 @@ import { platform } from "os";
 
 const homeDir = platform() === 'win32' ? process.env.HOMEPATH as string : process.env.HOME as string;
 const isDockerEnvironment = process.env.DOCKER_ENVIRONMENT && process.env.DOCKER_ENVIRONMENT === 'true';
-const dockerConfigDir = '/nelly/resources/';
+const dockerConfigDir = '/mnt/nelly/';
 
 process.env.CONFIG_DIR = isDockerEnvironment ? dockerConfigDir : `${homeDir}${sep}.nelly${sep}`;
 process.env.LOGS_DIR = `${process.env.CONFIG_DIR}logs${sep}`;
