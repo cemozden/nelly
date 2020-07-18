@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.0
+* Introducing Docker Image for Nelly. Available on Docker Hub.
+* Updated pre style for Aqua Light theme.
+
 ## v1.3.1
 * Fixing a bug that causes not to enable/disable mark as read button when clicking select all checkbox.
 
