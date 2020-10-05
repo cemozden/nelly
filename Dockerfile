@@ -18,6 +18,7 @@ COPY ./src /bin/nelly/src/
 WORKDIR /bin/nelly
 
 RUN npm install && npm run-script compile
+RUN chmod +x /bin/nelly/run.sh
 
 EXPOSE 6150
 VOLUME [ "/mnt/nelly" ]
